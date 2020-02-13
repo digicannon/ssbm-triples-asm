@@ -1,0 +1,46 @@
+; DO NOT DISTRIBUTE
+; SSBM Tripples
+
+@title Triples Data
+
+; Notice on title screen.
+@set 1A218C 60000000
+; "333"
+@set 3EA6C8 33333300
+@set 3EA6CC 00000000
+
+; Zero-out flags.
+@set 002900 00000000
+@set 002904 00000000
+
+; Tournament settings.
+@set 45BF10 00340102 ; Stock mode.
+@set 45BF14 04000A00 ; 4 Stocks & 1.0 damage ratio.
+@set 45BF18 08010100 ; 8min timer & friendly fire.
+@set 45C370 FF0000FF ; Disable items.
+@set 45C380 00000000 ; Disable rumble for all.
+@set 45C384 00000100 ; Deflicker off! Stop making your TV blurry AF.
+@set 45C388 070000B0 ; Legal stages only for Random.
+
+; Unlock characters & stages.
+@set 45BF28 FFFFFFFF
+@set 45BF2C FFFFFFFF
+
+; Disable Trophy Messages (1.02) [Achilles]
+@set 15D984 4E800020
+
+; Skip Result Screen & KO Star Count = Placement (v1.02) [Sham Rock]
+@branch  1A415C
+3803FFFF 2C000004
+40820060 2C0B0020
+41820058 3A400000
+3E808047 62949D58
+3EA0804D 62B5672F
+8E1400A8 8A340001
+2C10004E 4080000C
+9E350001 4800000C
+3A310001 9E350001
+3A520001 2C120004
+41A0FFD8 3A000000
+3A200000 3A800000
+3AA00000 38000000
