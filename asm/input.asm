@@ -2,13 +2,6 @@
 #  Insert at 8006B0DC
 # ====================
 
-.macro branchl reg, address
-    lis \reg, \address @h
-    ori \reg,\reg,\address @l
-    mtctr \reg
-    bctrl
-.endm
-
 .macro backup
     mflr r0
     stw r0, 0x4(r1)
@@ -52,19 +45,6 @@
     lis r3, 0x4330
     stw r3, 0x90(r1)
 
-#lwz r3, AnalogX(PlayerBackup)
-#stw r3, 0x620(PlayerData) #analog X
-#lwz r3, AnalogY(PlayerBackup)
-#stw r3, 0x624(PlayerData) #analog Y
-#lwz r3, CStickX(PlayerBackup)
-#stw r3, 0x638(PlayerData) #cstick X
-#lwz r3, CStickY(PlayerBackup)
-#stw r3, 0x63C(PlayerData) #cstick Y
-#lwz r3, Trigger(PlayerBackup)
-#stw r3, 0x650(PlayerData) #trigger
-#lwz r3, Buttons(PlayerBackup)
-#stw r3, 0x65C(PlayerData) #buttons
-
 #unsigned short button;
 #char stickX;
 #char stickY;
@@ -102,12 +82,12 @@ read_usb.set_buttons:
     stfs itof_result, 0x624(player_data)
     # C-Stick X.
     lbz r3, 0x4(r4)
-    bl stick_correct
+    bl cstick_correct
     bl itof_s
     stfs itof_result, 0x638(player_data)
     # C-Stick Y.
     lbz r3, 0x5(r4)
-    bl stick_correct
+    bl cstick_correct
     bl itof_s
     stfs itof_result, 0x63C(player_data)
     # Trigger.  The greater side is used.
@@ -161,13 +141,35 @@ stick_correct.posfine:
 stick_correct.ret:
     blr
 
+cstick_correct:    
+    extsb r3, r3
+    # Check for deadzone.
+    cmpi 0, r3, 27
+    bgt cstick_correct.notdead
+    cmpi 0, r3, -28
+    blt cstick_correct.notdead
+    li r3, 0
+    blr
+cstick_correct.notdead:
+    # Check for "alive"zone.
+    cmpi 0, r3, 55
+    blt cstick_correct.posfine
+    li r3, 126
+    blr
+cstick_correct.posfine:
+    cmpi 0, r3, -56
+    bgt cstick_correct.ret
+    li r3, -127
+cstick_correct.ret:
+    blr
+
 itof_s:
+    extsb r3, r3
     cmpi 0, r3, 0
     fmr f3, stick_max_float
     blt itof_s.pos
     fmr f3, stick_min_float
 itof_s.pos:
-    extsb r3, r3
     xoris r3, r3, 0x8000
     stw r3, 0x94(r1)
     lfd itof_result, 0x90(r1)
