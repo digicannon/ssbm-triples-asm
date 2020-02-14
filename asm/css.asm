@@ -43,7 +43,8 @@ css_for_1234:
     lis r3, 0x8000
     li r4, 1
     stb r4, 0x2900(r3)
-    # Step 2) Backup player 1-4 selections.
+    # Step 2) Backup player 1-4.
+    # Character, HMN/CPU, stocks, costume.
     lis r3, 0x8048
     lwz r4, 0x0820(r3)
     lwz r5, 0x0844(r3)
@@ -51,9 +52,20 @@ css_for_1234:
     lwz r7, 0x088C(r3)
     lis r3, 0x8000
     stw r4, 0x2910(r3)
-    stw r5, 0x2914(r3)
-    stw r6, 0x2918(r3)
-    stw r7, 0x291C(r3)
+    stw r5, 0x2918(r3)
+    stw r6, 0x2920(r3)
+    stw r7, 0x2928(r3)
+    # Subcolor, handicap, team ID, nametag ID.
+    lis r3, 0x8048
+    lwz r4, 0x0827(r3)
+    lwz r5, 0x084B(r3)
+    lwz r6, 0x086F(r3)
+    lwz r7, 0x0893(r3)
+    lis r3, 0x8000
+    stw r4, 0x2914(r3)
+    stw r5, 0x291C(r3)
+    stw r6, 0x2924(r3)
+    stw r7, 0x292C(r3)
     # Step 3) Copy in P5 and P6 data.    
     lis r3, 0x8048
     li r4, 1
