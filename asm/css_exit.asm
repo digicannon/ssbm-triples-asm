@@ -27,14 +27,17 @@
     cmpi 0, r5, 2
     bne return
 
+    # Check if this CSS was for P5/6.
+    # If not, no data movement required.
     lis r3, 0x8000
     lbz r4, 0x2900(r3)
     cmpli 0, r4, 0
     beq player_data_ok
-    # Set CSS state.
+
+    # Set CSS dirty flag.
     lis r3, 0x8000
-    li r4, 0
-    stb r4, 0x2900(r3)
+    li r4, 1
+    stb r4, 0x2901(r3)
     # Move P1 data to P5.
     lis r3, 0x8048
     lwz r4, 0x0820(r3)
@@ -79,6 +82,10 @@ player_data_ok:
     lis r4, 0x8043
     li r5, 0
 update_preload_table:
+    # Check if disabled.
+    lbz r6, 0x0821(r3)
+    cmpli 0, r6, 3
+    beq update_preload_table.while
     # Store character ID.
     lbz r6, 0x0820(r3)
     extsb r6, r6
@@ -86,7 +93,7 @@ update_preload_table:
     # Store costume ID.
     lbz r6, 0x0823(r3)
     stb r6, 0x2090(r4)
-    # Loop.
+update_preload_table.while:
     addi r3, r3, 0x24
     addi r4, r4, 0x08
     addi r5, r5, 1

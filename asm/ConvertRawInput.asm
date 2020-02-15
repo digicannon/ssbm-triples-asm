@@ -11,6 +11,18 @@
     ori r3, r3, 0x9D30
     lbz r3, 0(r3)
     cmpi 0, r3, 2
+    beq we_are_main_css
+    # We aren't main CSS!
+    lis r3, 0x8000
+    li r4, 0
+    sth r4, 0x2900(r3) # Clear state and dirty flag.
+    b return
+we_are_main_css:
+
+    # Check if CSS state is dirty.
+    lis r3, 0x8000
+    lbz r3, 0x2901(r3)
+    cmpli 0, r3, 0
     bne return
 
     # Check that the CSS is for P5 and P6.

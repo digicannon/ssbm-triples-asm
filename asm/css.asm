@@ -104,11 +104,7 @@ css_for_1234:
     b return
 
 css_for_56:
-    # Keep port 3 and 4 closed.
-    lis r3, 0x8048
-    lis r4, 0x1A03
-    stw r4, 0x0868(r3)
-    stw r4, 0x088C(r3)
+    # Nothing right now!
 
 return:
     lwz	r0, 0x34(sp) # Default code line.
