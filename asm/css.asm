@@ -66,7 +66,14 @@ css_for_1234:
     stw r5, 0x291C(r3)
     stw r6, 0x2924(r3)
     stw r7, 0x292C(r3)
-    # Step 3) Copy in P5 and P6 data.    
+    # CSS team colors for P1 and P2.
+    lis r3, 0x803F
+    lbz r4, 0x0E06(r3)
+    lbz r5, 0x0E2A(r3)
+    lis r3, 0x8000
+    stb r4, 0x2930(r3)
+    stb r5, 0x2931(r3)
+    # Step 3) Copy in P5 and P6 data.
     lis r3, 0x8048
     li r4, 1
     stb r4, 0x08B1(r3) # Set P5 to a HMN.
@@ -75,7 +82,15 @@ css_for_1234:
     lwz r5, 0x08D4(r3) # Load P6, now as a HMN.
     stw r4, 0x0820(r3) # Store P5 in P1.
     stw r5, 0x0844(r3) # Store P6 in P2.
+    # Team colors from 5 and 6 into "1" and "2".
+    lis r3, 0x8000
+    lbz r4, 0x2932(r3)
+    lbz r5, 0x2933(r3)
+    lis r3, 0x803F
+    stb r4, 0x0E06(r3)
+    stb r5, 0x0E2A(r3)
     # Step 4) Reset and close port 3 and 4.
+    lis r3, 0x8048
     lis r4, 0x1A03
     stw r4, 0x0868(r3)
     stw r4, 0x088C(r3)

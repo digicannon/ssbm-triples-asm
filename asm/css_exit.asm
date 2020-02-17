@@ -38,13 +38,13 @@
     lis r3, 0x8000
     li r4, 1
     stb r4, 0x2901(r3)
-    # Move P1 data to P5.
+    # Move "P1" data to P5.
     lis r3, 0x8048
     lwz r4, 0x0820(r3)
     lwz r5, 0x0827(r3)
     stw r4, 0x08B0(r3)
     stw r5, 0x08B7(r3)
-    # Move P2 data to P6.
+    # Move "P2" data to P6.
     lwz r4, 0x0844(r3)
     lwz r5, 0x084B(r3)
     stw r4, 0x08D4(r3)
@@ -53,6 +53,20 @@
     li r4, 1
     stb r4, 0x08B1(r3)
     stb r4, 0x08D5(r3)
+    # Backup "P1" and "P2" CSS team colors for 5 and 6.
+    lis r3, 0x803F
+    lbz r4, 0x0E06(r3)
+    lbz r5, 0x0E2A(r3)
+    lis r3, 0x8000
+    stb r4, 0x2932(r3)
+    stb r5, 0x2933(r3)
+    # Restore CSS team colors for P1 and P2.
+    lis r3, 0x8000
+    lbz r4, 0x2930(r3)
+    lbz r5, 0x2931(r3)
+    lis r3, 0x803F
+    stb r4, 0x0E06(r3)
+    stb r5, 0x0E2A(r3)
     # Bring player 1-4 data back to their proper location.
     # Character, HMN/CPU, stocks, costume.
     lis r3, 0x8000
