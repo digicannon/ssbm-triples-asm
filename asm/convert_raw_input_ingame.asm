@@ -27,6 +27,16 @@
     cmpwi port_number, 4
     bne return
 
+    # First, invalidate the cache for our data.
+    lis r3, 0
+    lis r25, 0x8000
+    ori r25, r25, 0x2A00
+cache_loop:
+    dcbi r3, r25
+    #addi r3, r3, 4
+    #cmpwi r3, 24
+    #blt cache_loop
+
     lis src_ptr, OUR_SRC_ADDR@h
     ori src_ptr, src_ptr, OUR_SRC_ADDR@l
 

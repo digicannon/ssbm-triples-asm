@@ -19,6 +19,7 @@
 # Registers.
 .set player_data,    31
 .set player_slot,    29
+.set player_buttons, 28
 
     backup
 
@@ -35,6 +36,14 @@
     ori r4, r4, 0x2800
     sync
 read_usb:
+    # Load buttons.
+    lwz player_buttons, 0(r4)
+    rlwinm r3, player_buttons, 0, 27, 27
+    cmpli 0, r3, 0
+    beq read_usb.no_z # If no Z, skip Z macros.
+    oris player_buttons, player_buttons, 0x8000 # Set trigger press.
+    ori player_buttons, player_buttons, 0x100   # Set A as pressed.
+read_usb.no_z:
     # Stick X.
     lwz r3, 0x20(r4)
     stw r3, 0x620(player_data)
@@ -50,17 +59,22 @@ read_usb:
     # Trigger.  The greater side is used.
     lbz r3, 0x1C(r4) # Left trigger.
     lbz r5, 0x1D(r4) # Right trigger.
-    cmpl 0, r3, r5
+    # r3 will contain greater float, r5 will contain greater byte.
+    cmpl 0, r5, r3
     bgt read_usb.load_rtrig
+    mr r5, r3
     lwz r3, 0x30(r4)
     b read_usb.store_trig
 read_usb.load_rtrig:
     lwz r3, 0x34(r4)
 read_usb.store_trig:
     stw r3, 0x650(player_data)
+    cmpli 0, r5, 0x1A
+    blt read_usb.no_trig_flag
+    oris player_buttons, player_buttons, 0x8000
+read_usb.no_trig_flag:
     # Finally, store buttons.
-    lwz r3, 0(r4)
-    stw r3, 0x65C(player_data)
+    stw player_buttons, 0x65C(player_data)
 
     b return
 
