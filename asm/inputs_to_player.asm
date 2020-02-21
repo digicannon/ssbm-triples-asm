@@ -69,7 +69,7 @@ read_usb.load_rtrig:
     lwz r3, 0x34(r4)
 read_usb.store_trig:
     stw r3, 0x650(player_data)
-    cmpli 0, r5, 0x1A
+    cmpli 0, r5, 0x4C
     blt read_usb.no_trig_flag
     oris player_buttons, player_buttons, 0x8000
 read_usb.no_trig_flag:
