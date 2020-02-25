@@ -26,6 +26,9 @@
 @set 3EA6C8 33333300
 @set 3EA6CC 00000000
 
+; Enable OSReport print on crash (1.02) [UnclePunch]
+@set 397878 4800020C
+
 ; Tournament settings.
 @set 45BF10 00340102 ; Stock mode.
 @set 45BF14 04000A00 ; 4 Stocks & 1.0 damage ratio.
