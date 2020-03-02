@@ -49,10 +49,6 @@
     lwz r5, 0x084B(r3)
     stw r4, 0x08D4(r3)
     stw r5, 0x08DB(r3)
-    # Make P5 and P6 a CPU type; some tables only go to P4.
-    li r4, 1
-    stb r4, 0x08B1(r3)
-    stb r4, 0x08D5(r3)
     # Backup "P1" and "P2" CSS team colors for 5 and 6.
     lis r3, 0x803F
     lbz r4, 0x0E06(r3)

@@ -75,11 +75,8 @@ css_for_1234:
     stb r5, 0x2931(r3)
     # Step 3) Copy in P5 and P6 data.
     lis r3, 0x8048
-    li r4, 1
-    stb r4, 0x08B1(r3) # Set P5 to a HMN.
-    stb r4, 0x08D5(r3) # Set P6 to a HMN.
-    lwz r4, 0x08B0(r3) # Load P5, now as a HMN.
-    lwz r5, 0x08D4(r3) # Load P6, now as a HMN.
+    lwz r4, 0x08B0(r3) # Load P5.
+    lwz r5, 0x08D4(r3) # Load P6.
     stw r4, 0x0820(r3) # Store P5 in P1.
     stw r5, 0x0844(r3) # Store P6 in P2.
     # Team colors from 5 and 6 into "1" and "2".

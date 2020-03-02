@@ -1,0 +1,12 @@
+playerthink
+    8006B030 checks single button mode
+        0 = not, skips to 8006B070
+        1 = is
+            will run until 8006B06C
+            then skips to 8006B0DC
+
+    // Check inputs to set various flags.
+    // Example: checking Z to set flag for A press.
+    if (single button mode) { 8006B038 to 8006B06C }
+    else /* normal melee */ { 8006B070 to 8006B0DC }
+    8006B0DC and on is actual input handling.
