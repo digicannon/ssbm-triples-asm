@@ -88,34 +88,6 @@
     stw r7, 0x0893(r3)
 player_data_ok:
 
-    lis r3, 0x8048
-    lis r4, 0x8043
-    li r5, 0
-update_preload_table:
-    # Check if disabled.
-    lbz r6, 0x0821(r3)
-    cmpli 0, r6, 3
-    beq update_preload_table.while
-    # Store character ID.
-    lbz r6, 0x0820(r3)
-    extsb r6, r6
-    stw r6, 0x208C(r4)
-    # Store costume ID.
-    lbz r6, 0x0823(r3)
-    stb r6, 0x2090(r4)
-update_preload_table.while:
-    addi r3, r3, 0x24
-    addi r4, r4, 0x08
-    addi r5, r5, 1
-    cmpli 0, r5, 6
-    blt update_preload_table
-
-    # Preload data.
-    lis r3, 0x8001
-    ori r3, r3, 0x8254
-    mtctr r3
-    bctrl
-
 return:
     restore
     li r3, 1

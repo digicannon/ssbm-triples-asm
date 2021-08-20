@@ -2,6 +2,8 @@
 #  Insert at 80263334
 # ====================
 
+.include "triples.s"
+
 .set FALSE, 0
 
     # Don't do anything if not on main CSS (ID 2).
@@ -10,7 +12,7 @@
     lbz r5, 0(r5)
     cmpi 0, r5, 2
     beq we_are_main_css
-    # Make sure CSS state is default.
+    # Make sure CSS state is default if not.
     lis r3, 0x8000
     li r4, FALSE
     stb r4, 0x2900(r3)

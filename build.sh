@@ -1,1 +1,1 @@
-./a2m triples.a2m triples.out && xdg-open triples.out
+../asm2memcard/a2m triples.a2m --dolphin
