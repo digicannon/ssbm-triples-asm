@@ -1,4 +1,4 @@
-.set DEBUG, 0
+.set DEBUG, 1
 
 .set BTN_MASK_START, 0b00010000 << 8
 .set BTN_MASK_L, 0b01000000
