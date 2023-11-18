@@ -69,22 +69,39 @@
 4E800020 7C0802A6
 60000000
 
+# Spoof Controller Plugins (1.02) [Achilles]
+#@set 376BD4 38000000
+#@set 376BDC 38000000
+#@set 376BF0 380000D8
+#@set 376C04 38000001
+# HMN Always Available on CSS (v1.02) [Dan Salvato]
+#@set 260508 38000003
+#@set 261adc 38060000
+
+# Start Vs. With only 1 Player [UnclePunch]
+#@branch  263064
+#7C0802A6 90010004
+#9421FF00 BE810008
+#7C9F2378 3D808015
+#618CCC34 7D8903A6
+#4E800421 88830002
+#2C040000 40820018
+#88830003 2C040000
+#4082000C 2C1F0001
+#48000008 2C1F0002
+#BA810008 80010104
+#38210100 7C0803A6
+#60000000
+
 @file 263334 asm/css.asm
-@file 266B48 asm/css_char_preload.asm
 # Disable writing "no entry" to preload table when loading CSS.
 # Otherwise the CSS for P5/P6 will erase the data for P1-4.
 @set  0174C8 60000000
 @file 1B14B8 asm/css_enter_dirty.asm
 @file 25C00C asm/css_text.asm
+@file 266B48 asm/css_char_preload.asm
 @file 266CE0 asm/css_exit.asm
+
 @file 377600 asm/convert_raw_input_css.asm
-
-# DEBUG disable some audio loads, can fix that last.
-@set 027168 4E800020
-
-#*
-@asm 15BD0
-lis r3, 0x8045
-ori r3, r3, 0xBF20
-blr
-*#
+@file 377988 asm/convert_raw_input_ingame.asm
+@file 06B028 asm/inputs_to_player.asm
