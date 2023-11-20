@@ -93,10 +93,23 @@
 #38210100 7C0803A6
 #60000000
 
+
+
 @file 263334 asm/css.asm
 # Disable writing "no entry" to preload table when loading CSS.
 # Otherwise the CSS for P5/P6 will erase the data for P1-4.
 @set  0174C8 60000000
+# Disable Player card on CSS
+@set  25ee70 ba6100ac
+# Disable CSS Background (Blackout for easier readability)
+@set  2644c0 60000000
+
+# Punkline's Toggleable GObj Mod for Debugging
+@set 390ff8 2C000000
+@set 390ffC 40800024
+@set 390f38 2C000000
+@set 390f3C 40800024
+
 @file 1B14B8 asm/css_enter_dirty.asm
 @file 25C00C asm/css_text.asm
 @file 266B48 asm/css_char_preload.asm
@@ -107,3 +120,5 @@
 @file 06B028 asm/inputs_to_player.asm
 @file 2662D0 asm/dbg_text_writer.asm
 @file 262614 asm/css_text_update.asm
+@file 260bf8 asm/force_set_fox_dbg.asm
+

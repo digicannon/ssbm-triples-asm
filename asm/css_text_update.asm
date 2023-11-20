@@ -6,7 +6,6 @@
 .include "triples_globals.s"
 
 # Get P2's hover (debug mode)
-.set p2_char_select, 0x803F0E2C # 2 bytes off from the sheet, but i watched it happen
 .set reg_stringtable, 31
 
 b END_STR_NAME_TABLE
@@ -76,8 +75,7 @@ END_STR_NAME_TABLE:
 # 0 == Dr Mario, 0xa == Fox, 0x18 == Roy
     lis   r28, p2_char_select @h
     ori   r28, r28, p2_char_select @l
-    lwz   r28, 0(r28)
-    andi. r28, r28, 0xff
+    lbz   r28, 2(r28)
     
     # Make sure it's in bounds
     cmpi  0, r28, 0
