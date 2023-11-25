@@ -1,10 +1,16 @@
 # ====================
-#  Insert at 80260bf8
+#  Insert at 80262614
 # ====================
 # This file is (probably) a misnomer and is used instead to just test CSS
 # But I do frequently do that by forcing Fox
+.include "common.s"
 
-#li  r20, 0x0a
+#li  r11, 0x0a
 
+
+
+
+# restore r3-
 # return
-lfs  f1, 0x000C (r4)
+
+b 0x80001E30
