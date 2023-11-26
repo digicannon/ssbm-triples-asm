@@ -120,4 +120,5 @@
 @file 06B028 asm/inputs_to_player.asm
 @file 2662D0 asm/dbg_text_writer.asm
 @file 262614 asm/css_text_update.asm
+@file 266830 asm/css_load_rescale_ui.asm
 
