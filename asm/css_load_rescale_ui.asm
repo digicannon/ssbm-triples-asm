@@ -3,6 +3,7 @@
 # ====================
 
 .include "common.s"
+.include "triples_globals.s"
 
 # Begin data table
 b END_CONST_TABLE
@@ -15,6 +16,9 @@ blrl
 FP_CONST_ONE_HUNDRED:
 blrl
 .float 20.0
+FP_CONST_ZERO:
+blrl
+.float 0.0
 FP_CONST_ONE:
 blrl
 .float 1.0
@@ -24,6 +28,15 @@ blrl
 FP_CONST_THREE:
 blrl
 .float 3.0
+FP_CONST_FOUR:
+blrl
+.float 4.0
+FP_CONST_FIVE:
+blrl
+.float 5.0
+FP_CONST_SIX:
+blrl
+.float 6.0
 
 FP_CONST_LABEL_POS_Y:
 blrl
@@ -74,6 +87,11 @@ END_CONST_TABLE:
 .set jobj_x30_ptr,       0x804d6cc0 
 .set jobj_x30,           0x810dc540
 .set jobj_x30_5,         0x810ea2a0
+.set jobj_x30_8,         0x810ed820
+.set jobj_x30_8_1,       0x810ed8c0
+.set jobj_x30_8_2,       0x810eda00
+.set jobj_x30_8_3,       0x810edaa0
+.set jobj_x30_8_4,       0x810edb40
 .set jobj_x30_12,        0x810fe0c0
 .set jobj_x30_13,        0x810ff760
 .set jobj_x30_14,        0x81100ae0
@@ -150,7 +168,7 @@ finished_loop:
 
 # Scale card to FP_CONST_... X size
     mr r7, r3
-	li r9, 28 # Number of scale_loop_vars
+	li r9, 32 # Number of scale_loop_vars
 	li r10, 0
 	bl scale_p1_vars
 	mflr r6
@@ -168,6 +186,7 @@ blrl
 	.long 0x810feea0    # Door
 	.long 0x810fe4a0    # Door curved inner anim pt1
 	.long 0x810fe540    # ^ pt2
+	.long 0x810ed8c0    # Team tag
 # P2
     .long 0x810EA3E0    # Rectangle border
     .long 0x810ecb80    # Char portrait
@@ -176,6 +195,7 @@ blrl
 	.long 0x811002a0    # Door
 	.long 0x810ff940    # Door curved inner anim
 	.long 0x810ffb00    # ^ pt2
+	.long 0x810eda00    # Team tag
 # P3
     .long 0x810ea480    # Rectangle border
 	.long 0x810ecca0    # Char portrait
@@ -184,6 +204,7 @@ blrl
 	.long 0x811016c0    # Door
 	.long 0x81100de0    # Door curved inner anim
 	.long 0x81100e80    # ^ pt2
+	.long 0x810edaa0    # Team tag
 # P4
     .long 0x810ea580    # Rectanlge border
     .long 0x810ecd40    # Char portrait
@@ -192,6 +213,7 @@ blrl
 	.long 0x81102a00    # Door
 	.long 0x811020e0    # Door curved inner anim
 	.long 0x81102180    # ^ pt2
+	.long 0x810edb40    # Team tag
 text_label_gobjs:
 blrl
     .long 0x80bd5c88    # P1 Char Label
@@ -232,12 +254,12 @@ finished_card_scale_loop:
 	lfs f9, 0(r9) # const 3.0
 	bl scale_p1_vars
 	mflr r6
-	addi r6, r6, 28 # skip P1 vars
+	addi r6, r6, 32 # skip P1 vars
 	bl FP_CONST_BORDER_POS_X_SHIFT
 	mflr r5
 
 # Init loop counters
-	li r9, 21 # Number of scale_loop_vars
+	li r9, 24 # Number of scale_loop_vars
 	li r10, 0
 translate_card_loop:
     cmp 0, r9, r10
@@ -247,10 +269,10 @@ translate_card_loop:
     lwz r3, 0(r6) # Current JObj
 	lfs f4, 0(r5) # X = Translate amount
 	lfs f5, x_pos_offset(r3) # Current pos
-	cmpi 0, r10, 7 # if we're on P1, no mul
+	cmpi 0, r10, 8 # if we're on P1, no mul
 	blt no_mul
 double_x:
-	cmpi 0, r10, 14
+	cmpi 0, r10, 16
 	bge triple_x # if we're onto P4, triple instead
     fmul f4, f4, f8
 	b no_mul
@@ -371,8 +393,8 @@ finished_card_translate_loop:
 	stfs f2, x_pos_offset(r3)
 
 
-	li r3, 0x8    # class
-	li r4, 1      # idx
+	li r3, 4      # class used for UI in CSS
+	li r4, 2      # idx
 	li r5, 0xff   # prio
 	branchl r12, 0x803901F0 # CreateG
     mr r31, r3
@@ -380,13 +402,71 @@ finished_card_translate_loop:
     li r4, 3      # JOBJ 
 	mr r5, r30    # The Jobj
     branchl r12, 0x80390a70 # InitKind
+    
+	# Store JObj in global
+    load r4, css_p5_border_jobj
+    stw r30, 0(r4)
 
     mr r3, r31
 	load r4, 0x80391070     # GXLink_Common
-    li r5, 1      # Same idx as above
-	li r6, 0xff  # Prio
+    li r5, 2                # Same idx as above
+	li r6, 0xff             # Prio
 	branchl r12, 0x8039069c # Add GxLink
+
+    # Get the TObj of the JObj we just made
+	lwz r3, 0x18(r30) # DObj
+	lwz r3, 0x8(r3)   # MObj
+	lwz r3, 0x8(r3)   # TObj
+
+    # Register the same animation(s) that P1 uses
+	    mr r3, r30
+	    load r4, 0 # AnimJoint
+	    load r5, 0x80f53b1c # MatJoint
+	    li   r6, 0          # ShapeAnimJoint
+	    branchl r12, 0x8036fb5c # HSD_JObjAddAnimAll
+
+	# Attempt to force a (useless?) animation on the rendered JOBJ
+	    #mr r3, r30 # JObj
+	    #li r4, 6
+        #li r5, 0x400,
+	    #load r6, 0x8036410c # HSD_AObjReqAnim
+        #li r7, 1            # Animation frame 1-blue 2-yellow
+	    #branchl r12, 0x80364c08 #HSD_JobjRunAObjCallback
+
+		#load r7, css_p5_color_ctr # global counter for frame testing
+        #li r6, 1
+		#stw r6, 0(r7)
+	    #
+	    #mr r3, r30 # JObj
+	    #branchl r12, 0x80370928 # HSD_JObjAnimAll
+	    #
+	    #mr r3, r30 # JObj
+	    #li r4, 6
+        #li r5, 0x400,
+	    #load r6, 0x8036414c # HSD_AObjStopAnim
+        #li r7, 6
+        #li r8, 0
+        #li r9, 0
+	    #branchl r12, 0x80364c08 #HSD_JobjRunAObjCallback
+
 	
+	# Expiriment to try and force the AOBJ directly to render
+	bl FP_CONST_FOUR
+	mflr r7
+	lfs f1, 0(r7)
+	load r3, 0x8111fd20 # P5's AObj
+	branchl r12, 0x8036410C #HSD_AObjReqAnim
+	mr r3, r30 # JObj
+	branchl r12, 0x80370928 # HSD_JObjAnimAll
+	
+	mr r3, r30 # JObj
+	li r4, 6
+	li r5, 0x400,
+	load r6, 0x8036414c # HSD_AObjStopAnim
+	li r7, 6
+	li r8, 0
+	li r9, 0
+	branchl r12, 0x80364c08 #HSD_JobjRunAObjCallback
 
 # Return / original value
 RETURN:
