@@ -451,7 +451,12 @@ finished_card_translate_loop:
 
 	
 	# Expiriment to try and force the AOBJ directly to render
-	bl FP_CONST_FOUR
+	# 0 - P2 Blue
+	# 1 - P4 Green
+	# 2 - P1 Red
+	# 8 - P3 Yellow
+	# 4 - Army Green
+	bl FP_CONST_TWO
 	mflr r7
 	lfs f1, 0(r7)
 	load r3, 0x8111fd20 # P5's AObj
@@ -467,6 +472,14 @@ finished_card_translate_loop:
 	li r8, 0
 	li r9, 0
 	branchl r12, 0x80364c08 #HSD_JobjRunAObjCallback
+
+# Make P5 Cyan
+    load r3, 0x8111f870
+	li r4, 0x00ff
+	sth r4, 0(r3)
+	li r4, 0xff
+	stb r4, 2(r3)
+	
 
 # Return / original value
 RETURN:
