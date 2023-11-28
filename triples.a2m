@@ -93,15 +93,65 @@
 #38210100 7C0803A6
 #60000000
 
-@file 263334 asm/css.asm
+# Check for pressing start and switching from 1234 to 56 screen.
+#@file 263334 asm/css.asm
 # Disable writing "no entry" to preload table when loading CSS.
 # Otherwise the CSS for P5/P6 will erase the data for P1-4.
-@set  0174C8 60000000
-@file 1B14B8 asm/css_enter_dirty.asm
-@file 25C00C asm/css_text.asm
-@file 266B48 asm/css_char_preload.asm
-@file 266CE0 asm/css_exit.asm
+#@set  0174C8 60000000
+#@file 1B14B8 asm/css_enter_dirty.asm
+#@file 25C00C asm/css_text.asm
+#@file 266B48 asm/css_char_preload.asm
+#@file 266CE0 asm/css_exit.asm
 
-@file 377600 asm/convert_raw_input_css.asm
+#@file 377600 asm/convert_raw_input_css.asm
 @file 377988 asm/convert_raw_input_ingame.asm
 @file 06B028 asm/inputs_to_player.asm
+
+@file 2662D0 asm/UCF Text.asm
+
+#@file 26268C asm/puck_handler.asm
+
+@branch 266B1C
+    7C741B78 3DE08048
+    89EF07C8 2C0F0000
+    4082013C 39E00000
+    3E008047 62109C3C
+    3E40817C 6252F000
+    1E2F0030 7E31802E
+    3A52FFFC 7E7278AE
+    562406B5 40820010
+    56240673 40820020
+    48000048 3A730001
+    2C130011 40810008
+    3A600000 7E7279AE
+    4800001C 3A73FFFF
+    2C130000 40800008
+    3A600011 7E7279AE
+    48000004 38600002
+    3D808002 618C4030
+    7D8903A6 4E800421
+    3A520004 3C80804C
+    2C0F0000 40820008
+    608424EC 2C0F0001
+    40820008 60842458
+    2C0F0002 40820008
+    60842558 2C0F0003
+    40820008 608424C4
+    2C0F0001 41810008
+    80840000 80840000
+    80840000 80840008
+    80840018 80840008
+    8084001C 80840004
+    80840008 1E730004
+    3AA00002 3AC00000
+    3AE00004 7CB298AE
+    2C050020 40800008
+    38A00020 38A5FFE0
+    7CB621AE 7CA5AB96
+    7CB721AE 3AD60001
+    3AF70001 3A730001
+    2C160002 4081FFD0
+    48000004 39EF0001
+    2C0F0004 41A0FEE4
+    48000004 7E83A378
+    808DB610

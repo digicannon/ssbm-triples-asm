@@ -1,0 +1,5 @@
+/a.obj
+/a.out
+*.stackdump
+*.swp
+*~
