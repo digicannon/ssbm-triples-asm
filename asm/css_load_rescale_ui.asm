@@ -39,10 +39,10 @@ blrl
 .float 6.0
 FP_CONST_TWELVE:
 blrl
-.float 12.0
+.float 10.8
 FP_CONST_SIXTEEN:
 blrl
-.float 16.0
+.float 21.0
 
 FP_CONST_LABEL_POS_Y:
 blrl
@@ -413,6 +413,24 @@ finished_card_translate_loop:
 	lfs f4, 0(r7)
 	stfs f4, x_pos_offset(r29)
 
+# Color P5
+    load r3, 0x8111f870
+	li r4, 0xff
+	stb r4, 0(r3)
+	li r4, 0x98
+	stb r4, 1(r3)
+	li r4, 0x26
+	stb r4, 2(r3)
+
+# Color P6
+    load r3, 0x81120d90
+	li r4, 0x98
+	stb r4, 0(r3)
+	li r4, 0x4c
+	stb r4, 1(r3)
+	li r4, 0xe5
+	stb r4, 2(r3)
+
 b RETURN
 
 create_new_char:
@@ -460,11 +478,16 @@ create_new_char:
 	# 1 - P4 Green
 	# 2 - P1 Red
 	# 8 - P3 Yellow
+	# 3 - NPC Gray
 	# 4 - Army Green
-	bl FP_CONST_TWO
+	bl FP_CONST_THREE
 	mflr r7
 	lfs f1, 0(r7)
-	load r3, 0x8111fd20 # P5's AObj
+	lwz r3, 16(sp)   # The jobj from the stack
+	lwz r3, 0x18(r3) # Jobj's DObj
+	lwz r3, 8(r3) # DObj's MObj
+	lwz r3, 8(r3) # MObj's TObj
+	lwz r3, 0x64(r3) # MObj's AObj
 	branchl r12, 0x8036410C #HSD_AObjReqAnim
 	lwz r3, 16(sp) # The jobj from the stack
 	branchl r12, 0x80370928 # HSD_JObjAnimAll
@@ -477,15 +500,6 @@ create_new_char:
 	li r8, 0
 	li r9, 0
 	branchl r12, 0x80364c08 #HSD_JobjRunAObjCallback
-
-# Co#lor P5
-    load r3, 0x8111f870
-	li r4, 0x98
-	stb r4, 0(r3)
-	li r4, 0x4c
-	stb r4, 1(r3)
-	li r4, 0xe5
-	stb r4, 2(r3)
 
 	lwz r3, 16(sp)    # The jobj from the stack as return value
 	mtlr r30          # Restore LR
