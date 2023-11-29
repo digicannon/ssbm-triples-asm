@@ -37,6 +37,12 @@ blrl
 FP_CONST_SIX:
 blrl
 .float 6.0
+FP_CONST_TWELVE:
+blrl
+.float 12.0
+FP_CONST_SIXTEEN:
+blrl
+.float 16.0
 
 FP_CONST_LABEL_POS_Y:
 blrl
@@ -140,6 +146,11 @@ loop:
 found_match:
     nop #nop for BP
 finished_loop:
+	
+# Make some stack room
+	stmw r28, -16(sp) # Save r28 .. r31
+	mr r31, sp        # Backup SP
+	stwu sp, -24(sp)  # Grow stack 6 words
 
 # Hide extra artifacts we don't want anymore, like P1-P4 italics
 .set func_m_set_alpha, 0x80363C2C
@@ -380,75 +391,69 @@ finished_card_translate_loop:
 	stfs f3, x_scale_offset(r3)
 	stfs f4, y_scale_offset(r3)
 
-# This code will probably crash - DEBUG
+# Create P5 & 6
+    bl create_new_char
+    mr r28, r3 # P5 
+    bl create_new_char
+    mr r29, r3 # P6
+
+# Scale P5 & 6
+	bl FP_CONST_SIXTY_SIX
+	mflr r7
+	lfs f4, 0(r7)
+	stfs f4, x_scale_offset(r28)
+	stfs f4, x_scale_offset(r29)
+
+	bl FP_CONST_TWELVE
+	mflr r7
+	lfs f4, 0(r7)
+	stfs f4, x_pos_offset(r28)
+	bl FP_CONST_SIXTEEN
+	mflr r7
+	lfs f4, 0(r7)
+	stfs f4, x_pos_offset(r29)
+
+b RETURN
+
+create_new_char:
+	stmw r30, -8(sp) # Save r30, r31
+    mflr r30         # Backup LR
+	mr r31, sp       # Backup SP
+	stwu sp, -24(sp) # Grow stack 6 words
+
     load r3, 0x80f45128 # The JObj Desc to steal
 	branchl r12, 0x80370E44 # CreateJObj from Desc
-	mr   r30, r3
+	stw r3, 16(sp) # Store JObj on stack
 	lfs  f3, x_pos_offset(r3)
 
 	bl FP_CONST_ONE_HUNDRED
     mflr r4
-	lfs  f2, 0(r4) # 100.0
+	lfs  f2, -8(r4) # 100.0
 	fadd f3, f2, f3
 	stfs f2, x_pos_offset(r3)
-
 
 	li r3, 4      # class used for UI in CSS
 	li r4, 2      # idx
 	li r5, 0xff   # prio
 	branchl r12, 0x803901F0 # CreateG
-    mr r31, r3
+	stw r3, 12(sp) # Store GObj return value to stack
 
-    li r4, 3      # JOBJ 
-	mr r5, r30    # The Jobj
+    li r4, 3      # JOBJ class
+	lwz r5, 16(sp) # The jobj from the stack
     branchl r12, 0x80390a70 # InitKind
-    
-	# Store JObj in global
-    load r4, css_p5_border_jobj
-    stw r30, 0(r4)
 
-    mr r3, r31
+	lwz r3, 12(sp) # Load GObj from stack
 	load r4, 0x80391070     # GXLink_Common
     li r5, 2                # Same idx as above
 	li r6, 0xff             # Prio
 	branchl r12, 0x8039069c # Add GxLink
 
-    # Get the TObj of the JObj we just made
-	lwz r3, 0x18(r30) # DObj
-	lwz r3, 0x8(r3)   # MObj
-	lwz r3, 0x8(r3)   # TObj
-
     # Register the same animation(s) that P1 uses
-	    mr r3, r30
-	    load r4, 0 # AnimJoint
-	    load r5, 0x80f53b1c # MatJoint
-	    li   r6, 0          # ShapeAnimJoint
-	    branchl r12, 0x8036fb5c # HSD_JObjAddAnimAll
-
-	# Attempt to force a (useless?) animation on the rendered JOBJ
-	    #mr r3, r30 # JObj
-	    #li r4, 6
-        #li r5, 0x400,
-	    #load r6, 0x8036410c # HSD_AObjReqAnim
-        #li r7, 1            # Animation frame 1-blue 2-yellow
-	    #branchl r12, 0x80364c08 #HSD_JobjRunAObjCallback
-
-		#load r7, css_p5_color_ctr # global counter for frame testing
-        #li r6, 1
-		#stw r6, 0(r7)
-	    #
-	    #mr r3, r30 # JObj
-	    #branchl r12, 0x80370928 # HSD_JObjAnimAll
-	    #
-	    #mr r3, r30 # JObj
-	    #li r4, 6
-        #li r5, 0x400,
-	    #load r6, 0x8036414c # HSD_AObjStopAnim
-        #li r7, 6
-        #li r8, 0
-        #li r9, 0
-	    #branchl r12, 0x80364c08 #HSD_JobjRunAObjCallback
-
+	lwz r3, 16(sp) # The jobj from the stack
+	load r4, 0 # AnimJoint
+	load r5, 0x80f53b1c # MatJoint
+	li   r6, 0          # ShapeAnimJoint
+	branchl r12, 0x8036fb5c # HSD_JObjAddAnimAll
 	
 	# Expiriment to try and force the AOBJ directly to render
 	# 0 - P2 Blue
@@ -461,10 +466,10 @@ finished_card_translate_loop:
 	lfs f1, 0(r7)
 	load r3, 0x8111fd20 # P5's AObj
 	branchl r12, 0x8036410C #HSD_AObjReqAnim
-	mr r3, r30 # JObj
+	lwz r3, 16(sp) # The jobj from the stack
 	branchl r12, 0x80370928 # HSD_JObjAnimAll
 	
-	mr r3, r30 # JObj
+	lwz r3, 16(sp) # The jobj from the stack
 	li r4, 6
 	li r5, 0x400,
 	load r6, 0x8036414c # HSD_AObjStopAnim
@@ -473,15 +478,26 @@ finished_card_translate_loop:
 	li r9, 0
 	branchl r12, 0x80364c08 #HSD_JobjRunAObjCallback
 
-# Make P5 Cyan
+# Co#lor P5
     load r3, 0x8111f870
-	li r4, 0x00ff
-	sth r4, 0(r3)
-	li r4, 0xff
+	li r4, 0x98
+	stb r4, 0(r3)
+	li r4, 0x4c
+	stb r4, 1(r3)
+	li r4, 0xe5
 	stb r4, 2(r3)
+
+	lwz r3, 16(sp)    # The jobj from the stack as return value
+	mtlr r30          # Restore LR
+	mr sp, r31        # Pop the stack
+	lmw r30, -8(sp)   # Restore r30, r31
+	blrl
 	
 
 # Return / original value
 RETURN:
+	mr sp, r31         # Pop the stack
+	lmw r28, -16(sp)   # Restore r28 .. r31
+
     mr r3, r7
 	lmw	r17, 0x011C(sp)
