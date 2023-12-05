@@ -5,17 +5,29 @@
 .include "common.s"
 .include "triples_globals.s"
 
+b START_CODE
 # Begin data table
-b END_CONST_TABLE
-FP_CONST_NINE_TWO:
+FP_CONST_HALF:
+blrl
+.float 0.5
+FP_CONST_POINT_NINE_TWO:
 blrl
 .float 0.92
-FP_CONST_SIXTY_SIX:
+FP_CONST_POINT_ONE:
+blrl
+.float 0.1
+FP_CONST_POINT_SIX:
+blrl
+.float 0.6
+FP_CONST_POINT_SIX_SIX:
 blrl
 .float 0.66
-FP_CONST_ONE_HUNDRED:
+FP_CONST_POINT_SEVEN:
 blrl
-.float 20.0
+.float 0.7
+FP_CONST_NEG_FIVE:
+blrl
+.float -2.0
 FP_CONST_ZERO:
 blrl
 .float 0.0
@@ -37,12 +49,42 @@ blrl
 FP_CONST_SIX:
 blrl
 .float 6.0
-FP_CONST_TWELVE:
+FP_CONST_EIGHT:
+blrl
+.float 8.0
+FP_CONST_10_45:
+blrl
+.float 10.45
+FP_CONST_TEN_POINT_EIGHT:
 blrl
 .float 10.8
-FP_CONST_SIXTEEN:
+FP_CONST_FIFTEEN:
+blrl
+.float 15.5
+FP_CONST_TWENTY:
+blrl
+.float 20.0
+FP_CONST_20_65:
+blrl
+.float 20.65
+FP_CONST_TWENTY_ONE:
 blrl
 .float 21.0
+FP_CONST_TWENTY_FIVE:
+blrl
+.float 25.7
+FP_CONST_32:
+blrl
+.float 32.0
+FP_CONST_155:
+blrl
+.float 155.0
+FP_CONST_206_5:
+blrl
+.float 206.5
+FP_CONST_255:
+blrl
+.float 255.0
 
 FP_CONST_LABEL_POS_Y:
 blrl
@@ -69,6 +111,9 @@ blrl
 FP_CONST_LABEL_BG_POS_Y:
 blrl
 .float -21
+FP_CONST_LABEL_BG_POS_Y_NEW: # For P5 & 6 (New)
+blrl
+.float -24.0
 FP_CONST_LABEL_BG_POS_X_P1:
 blrl
 .float -25.5
@@ -87,9 +132,168 @@ blrl
 FP_CONST_LABEL_BG_SCALE_X:
 blrl
 .float 0.69
+
+CONST_STR_TRIPLES:
+blrl
+.string "Triples"
 END_CONST_TABLE:
 
+# Begin Function decls
+
+get_rgb_ptr:
+    # R3 is a JObj* and on return contains a pointer to the RGB values
+    # This was written for player portrait background "card's", but may work for other things
+	lwz r3, 0x18(r3)
+	lwz r3, 0x08(r3)
+	lwz r3, 0x1c(r3)
+	lwz r3, 0x08(r3)
+	subi r3, r3, 4
+	blr
+
+set_jobj_alpha:
+    # R3 is a JObj*
+	# f1 is new alpha value
+	# Strictly, this sets the first alpha of the first DObj's first material. Generally, that's what you wnat.
+	lwz r3, 0x18(r3)
+	lwz r3, 0x8(r3)
+	lwz r3, 0xc(r3)
+	stfs f1, 0xc(r3)
+	blr
+
+create_text:
+    # R3 should be a char*
+	# F1 should be X offset
+	# F2 should be Y offset
+	stmw r30, -8(sp) # Save r30, r31
+    mflr r30         # Backup LR
+	mr r31, sp       # Backup SP
+	stwu sp, -30(sp) # Grow stack
+
+    stfs f1, 12(sp)  # Store X on stack
+    stfs f2, 16(sp)  # Store Y on stack
+    stw  r3,  8(sp)  # Store char * on stack
+
+    # Create the text GObj
+    li r3, 0
+	li r4, 0
+	branchl r12, 0x803a6754 # CreateTextGObj
+
+	# Store GObj return on stack
+	stw r3,  20(sp)
+
+    # Set text spacing to TIGHT in GObj
+	li r4, 1
+	stb r4, 0x49(r3)
+	# Set text to center around x
+	li r4,0x1
+	stb r4, 0x4A(r3)
+
+	# Set canvas scaling
+	bl FP_CONST_POINT_ONE
+	mflr r5
+	lfs f1,  0(r5)
+	lwz r3, 20(sp) # GObj
+	stfs f1, 0x24(r3) # X
+	stfs f1, 0x28(r3) # Y
+
+    # Subtext Init
+	lwz r4,  8(sp) # Str char *
+	lfs f1, 12(sp) # X
+	lfs f2, 16(sp) # Y
+	branchl r12, 0x803a6b98 # InitializeSubtext
+
+	# Scale text
+	mr r4, r3  # JObj return from prev call
+	lwz r3, 20(sp) # GObj
+	bl FP_CONST_POINT_SIX
+	mflr r5
+	lfs f1, 0(r5)
+	lfs f2, 0(r5)
+	branchl r12, 0x803a7548 # UpdateSubtextSize
+
+	mtlr r30          # Restore LR
+	mr sp, r31        # Pop the stack
+	lmw r30, -8(sp)   # Restore r30, r31
+	blr
+
+copy_jobj:
+    # R3 should be a JObj* and will contain the copied JObj* as a ret val
+	# NOTE this does not copy animations. You will likely need to not only register,
+	#      but also manually trigger them yourself.
+	stmw r30, -8(sp) # Save r30, r31
+    mflr r30         # Backup LR
+	mr r31, sp       # Backup SP
+	stwu sp, -24(sp) # Grow stack 6 words
+
+    # Create the new JObj
+    lwz r3, 0x84(r3)        # The JObj Desc to steal
+	branchl r12, 0x80370E44 # CreateJObj from Desc
+	stw r3, 16(sp)          # Store JObj on stack
+
+    # Create the GObj
+	li r3, 4      # GObj UI Class. 4, Player is used by CSS for UI.
+	li r4, 0x1   # idx
+	li r5, 0x80   # prio
+	branchl r12, 0x803901F0 # CreateG
+	stw r3, 12(sp) # Store GObj return value to stack
+
+    # Link the two
+    li r4, 4       # JOBJ class
+	lwz r5, 16(sp) # The jobj from the stack
+    branchl r12, 0x80390a70 # InitKind
+
+    # Add a render function
+	lwz r3, 12(sp) # Load GObj from stack
+	load r4, 0x80391070     # TextureDisplay
+    li r5, 0x1             # Same idx as above
+	li r6, 0x80             # Prio
+	branchl r12, 0x8039069c # Add GxLink
+
+	lwz r3, 16(sp)    # The jobj from the stack as return value
+	mtlr r30          # Restore LR
+	mr sp, r31        # Pop the stack
+	lmw r30, -8(sp)   # Restore r30, r31
+	blr
+
+manually_animate_below:
+blrl
+manually_animate:
+    # R3 contains a JObj*, Undefined return value
+	# f1 contains frame number
+	
+	stmw r30, -8(sp) # Save r30, r31
+    mflr r30         # Backup LR
+	mr r31, sp       # Backup SP
+	stwu sp, -24(sp) # Grow stack 6 words
+	
+	# Uses f1 to know the frame number
+	# Requires AObj * since we are manually calling, rather than with JObjRunAObjCallback
+	stw r3, 16(sp)   # Store JObj on stack
+	lwz r3, 0x18(r3) # Jobj's DObj
+	lwz r3, 8(r3)    # DObj's MObj
+	lwz r3, 8(r3)    # MObj's TObj
+	lwz r3, 0x64(r3) # MObj's AObj
+	branchl r12, 0x8036410C # HSD_AObjReqAnim
+
+	lwz r3, 16(sp)          # The jobj from the stack
+	branchl r12, 0x80370928 # HSD_JObjAnimAll
+	
+	lwz r3, 16(sp) # The jobj from the stack
+	li r4, 6
+	li r5, 0x400
+	load r6, 0x8036414c # HSD_AObjStopAnim
+	li r7, 6
+	li r8, 0
+	li r9, 0
+	branchl r12, 0x80364c08 #HSD_JobjRunAObjCallback
+
+	mtlr r30          # Restore LR
+	mr sp, r31        # Pop the stack
+	lmw r30, -8(sp)   # Restore r30, r31
+	blr
+
 # Begin actual code
+START_CODE:
 .set jobj_x30_ptr,       0x804d6cc0 
 .set jobj_x30,           0x810dc540
 .set jobj_x30_5,         0x810ea2a0
@@ -183,7 +387,7 @@ finished_loop:
 	li r10, 0
 	bl scale_p1_vars
 	mflr r6
-	bl FP_CONST_SIXTY_SIX
+	bl FP_CONST_POINT_SIX_SIX
 	mflr r5
 
 b scale_card_loop
@@ -392,121 +596,293 @@ finished_card_translate_loop:
 	stfs f4, y_scale_offset(r3)
 
 # Create P5 & 6
-    bl create_new_char
-    mr r28, r3 # P5 
-    bl create_new_char
-    mr r29, r3 # P6
+    load r3, 0x810ea340 # P1 JObj
+    bl copy_jobj
+    mr r28, r3 # P5 JObj
+	load r3, 0x810ea340 # P1 JObj
+    bl copy_jobj
+    mr r29, r3 # P6 Jobj
 
-# Scale P5 & 6
-	bl FP_CONST_SIXTY_SIX
+# Scale & Move P5 & 6
+	bl FP_CONST_POINT_SIX_SIX
 	mflr r7
 	lfs f4, 0(r7)
 	stfs f4, x_scale_offset(r28)
 	stfs f4, x_scale_offset(r29)
 
-	bl FP_CONST_TWELVE
+	bl FP_CONST_TEN_POINT_EIGHT
 	mflr r7
 	lfs f4, 0(r7)
 	stfs f4, x_pos_offset(r28)
-	bl FP_CONST_SIXTEEN
+	bl FP_CONST_TWENTY_ONE
 	mflr r7
 	lfs f4, 0(r7)
 	stfs f4, x_pos_offset(r29)
 
 # Color P5
-    load r3, 0x8111f870
-	li r4, 0xff
-	stb r4, 0(r3)
-	li r4, 0x98
-	stb r4, 1(r3)
-	li r4, 0x26
-	stb r4, 2(r3)
+	mr r3, r28
+    bl get_rgb_ptr # R3 contains P5 RGB offset
+	load r4, 0xff982600 # P5 Orange
+	stw r4, 0(r3)
+	load r4, 0x2c2c2c00 # Gray for inner line
+	stw r4, 4(r3)
 
 # Color P6
-    load r3, 0x81120d90
-	li r4, 0x98
-	stb r4, 0(r3)
-	li r4, 0x4c
-	stb r4, 1(r3)
-	li r4, 0xe5
-	stb r4, 2(r3)
+	mr r3, r29
+    bl get_rgb_ptr # R3 contains P6 RGB offset
+	load r4, 0x984ce500 # P6 Purple
+	stw r4, 0(r3)
+	load r4, 0x2c2c2c00 # Gray for inner line
+	stw r4, 4(r3)
+
+# Create P5 Player Portrait
+    load r3, 0x810ecae0 # Portrait
+    bl copy_jobj
+    mr r28, r3 # JObj
+	
+	nop
+	nop
+	nop
+	nop
+    # Store JObj in global for use in input loop
+	load r4, css_p5_portrait
+	stw r28, 0(r4)
+
+	# Store starting frame number
+	bl FP_CONST_ONE
+	mflr r3
+	lfs f1, 0(r3)
+	load r4, css_backup_space
+	stfs f1, 0(r4)
+
+	# Scale and move
+	    bl FP_CONST_POINT_SIX_SIX
+	    mflr r7
+	    lfs f4, 0(r7)
+	    stfs f4, x_scale_offset(r28)
+		bl FP_CONST_TEN_POINT_EIGHT
+		mflr r7
+		lfs f4, 0(r7)
+		stfs f4, x_pos_offset(r28)
+	
+	# Register animation and set to frame 2
+        mr r3, r28 # The jobj from the stack
+        load r4, 0x80f47f34 # AnimJoint
+        load r5, 0x80f53b94 # MatJoint
+        li   r6, 0          # ShapeAnimJoint
+        branchl r12, 0x8036fb5c # HSD_JObjAddAnimAll
+        
+        bl FP_CONST_TWO
+        mflr r4
+        lfs f1, 0(r4)
+        mr r3, r28
+        bl manually_animate
+    
+	# Set alpha to unselected mode
+	    mr r3, r28
+		bl FP_CONST_HALF
+		mflr r4
+		lfs f1, 0(r4)
+		bl set_jobj_alpha
+
+# Create P6 Player Portrait
+    load r3, 0x810ecae0 # Portrait
+    bl copy_jobj
+    mr r28, r3 # JObj
+	
+	# Scale and move
+	    bl FP_CONST_POINT_SIX_SIX
+	    mflr r7
+	    lfs f4, 0(r7)
+	    stfs f4, x_scale_offset(r28)
+		bl FP_CONST_TWENTY_ONE
+		mflr r7
+		lfs f4, 0(r7)
+		stfs f4, x_pos_offset(r28)
+	
+	# Register animation and set to frame 2
+        mr r3, r28 # The jobj from the stack
+        load r4, 0x80f47f34 # AnimJoint
+        load r5, 0x80f53b94 # MatJoint
+        li   r6, 0          # ShapeAnimJoint
+        branchl r12, 0x8036fb5c # HSD_JObjAddAnimAll
+        
+        bl FP_CONST_ZERO
+        mflr r4
+        lfs f1, 0(r4)
+        mr r3, r28
+        bl manually_animate
+
+    # Set alpha to unselected mode
+	    mr r3, r28
+		bl FP_CONST_HALF
+		mflr r4
+		lfs f1, 0(r4)
+		bl set_jobj_alpha
+
+# Create P5 Nametag
+    load r3, 0x810ef040 # Text Label BG
+    bl copy_jobj
+    mr r28, r3 # JObj
+	
+	# Scale and move
+		bl FP_CONST_LABEL_BG_SCALE_X
+	    mflr r7
+	    lfs f4, 0(r7)
+	    stfs f4, x_scale_offset(r28)
+
+		bl FP_CONST_LABEL_BG_SCALE_Y
+	    mflr r7
+	    lfs f4, 0(r7)
+	    stfs f4, y_scale_offset(r28)
+
+		bl FP_CONST_FIFTEEN
+		mflr r7
+		lfs f4, 0(r7)
+		stfs f4, x_pos_offset(r28)
+
+	    bl FP_CONST_LABEL_BG_POS_Y_NEW
+		mflr r7
+		lfs f4, 0(r7)
+		stfs f4, y_pos_offset(r28)
+
+# Create P6 Nametag
+    load r3, 0x810ef040 # Text Label BG
+    bl copy_jobj
+    mr r28, r3 # JObj
+	
+	# Scale and move
+		bl FP_CONST_LABEL_BG_SCALE_X
+	    mflr r7
+	    lfs f4, 0(r7)
+	    stfs f4, x_scale_offset(r28)
+
+		bl FP_CONST_LABEL_BG_SCALE_Y
+	    mflr r7
+	    lfs f4, 0(r7)
+	    stfs f4, y_scale_offset(r28)
+
+		bl FP_CONST_TWENTY_FIVE
+		mflr r7
+		lfs f4, 0(r7)
+		stfs f4, x_pos_offset(r28)
+
+	    bl FP_CONST_LABEL_BG_POS_Y_NEW
+		mflr r7
+		lfs f4, 0(r7)
+		stfs f4, y_pos_offset(r28)
+
+# Create P5 HMN tag
+    load r3, 0x81103400 # HMN tag
+    bl copy_jobj
+    mr r28, r3 # JObj
+
+	# Scale and move
+	    bl FP_CONST_POINT_SIX_SIX
+	    mflr r7
+	    lfs f4, 0(r7)
+	    stfs f4, x_scale_offset(r28)
+
+		bl FP_CONST_10_45
+		mflr r7
+		lfs f4, 0(r7)
+		stfs f4, x_pos_offset(r28)
+
+	    bl FP_CONST_NEG_FIVE
+	    mflr r7
+	    lfs f4, 0(r7)
+	    stfs f4, y_pos_offset(r28)
+
+	# Color and modify
+		mr r3, r28
+		lwz r3, 0x18(r3) # DObj
+		lwz r3, 0x04(r3) # Next DObj
+		lwz r3, 0x08(r3) # MObj
+		lwz r3, 0x1c(r3) # Texp
+		lwz r3, 0x08(r3) # Idk
+		subi r3, r3, 8
+		load r4, 0xEECB0000 # HMN Yellow
+		stw r4, 0(r3)
+	
+		# Hide text italics
+		li r4, 0
+		mr r3, r28
+		lwz r3, 0x18(r3) # DObj
+		lwz r3, 0x04(r3) # Next DObj
+		lwz r3, 0x04(r3) # Next DObj
+		lwz r3, 0x0c(r3) # PObj
+		sth r4, 0xe(r3) # n_display
+
+# Create P6 HMN tag
+    load r3, 0x81103400 # HMN tag
+    bl copy_jobj
+    mr r28, r3 # JObj
+
+	# Scale and move
+	    bl FP_CONST_POINT_SIX_SIX
+	    mflr r7
+	    lfs f4, 0(r7)
+	    stfs f4, x_scale_offset(r28)
+
+		bl FP_CONST_20_65
+		mflr r7
+		lfs f4, 0(r7)
+		stfs f4, x_pos_offset(r28)
+
+	    bl FP_CONST_NEG_FIVE
+	    mflr r7
+	    lfs f4, 0(r7)
+	    stfs f4, y_pos_offset(r28)
+
+	# Color and modify
+		mr r3, r28
+		lwz r3, 0x18(r3) # DObj
+		lwz r3, 0x04(r3) # Next DObj
+		lwz r3, 0x08(r3) # MObj
+		lwz r3, 0x1c(r3) # Texp
+		lwz r3, 0x08(r3) # Idk
+		subi r3, r3, 8
+		load r4, 0xEECB0000 # HMN Yellow
+		stw r4, 0(r3)
+	
+		# Hide text italics
+		li r4, 0
+		mr r3, r28
+		lwz r3, 0x18(r3) # DObj
+		lwz r3, 0x04(r3) # Next DObj
+		lwz r3, 0x04(r3) # Next DObj
+		lwz r3, 0x0c(r3) # PObj
+		sth r4, 0xe(r3) # n_display
+
+# Create P5 Text Label
+	bl CONST_STR_TRIPLES
+	mflr r3
+	bl FP_CONST_155
+	mflr r5
+	lfs f1, 0(r5) # X offset
+	bl FP_CONST_206_5
+	mflr r5
+	lfs f2, 0(r5) # Y Offset
+	bl create_text
+	
+# Create P6 Text Label
+	bl CONST_STR_TRIPLES
+	mflr r3
+	bl FP_CONST_255
+	mflr r5
+	lfs f1, 0(r5) # X offset
+	bl FP_CONST_206_5
+	mflr r5
+	lfs f2, 0(r5) # Y Offset
+	bl create_text
+
+# Load function addr into global
+bl manually_animate_below
+mflr r3
+load r4, css_manually_animate
+stw r3, 0(r4)
 
 b RETURN
-
-create_new_char:
-	stmw r30, -8(sp) # Save r30, r31
-    mflr r30         # Backup LR
-	mr r31, sp       # Backup SP
-	stwu sp, -24(sp) # Grow stack 6 words
-
-    load r3, 0x80f45128 # The JObj Desc to steal
-	branchl r12, 0x80370E44 # CreateJObj from Desc
-	stw r3, 16(sp) # Store JObj on stack
-	lfs  f3, x_pos_offset(r3)
-
-	bl FP_CONST_ONE_HUNDRED
-    mflr r4
-	lfs  f2, -8(r4) # 100.0
-	fadd f3, f2, f3
-	stfs f2, x_pos_offset(r3)
-
-	li r3, 4      # class used for UI in CSS
-	li r4, 2      # idx
-	li r5, 0xff   # prio
-	branchl r12, 0x803901F0 # CreateG
-	stw r3, 12(sp) # Store GObj return value to stack
-
-    li r4, 3      # JOBJ class
-	lwz r5, 16(sp) # The jobj from the stack
-    branchl r12, 0x80390a70 # InitKind
-
-	lwz r3, 12(sp) # Load GObj from stack
-	load r4, 0x80391070     # GXLink_Common
-    li r5, 2                # Same idx as above
-	li r6, 0xff             # Prio
-	branchl r12, 0x8039069c # Add GxLink
-
-    # Register the same animation(s) that P1 uses
-	lwz r3, 16(sp) # The jobj from the stack
-	load r4, 0 # AnimJoint
-	load r5, 0x80f53b1c # MatJoint
-	li   r6, 0          # ShapeAnimJoint
-	branchl r12, 0x8036fb5c # HSD_JObjAddAnimAll
-	
-	# Expiriment to try and force the AOBJ directly to render
-	# 0 - P2 Blue
-	# 1 - P4 Green
-	# 2 - P1 Red
-	# 8 - P3 Yellow
-	# 3 - NPC Gray
-	# 4 - Army Green
-	bl FP_CONST_THREE
-	mflr r7
-	lfs f1, 0(r7)
-	lwz r3, 16(sp)   # The jobj from the stack
-	lwz r3, 0x18(r3) # Jobj's DObj
-	lwz r3, 8(r3) # DObj's MObj
-	lwz r3, 8(r3) # MObj's TObj
-	lwz r3, 0x64(r3) # MObj's AObj
-	branchl r12, 0x8036410C #HSD_AObjReqAnim
-	lwz r3, 16(sp) # The jobj from the stack
-	branchl r12, 0x80370928 # HSD_JObjAnimAll
-	
-	lwz r3, 16(sp) # The jobj from the stack
-	li r4, 6
-	li r5, 0x400,
-	load r6, 0x8036414c # HSD_AObjStopAnim
-	li r7, 6
-	li r8, 0
-	li r9, 0
-	branchl r12, 0x80364c08 #HSD_JobjRunAObjCallback
-
-	lwz r3, 16(sp)    # The jobj from the stack as return value
-	mtlr r30          # Restore LR
-	mr sp, r31        # Pop the stack
-	lmw r30, -8(sp)   # Restore r30, r31
-	blrl
-	
 
 # Return / original value
 RETURN:
