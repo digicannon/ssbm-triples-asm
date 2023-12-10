@@ -16,6 +16,9 @@ blrl
 FP_CONST_POINT_ONE:
 blrl
 .float 0.1
+FP_CONST_POINT_THREE:
+blrl
+.float 0.3
 FP_CONST_POINT_SIX:
 blrl
 .float 0.6
@@ -28,6 +31,7 @@ blrl
 FP_CONST_NEG_FIVE:
 blrl
 .float -2.0
+FP_CONST_0:
 FP_CONST_ZERO:
 blrl
 .float 0.0
@@ -58,9 +62,13 @@ blrl
 FP_CONST_TEN_POINT_EIGHT:
 blrl
 .float 10.8
-FP_CONST_FIFTEEN:
+FP_CONST_15:
+blrl
+.float 15
+FP_CONST_15_5:
 blrl
 .float 15.5
+FP_CONST_20:
 FP_CONST_TWENTY:
 blrl
 .float 20.0
@@ -164,10 +172,11 @@ create_text:
     # R3 should be a char*
 	# F1 should be X offset
 	# F2 should be Y offset
+	# R3 return value is the GObj *
 	stmw r30, -8(sp) # Save r30, r31
     mflr r30         # Backup LR
 	mr r31, sp       # Backup SP
-	stwu sp, -30(sp) # Grow stack
+	stwu sp, -34(sp) # Grow stack
 
     stfs f1, 12(sp)  # Store X on stack
     stfs f2, 16(sp)  # Store Y on stack
@@ -201,16 +210,21 @@ create_text:
 	lfs f1, 12(sp) # X
 	lfs f2, 16(sp) # Y
 	branchl r12, 0x803a6b98 # InitializeSubtext
+	stw r3, 24(sp) # Store the JObj of the subtext
 
 	# Scale text
 	mr r4, r3  # JObj return from prev call
 	lwz r3, 20(sp) # GObj
 	bl FP_CONST_POINT_SIX
 	mflr r5
-	lfs f1, 0(r5)
-	lfs f2, 0(r5)
+	bl FP_CONST_POINT_SIX
+	mflr r6
+	lfs f1, 0(r5) # X Scaling
+	lfs f2, 0(r6) # Y Scaling
 	branchl r12, 0x803a7548 # UpdateSubtextSize
 
+	lwz r3, 20(sp) # GObj* return value
+	lwz r4, 24(sp) # JObj* alt return value
 	mtlr r30          # Restore LR
 	mr sp, r31        # Pop the stack
 	lmw r30, -8(sp)   # Restore r30, r31
@@ -260,6 +274,7 @@ blrl
 manually_animate:
     # R3 contains a JObj*, Undefined return value
 	# f1 contains frame number
+	# Undefined return value
 	
 	stmw r30, -8(sp) # Save r30, r31
     mflr r30         # Backup LR
@@ -290,6 +305,108 @@ manually_animate:
 	mtlr r30          # Restore LR
 	mr sp, r31        # Pop the stack
 	lmw r30, -8(sp)   # Restore r30, r31
+	blr
+
+open_doors_export:
+blrl
+open_doors: # 800026e8 ish
+    # R3 contains the id of the player [1-6]
+	# Undefined return value
+	stmw r27, -24(sp) # Save r27-r31
+    mflr r30         # Backup LR
+	mr r31, sp       # Backup SP
+	stwu sp, -40(sp) # Grow stack 
+	
+	b open_door_begin_exec
+	open_door_parents_arr:
+	blrl
+	.long 0x810feea0    # P1
+	.long 0x810fe4a0
+	.long 0x810fe540
+	.long 0x811002a0    # P2
+	.long 0x810ff940
+	.long 0x810ffb00
+	.long 0x811016c0    # P3
+	.long 0x81100de0
+	.long 0x81100e80
+	.long 0x81102a00    # P4
+	.long 0x811020e0
+	.long 0x81102180
+
+	open_door_begin_exec:
+        bl open_door_parents_arr
+	    mflr r28 # Array start
+
+        subi r3, r3, 1   # Change to 0 index
+		mulli r3, r3, 12 # Convert to offset
+        add r28, r3, r28 # Struct addr in arr
+	    #slw r3, r3, 2   
+        
+	    lwz r29, 0(r28)    # Parent JObj
+	    lwz r29, 0x10(r29) # Child
+		bl FP_CONST_15
+	    mflr r4
+	    lfs f2, 0(r4) # End frame
+		bl open_door_inner
+
+	    lwz r29, 0x08(r29) # Sibling
+		bl FP_CONST_15
+	    mflr r4
+	    lfs f2, 0(r4) # End frame
+		bl open_door_inner
+		addi r28, r28, 4
+		lwz r29, 0(r28)    # Door inner pt1
+
+		# Inner door things need a later frame
+		bl FP_CONST_20
+	    mflr r4
+	    lfs f2, 0(r4) # End frame
+		bl open_door_inner
+		addi r28, r28, 4
+		lwz r29, 0(r28)    # Door inner pt2
+		bl FP_CONST_20
+	    mflr r4
+	    lfs f2, 0(r4) # End frame
+		bl open_door_inner
+
+		b open_door_return
+
+	open_door_inner:
+        # Arg1 r28 - jobj
+		# Arg2 f2 - end frame
+
+	    mflr r27 # Save LR (again)
+        # Start the opening animation
+	    lwz r3, 0x18(r29) # Jobj's DObj
+	    lwz r3, 8(r3)    # DObj's MObj
+	    lwz r3, 8(r3)    # MObj's TObj
+	    lwz r3, 0x64(r3) # MObj's AObj
+		stw r3, 28(sp) # AObj Copy
+
+		fmr f1, f2
+	    branchl r12, 0x8036532C #AObjSetEndFrame
+	    
+		lwz r3, 28(sp) # AObj copy
+        bl FP_CONST_POINT_SIX_SIX
+	    mflr r4
+	    lfs f1, 0(r4)
+	    branchl r12, 0x8036530C # AObjSetRate
+
+		lwz r3, 28(sp) # AObj copy
+	    bl FP_CONST_0
+	    mflr r4
+	    lfs f1, 0(r4) # 1.0
+	    branchl r12, 0x8036410C # HSD_AObjReqAnim
+
+	    mr r3, r29 # JObj again
+	    branchl r12, 0x80370928 # HSD_JObjAnimAll
+		mtlr r27 # Outer LR
+		blrl
+
+open_door_return:
+	mtlr r30           # Restore LR
+	mr sp, r31         # Pop the stack
+	lmw r27, -24(sp)   # Restore r27-r31
 	blr
 
 # Begin actual code
@@ -640,10 +757,6 @@ finished_card_translate_loop:
     bl copy_jobj
     mr r28, r3 # JObj
 	
-	nop
-	nop
-	nop
-	nop
     # Store JObj in global for use in input loop
 	load r4, css_p5_portrait
 	stw r28, 0(r4)
@@ -736,7 +849,7 @@ finished_card_translate_loop:
 	    lfs f4, 0(r7)
 	    stfs f4, y_scale_offset(r28)
 
-		bl FP_CONST_FIFTEEN
+		bl FP_CONST_15_5
 		mflr r7
 		lfs f4, 0(r7)
 		stfs f4, x_pos_offset(r28)
@@ -864,6 +977,13 @@ finished_card_translate_loop:
 	mflr r5
 	lfs f2, 0(r5) # Y Offset
 	bl create_text
+    
+	# Store GObj in global for use in input loop
+	load r5, css_p5_text_gobj
+	stw r3, 0(r5)
+	# Store Subtext in global for use in input loop
+	load r5, css_p5_text_subtext
+	stw r4, 0(r5)
 	
 # Create P6 Text Label
 	bl CONST_STR_TRIPLES
@@ -876,10 +996,15 @@ finished_card_translate_loop:
 	lfs f2, 0(r5) # Y Offset
 	bl create_text
 
-# Load function addr into global
+# Load function addrs into global
 bl manually_animate_below
 mflr r3
 load r4, css_manually_animate
+stw r3, 0(r4)
+
+bl open_doors_export
+mflr r3
+load r4, css_open_doors
 stw r3, 0(r4)
 
 b RETURN

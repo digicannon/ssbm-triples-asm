@@ -8,12 +8,6 @@
 .set port_number, 24
 .set usb_data, 3
 
-# Debug start P5 door animation
-#load r3, 0x804C1FAC
-#lwz r4, 0(r3)
-#lwz r5, 4(r3)
-#rwlimi r4, r4, 0, 0x100, 0x100
-
     # Don't do anything if not on main CSS (ID 2).
     lis r3, 0x8047
     ori r3, r3, 0x9D30

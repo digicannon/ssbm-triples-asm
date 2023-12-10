@@ -13,6 +13,10 @@
     blt return
 
     # Read "raw" USB data converted by the game.
+	# Commenting out this temporarily while I work on CSS because Noah says he can relocate it, and it's clobbering my exec memory.
+	b return
+
+
     subi r4, r4, 4 # Make P5 offset 0.
     mulli r4, r4, 0x44 # Multiply by size of input struct.
     oris r4, r4, 0x8000

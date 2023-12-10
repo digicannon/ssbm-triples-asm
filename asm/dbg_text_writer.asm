@@ -104,7 +104,7 @@ b end
 TEXTPROPERTIES:
 blrl
 .float -300		  # x offset
-.float 14		  # y offset
+.float -10		  # y offset
 .float 0.7		  # REG_TextGObj scaling
 .float 0.1		  # canvas scaling
 # Begin Colors
@@ -118,8 +118,8 @@ blrl
 
 TEXT:
 blrl
-.string "Triples    INDEV     Triples    INDEV"
-# 80001da4 is where literal starts (inline)
+#.string "Triples    INDEV     Triples    INDEV"
+.string ""
 .align 2
 
 #**************************************************#

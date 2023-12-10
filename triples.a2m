@@ -6,17 +6,19 @@
 # ===== MEMORY MAP =====
 #* 002800 - 0028FF reserved for P5/P6 ConvertRawInput output.
             CSS State, CSS Dirty Flag, unused, unused *#
-@set 002900 00000000
-#           unused, unused, unused, unused
-@set 002904 00000000
-@set 002910 00000000 # P1 CSS data.
-@set 002914 00000000
-@set 002918 00000000 # P2 CSS data.
-@set 00291C 00000000
-@set 002920 00000000 # P3 CSS data.
-@set 002924 00000000
-@set 002928 00000000 # P4 CSS data.
-@set 00292C 00000000
+# Noah says I can remove this whole memory map because he's going to relocate it
+#@set 002900 00000000
+##           unused, unused, unused, unused
+#@set 002904 00000000
+#@set 002910 00000000 # P1 CSS data.
+#@set 002914 00000000
+#@set 002918 00000000 # P2 CSS data.
+#@set 00291C 00000000
+#@set 002920 00000000 # P3 CSS data.
+#@set 002924 00000000
+#@set 002928 00000000 # P4 CSS data.
+#@set 00292C 00000000
+# End removal
 # 002A00 - 002AFF reserved for USB data.
 # ======================
 
@@ -117,9 +119,8 @@
 
 @file 377600 asm/convert_raw_input_css.asm
 @file 377988 asm/convert_raw_input_ingame.asm
-@file 06B028 asm/inputs_to_player.asm
+#@file 06B028 asm/inputs_to_player.asm
 @file 2662D0 asm/dbg_text_writer.asm
 @file 262614 asm/css_text_update.asm
 @file 266830 asm/css_load_rescale_ui.asm
-#@file 25ec68 asm/css_p5_animate.asm
 

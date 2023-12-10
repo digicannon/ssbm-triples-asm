@@ -9,7 +9,11 @@ TRIPLES_GLOBALS_TABLE:
 .set css_backup_space, css_p5_border_jobj + 4
 .set css_end_backup_space, css_run_once + 64
 .set css_manually_animate, css_end_backup_space + 4
-.set css_p5_portrait, css_manually_animate + 4
+.set css_open_doors, css_manually_animate + 4
+.set css_p5_portrait, css_open_doors + 4
+.set css_p5_text_gobj, css_p5_portrait + 4
+.set css_p5_text_subtext, css_p5_text_gobj + 4
+.set css_p1_door, css_p5_text_subtext + 4
 
 .set p2_char_select, 0x803F0E2C # 2 bytes off from the sheet, but i watched it happen
 
