@@ -7,11 +7,13 @@ TRIPLES_GLOBALS_TABLE:
 .set css_run_once, dbg_subtext_str + 4
 .set css_p5_border_jobj, css_run_once + 4
 .set css_backup_space, css_p5_border_jobj + 4
+.set css_backup_dbg, css_backup_space + 4 #803fa40c
 .set css_end_backup_space, css_run_once + 64
 .set css_manually_animate, css_end_backup_space + 4
 .set css_open_doors, css_manually_animate + 4
 .set css_p5_portrait, css_open_doors + 4
-.set css_p5_text_gobj, css_p5_portrait + 4
+.set css_p5_door_jobj, css_p5_portrait + 4
+.set css_p5_text_gobj, css_p5_door_jobj + 4
 .set css_p5_text_subtext, css_p5_text_gobj + 4
 .set css_p1_door, css_p5_text_subtext + 4
 

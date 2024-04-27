@@ -408,18 +408,12 @@ run_debug_code:
 	rlwinm. r4, r4, 0, 0x17, 0x17 # Check if A was prev not pressed
 	bne RETURN
 
-	nop
-	nop
-	li r3, 1
+	li r3, 5
 	load r4, css_open_doors
 	lwz r4, 0(r4)
 	mtctr r4
 	bctrl
 
-	nop
-	nop
-	nop
-	
 	b RETURN
 
 # Debug code - DOES NOT RUN - keeping for reference

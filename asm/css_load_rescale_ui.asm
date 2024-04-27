@@ -7,27 +7,9 @@
 
 b START_CODE
 # Begin data table
-FP_CONST_HALF:
+FP_CONST_NEG_2_3:
 blrl
-.float 0.5
-FP_CONST_POINT_NINE_TWO:
-blrl
-.float 0.92
-FP_CONST_POINT_ONE:
-blrl
-.float 0.1
-FP_CONST_POINT_THREE:
-blrl
-.float 0.3
-FP_CONST_POINT_SIX:
-blrl
-.float 0.6
-FP_CONST_POINT_SIX_SIX:
-blrl
-.float 0.66
-FP_CONST_POINT_SEVEN:
-blrl
-.float 0.7
+.float -2.3
 FP_CONST_NEG_FIVE:
 blrl
 .float -2.0
@@ -35,12 +17,39 @@ FP_CONST_0:
 FP_CONST_ZERO:
 blrl
 .float 0.0
+FP_CONST_POINT_ONE:
+blrl
+.float 0.1
+FP_CONST_POINT_THREE:
+blrl
+.float 0.3
+FP_CONST_HALF:
+blrl
+.float 0.5
+FP_CONST_POINT_SIX:
+blrl
+.float 0.6
+FP_CONST_0_64:
+FP_CONST_POINT_SIX_FOUR:
+blrl
+.float 0.64
+FP_CONST_0_66:
+FP_CONST_POINT_SIX_SIX:
+blrl
+.float 0.66
+FP_CONST_POINT_SEVEN:
+blrl
+.float 0.7
+FP_CONST_POINT_NINE_TWO:
+blrl
+.float 0.92
 FP_CONST_ONE:
 blrl
 .float 1.0
 FP_CONST_TWO:
 blrl
 .float 2.0
+FP_CONST_3:
 FP_CONST_THREE:
 blrl
 .float 3.0
@@ -56,6 +65,12 @@ blrl
 FP_CONST_EIGHT:
 blrl
 .float 8.0
+FP_CONST_10:
+blrl
+.float 10.0
+FP_CONST_11:
+blrl
+.float 10.65
 FP_CONST_10_45:
 blrl
 .float 10.45
@@ -84,6 +99,10 @@ blrl
 FP_CONST_32:
 blrl
 .float 32.0
+FP_CONST_50:
+FP_CONST_FIFTY:
+blrl
+.float 50.0
 FP_CONST_155:
 blrl
 .float 155.0
@@ -275,12 +294,12 @@ manually_animate:
     # R3 contains a JObj*, Undefined return value
 	# f1 contains frame number
 	# Undefined return value
-	
+
 	stmw r30, -8(sp) # Save r30, r31
     mflr r30         # Backup LR
 	mr r31, sp       # Backup SP
 	stwu sp, -24(sp) # Grow stack 6 words
-	
+
 	# Uses f1 to know the frame number
 	# Requires AObj * since we are manually calling, rather than with JObjRunAObjCallback
 	stw r3, 16(sp)   # Store JObj on stack
@@ -292,7 +311,7 @@ manually_animate:
 
 	lwz r3, 16(sp)          # The jobj from the stack
 	branchl r12, 0x80370928 # HSD_JObjAnimAll
-	
+
 	lwz r3, 16(sp) # The jobj from the stack
 	li r4, 6
 	li r5, 0x400
@@ -315,23 +334,28 @@ open_doors: # 800026e8 ish
 	stmw r27, -24(sp) # Save r27-r31
     mflr r30         # Backup LR
 	mr r31, sp       # Backup SP
-	stwu sp, -40(sp) # Grow stack 
-	
+	stwu sp, -40(sp) # Grow stack
+
 	b open_door_begin_exec
 	open_door_parents_arr:
 	blrl
-	.long 0x810feea0    # P1
+	.long 0x810feea0    # P1 Door (x30_12_1_2)
 	.long 0x810fe4a0
 	.long 0x810fe540
-	.long 0x811002a0    # P2
+	.long 0x811002a0    # P2 Door
 	.long 0x810ff940
 	.long 0x810ffb00
-	.long 0x811016c0    # P3
+	.long 0x811016c0    # P3 Door
 	.long 0x81100de0
 	.long 0x81100e80
-	.long 0x81102a00    # P4
+	.long 0x81102a00    # P4 Door
 	.long 0x811020e0
 	.long 0x81102180
+	.long 0x81136e80    # P5 Door
+	#.long 0x81102a00    # P4 Door (debug)
+	.long 0x810fe4a0    # P1 inner (debug)
+	.long 0x810fe540    # P1 inner (debug)
+
 
 	open_door_begin_exec:
         bl open_door_parents_arr
@@ -340,27 +364,27 @@ open_doors: # 800026e8 ish
         subi r3, r3, 1   # Change to 0 index
 		mulli r3, r3, 12 # Convert to offset
         add r28, r3, r28 # Struct addr in arr
-	    #slw r3, r3, 2   
-        
+	    #slw r3, r3, 2
+
 	    lwz r29, 0(r28)    # Parent JObj
-	    lwz r29, 0x10(r29) # Child
+	    lwz r29, 0x10(r29) # Child (Door pt1)
 		bl FP_CONST_15
 	    mflr r4
 	    lfs f2, 0(r4) # End frame
 		bl open_door_inner
 
-	    lwz r29, 0x08(r29) # Sibling
+	    lwz r29, 0x08(r29) # Sibling (Door pt 2)
 		bl FP_CONST_15
 	    mflr r4
 	    lfs f2, 0(r4) # End frame
 		bl open_door_inner
+
+		# Inner door curved things
 		addi r28, r28, 4
 		lwz r29, 0(r28)    # Door inner pt1
-
-		# Inner door things need a later frame
-		bl FP_CONST_20
+		bl FP_CONST_20 # Inner door things need a later frame
 	    mflr r4
-	    lfs f2, 0(r4) # End frame
+	    lfs f2, 0(r4)  # End frame
 		bl open_door_inner
 		addi r28, r28, 4
 		lwz r29, 0(r28)    # Door inner pt2
@@ -380,12 +404,12 @@ open_doors: # 800026e8 ish
 	    lwz r3, 0x18(r29) # Jobj's DObj
 	    lwz r3, 8(r3)    # DObj's MObj
 	    lwz r3, 8(r3)    # MObj's TObj
-	    lwz r3, 0x64(r3) # MObj's AObj
+	    lwz r3, 0x64(r3) # TObj's AObj
 		stw r3, 28(sp) # AObj Copy
 
 		fmr f1, f2
 	    branchl r12, 0x8036532C #AObjSetEndFrame
-	    
+
 		lwz r3, 28(sp) # AObj copy
         bl FP_CONST_POINT_SIX_SIX
 	    mflr r4
@@ -411,7 +435,7 @@ open_door_return:
 
 # Begin actual code
 START_CODE:
-.set jobj_x30_ptr,       0x804d6cc0 
+.set jobj_x30_ptr,       0x804d6cc0
 .set jobj_x30,           0x810dc540
 .set jobj_x30_5,         0x810ea2a0
 .set jobj_x30_8,         0x810ed820
@@ -436,8 +460,8 @@ START_CODE:
 .set jobj_x30_16_4_1,    0x81104ca0
 .set known_flags,       0x20000208
 .set func_text_update_subtext_pos, 0x803a746c
-.set func_jobj_remove,             0x80371370  
-.set func_jobj_remove_anim_all,    0x8036f6b4 
+.set func_jobj_remove,             0x80371370
+.set func_jobj_remove_anim_all,    0x8036f6b4
 .set func_jobj_set_flags,          0x80371d00
 .set func_jobj_hide,               func_jobj_set_flags
 .set func_dobj_set_flags,          0x8035DDB8
@@ -467,7 +491,7 @@ loop:
 found_match:
     nop #nop for BP
 finished_loop:
-	
+
 # Make some stack room
 	stmw r28, -16(sp) # Save r28 .. r31
 	mr r31, sp        # Backup SP
@@ -650,13 +674,13 @@ finished_card_translate_loop:
 	fmr f1, f9
 	lis r4, 0 # Subtext Idx
 	branchl r12, func_text_update_subtext_pos
-    
+
 	addi r28, r28, 4
     lwz r3, 0(r28)  # P3 Label GObj ptr
 	fmr f1, f10
 	lis r4, 0 # Subtext Idx
 	branchl r12, func_text_update_subtext_pos
-	
+
 	addi r28, r28, 4
     lwz r3, 0(r28)  # P4 Label GObj ptr
 	fmr f1, f11
@@ -666,7 +690,7 @@ finished_card_translate_loop:
 # Translate and scale text backgrounds
 	bl text_background_jobjs
 	mflr r28
-	
+
 	bl FP_CONST_LABEL_BG_POS_Y
     mflr r3
 	lfs f2, 0(r3) # Label BG Y Pos
@@ -690,7 +714,7 @@ finished_card_translate_loop:
     mflr r3
 	lfs f11, 0(r3) # P4 Label BG X Pos
 
-    
+
 	lwz r3, 0x0(r28) # P1 BG JObj
 	stfs f8, x_pos_offset(r3)
 	stfs f2, y_pos_offset(r3)
@@ -756,7 +780,7 @@ finished_card_translate_loop:
     load r3, 0x810ecae0 # Portrait
     bl copy_jobj
     mr r28, r3 # JObj
-	
+
     # Store JObj in global for use in input loop
 	load r4, css_p5_portrait
 	stw r28, 0(r4)
@@ -769,7 +793,7 @@ finished_card_translate_loop:
 	stfs f1, 0(r4)
 
 	# Scale and move
-	    bl FP_CONST_POINT_SIX_SIX
+	    bl FP_CONST_0_64
 	    mflr r7
 	    lfs f4, 0(r7)
 	    stfs f4, x_scale_offset(r28)
@@ -777,20 +801,20 @@ finished_card_translate_loop:
 		mflr r7
 		lfs f4, 0(r7)
 		stfs f4, x_pos_offset(r28)
-	
+
 	# Register animation and set to frame 2
         mr r3, r28 # The jobj from the stack
         load r4, 0x80f47f34 # AnimJoint
         load r5, 0x80f53b94 # MatJoint
         li   r6, 0          # ShapeAnimJoint
         branchl r12, 0x8036fb5c # HSD_JObjAddAnimAll
-        
+
         bl FP_CONST_TWO
         mflr r4
         lfs f1, 0(r4)
         mr r3, r28
         bl manually_animate
-    
+
 	# Set alpha to unselected mode
 	    mr r3, r28
 		bl FP_CONST_HALF
@@ -802,9 +826,9 @@ finished_card_translate_loop:
     load r3, 0x810ecae0 # Portrait
     bl copy_jobj
     mr r28, r3 # JObj
-	
+
 	# Scale and move
-	    bl FP_CONST_POINT_SIX_SIX
+	    bl FP_CONST_0_64
 	    mflr r7
 	    lfs f4, 0(r7)
 	    stfs f4, x_scale_offset(r28)
@@ -812,14 +836,14 @@ finished_card_translate_loop:
 		mflr r7
 		lfs f4, 0(r7)
 		stfs f4, x_pos_offset(r28)
-	
+
 	# Register animation and set to frame 2
         mr r3, r28 # The jobj from the stack
         load r4, 0x80f47f34 # AnimJoint
         load r5, 0x80f53b94 # MatJoint
         li   r6, 0          # ShapeAnimJoint
         branchl r12, 0x8036fb5c # HSD_JObjAddAnimAll
-        
+
         bl FP_CONST_ZERO
         mflr r4
         lfs f1, 0(r4)
@@ -837,7 +861,7 @@ finished_card_translate_loop:
     load r3, 0x810ef040 # Text Label BG
     bl copy_jobj
     mr r28, r3 # JObj
-	
+
 	# Scale and move
 		bl FP_CONST_LABEL_BG_SCALE_X
 	    mflr r7
@@ -863,7 +887,7 @@ finished_card_translate_loop:
     load r3, 0x810ef040 # Text Label BG
     bl copy_jobj
     mr r28, r3 # JObj
-	
+
 	# Scale and move
 		bl FP_CONST_LABEL_BG_SCALE_X
 	    mflr r7
@@ -884,6 +908,73 @@ finished_card_translate_loop:
 		mflr r7
 		lfs f4, 0(r7)
 		stfs f4, y_pos_offset(r28)
+
+# Create P5 Text Label
+	bl CONST_STR_TRIPLES
+	mflr r3
+	bl FP_CONST_155
+	mflr r5
+	lfs f1, 0(r5) # X offset
+	bl FP_CONST_206_5
+	mflr r5
+	lfs f2, 0(r5) # Y Offset
+	bl create_text
+
+	# Store GObj in global for use in input loop
+	load r5, css_p5_text_gobj
+	stw r3, 0(r5)
+	# Store Subtext in global for use in input loop
+	load r5, css_p5_text_subtext
+	stw r4, 0(r5)
+
+# Create P6 Text Label
+	bl CONST_STR_TRIPLES
+	mflr r3
+	bl FP_CONST_255
+	mflr r5
+	lfs f1, 0(r5) # X offset
+	bl FP_CONST_206_5
+	mflr r5
+	lfs f2, 0(r5) # Y Offset
+	bl create_text
+
+
+# Create P5 Doors
+    load r3, 0x810feea0  # P1 Door
+    bl copy_jobj
+	load r7, css_p5_door_jobj
+	stw r3, 0(r7) # P5 Door 0x81136e80
+
+	# Register animation from P1's door
+	load r4, 0x80f485ec # AnimJoint
+	load r5, 0x80f53f9c # MatJoint
+	li   r6, 0          # ShapeAnimJoint
+	#branchl r12, 0x8036fb5c # HSD_JObjAddAnimAll
+	branchl r12, 0x8036FA10 # HSD_JObjAddAnim
+
+	# Debug code for easy bp
+	load r7, begin_triples_globals
+	load r4, 0xc0ffeeee
+	stw r4, 0(r7)
+
+	# Restore door jobj back
+	load r7, css_p5_door_jobj
+	lwz r3, 0(r7) # P5 Door 0x81136e80
+
+	# Scale and move
+		bl FP_CONST_POINT_SIX_SIX
+		mflr r7
+		lfs f4, 0(r7)
+		stfs f4, x_scale_offset(r3)
+
+		bl FP_CONST_11
+		mflr r7
+		lfs f4, 0(r7)
+		stfs f4, x_pos_offset(r3)
+		bl FP_CONST_NEG_2_3
+		mflr r7
+		lfs f4, 0(r7)
+		stfs f4, y_pos_offset(r3)
 
 # Create P5 HMN tag
     load r3, 0x81103400 # HMN tag
@@ -916,7 +1007,7 @@ finished_card_translate_loop:
 		subi r3, r3, 8
 		load r4, 0xEECB0000 # HMN Yellow
 		stw r4, 0(r3)
-	
+
 		# Hide text italics
 		li r4, 0
 		mr r3, r28
@@ -957,7 +1048,7 @@ finished_card_translate_loop:
 		subi r3, r3, 8
 		load r4, 0xEECB0000 # HMN Yellow
 		stw r4, 0(r3)
-	
+
 		# Hide text italics
 		li r4, 0
 		mr r3, r28
@@ -967,34 +1058,6 @@ finished_card_translate_loop:
 		lwz r3, 0x0c(r3) # PObj
 		sth r4, 0xe(r3) # n_display
 
-# Create P5 Text Label
-	bl CONST_STR_TRIPLES
-	mflr r3
-	bl FP_CONST_155
-	mflr r5
-	lfs f1, 0(r5) # X offset
-	bl FP_CONST_206_5
-	mflr r5
-	lfs f2, 0(r5) # Y Offset
-	bl create_text
-    
-	# Store GObj in global for use in input loop
-	load r5, css_p5_text_gobj
-	stw r3, 0(r5)
-	# Store Subtext in global for use in input loop
-	load r5, css_p5_text_subtext
-	stw r4, 0(r5)
-	
-# Create P6 Text Label
-	bl CONST_STR_TRIPLES
-	mflr r3
-	bl FP_CONST_255
-	mflr r5
-	lfs f1, 0(r5) # X offset
-	bl FP_CONST_206_5
-	mflr r5
-	lfs f2, 0(r5) # Y Offset
-	bl create_text
 
 # Load function addrs into global
 bl manually_animate_below
