@@ -88,25 +88,61 @@
 @set 02BBD4 4800001C
 
 # Punkline's Toggleable GObj Mod for Debugging
-#@set 390ff8 2C000000
-#@set 390ffC 40800024
-#@set 390f38 2C000000
-#@set 390f3C 40800024
+@set 390ff8 2C000000
+@set 390ffC 40800024
+@set 390f38 2C000000
+@set 390f3C 40800024
 
 # ====================================
 
+# ==========
 # Input.
+# ==========
 
 @file 377988 asm/convert_raw_input_for_usb.asm
 @file 377998 asm/convert_raw_input_menu.asm
 @file 06B028 asm/inputs_to_player.asm
 
+# ==========
 # CSS.
+# ==========
 
 @file 263334 asm/css.asm
 @file 266CE0 asm/css_exit.asm
 
+@file 25C00C asm/css_text.asm
+#@file 2662D0 asm/dbg_text_writer.asm
+@file 262614 asm/css_text_update.asm
+@file 266830 asm/css_load_rescale_ui.asm
+
+# Set Team tag hitboxes for Kyle's Sick CSS (KSCSS)
+@set 3F0E18 C1F00000 # P1 [-30, -25.5]
+@set 3F0E1C C1CC0000
+@set 3F0E3C C1A00000 # P2 [-20, -15.5]
+@set 3F0E40 C1780000
+@set 3F0E60 C1180000 # P3 [-9.5, -5.5]
+@set 3F0E64 C0B00000
+@set 3F0E84 00000000 # P4 [0, 4.75]
+@set 3F0E88 40980000
+# Set CPU tag hitboxes
+@set 3F0E10 C20C0000 # P1 [-35, -31]
+@set 3F0E14 C1F80000
+@set 3F0E34 C1C4CCCD # P2 [-24.6, -20.9]
+@set 3F0E38 C1A73333
+@set 3F0E58 C16CCCCD # P3 [-14.8, -11]
+@set 3F0E5C C1300000
+@set 3F0E7C C0900000 # P4 [-4.5, -0.5]
+@set 3F0E80 BF000000
+
+# Remove the KO Stars rendering
+@set 25d22c 3ba00000
+
+# Disable Rules Menu from CSS
+@set 2616d4 c03f000c
+
+# ==========
 # In game.
+# ==========
 
 @file 16E510 asm/neutral_spawn.asm
 

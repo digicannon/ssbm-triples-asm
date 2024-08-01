@@ -15,12 +15,18 @@ blrl
 FP_CONST_0:
 blrl
 .float 0.0
+FP_CONST_0_5:
+FP_CONST_HALF:
+blrl
+.float 0.5
 FP_CONST_0_1:
 blrl
 .float 0.6
 FP_CONST_1:
+FP_CONST_ONE:
 blrl
 .float 1.0
+FP_CONST_2:
 FP_CONST_TWO:
 blrl
 .float 2.0
@@ -81,6 +87,12 @@ FP_CONST_LABEL_BG_SCALE_X:
 blrl
 .float 0.69
 
+BG_COLOR_TABLE:
+blrl # Are these values right?
+.long 0xE54C4CFF # Red
+.long 0x4B4CE5FF # Blue
+.long 0x00B200FF # Green
+
 STR_NAME_TABLE:
 # Do not remove these nop(s). They are for alignment and the string table will break without them.
 blrl
@@ -96,11 +108,11 @@ blrl
 .align 4, 0
 .string "Yoshi"
 .align 4, 0
-.string "Donkey Kong"
+.string "DK"
 .align 4, 0
-.string "Cpt. Falcon"
+.string "Falcon"
 .align 4, 0
-.string "Ganondorf"
+.string "Ganon"
 .align 4, 0
 .string "Falco"
 .align 4, 0
@@ -108,7 +120,7 @@ blrl
 .align 4, 0
 .string "Ness"
 .align 4, 0
-.string "Ice Climbers"
+.string "Wobblers"
 .align 4, 0
 .string "Kirby"
 .align 4, 0
@@ -118,17 +130,17 @@ blrl
 .align 4, 0
 .string "Link"
 .align 4, 0
-.string "Young Link"
+.string "smol"
 .align 4, 0
 .string "Pichu"
 .align 4, 0
 .string "Pikachu"
 .align 4, 0
-.string "JigglyPuff"
+.string "Puff"
 .align 4, 0
 .string "Mewtwo"
 .align 4, 0
-.string "Mr Game & Watch"
+.string "Mr G"
 .align 4, 0
 .string "Marth"
 .align 4, 0
@@ -145,55 +157,105 @@ BEGIN_CHAR_ID_TABLE:
 
 blrl
 .byte 0x15 # Dr Mario
-.byte 0x05
+.byte 0x01 #r
+.byte 0x02 #g
+.byte 0x03 #b
 .byte 0x08 # Mario
-.byte 0x05
+.byte 0x00 #r
+.byte 0x03 #g
+.byte 0x04 #b
 .byte 0x07 # Luigi
-.byte 0x04
+.byte 0x03 #r
+.byte 0x02 #b
+.byte 0x00 #g
 .byte 0x05 # Bowser
-.byte 0x04 
+.byte 0x1
+.byte 0x2
+.byte 0x0
 .byte 0x0c # Peach
-.byte 0x05 
+.byte 0x0
+.byte 0x3
+.byte 0x4
 .byte 0x11 # Yoshi
-.byte 0x06
+.byte 0x1
+.byte 0x2
+.byte 0x0
 .byte 0x01 # Donkey Kong
-.byte 0x05
+.byte 0x2
+.byte 0x3
+.byte 0x4
 .byte 0x00 # Cpt Falcon
-.byte 0x06
+.byte 0x2
+.byte 0x5
+.byte 0x4
 .byte 0x18 # Gannon
-.byte 0x05
+.byte 0x1
+.byte 0x2
+.byte 0x3
 .byte 0x13 # Falco
-.byte 0x04
+.byte 0x1
+.byte 0x2
+.byte 0x3
 .byte 0x02 # Fox
-.byte 0x04
+.byte 0x1
+.byte 0x2
+.byte 0x3
 .byte 0x0b # Ness
-.byte 0x04
+.byte 0x0
+.byte 0x2
+.byte 0x3
 .byte 0x0e # Ice Climbers
-.byte 0x04
+.byte 0x3
+.byte 0x0
+.byte 0x1
 .byte 0x04 # Kirby
-.byte 0x06
+.byte 0x3
+.byte 0x2
+.byte 0x4
 .byte 0x10 # Samus
-.byte 0x05
+.byte 0x0
+.byte 0x4
+.byte 0x3
 .byte 0x12 # Zelda
-.byte 0x05
+.byte 0x1
+.byte 0x2
+.byte 0x3
 .byte 0x06 # Link
-.byte 0x05
+.byte 0x1
+.byte 0x2
+.byte 0x0
 .byte 0x14 # Young Link
-.byte 0x05
+.byte 0x1
+.byte 0x2
+.byte 0x0
 .byte 0x17 # Pichu
-.byte 0x04
+.byte 0x1
+.byte 0x2
+.byte 0x3
 .byte 0x0d # Pikachu
-.byte 0x04
+.byte 0x1
+.byte 0x2
+.byte 0x3
 .byte 0x0f # Jigglypuff
-.byte 0x05
+.byte 0x1
+.byte 0x2
+.byte 0x3
 .byte 0x0a # Mewtwo
-.byte 0x04
+.byte 0x1
+.byte 0x2
+.byte 0x3
 .byte 0x03 # Game and Watch
-.byte 0x04
+.byte 0x1
+.byte 0x2
+.byte 0x3
 .byte 0x09 # Marth
-.byte 0x05
+.byte 0x1
+.byte 0x0
+.byte 0x2
 .byte 0x16 # Roy
-.byte 0x05
+.byte 0x1
+.byte 0x2
+.byte 0x3
 .align 4
 END_CHAR_ID_TABLE:
 
@@ -208,7 +270,30 @@ convert_css_to_external_id:
 	mr r31, sp       # Backup SP
 	stwu sp, -16(sp)  # Grow stack
 
-	mulli r3, r3, 2 # table entries are 2b each
+	mulli r3, r3, 4 # table entries are 5b each
+	bl BEGIN_CHAR_ID_TABLE
+	mflr r4         # the table itself
+	add r4, r4, r3
+	lbz r3, 0(r4)
+
+	mtlr r30          # Restore LR
+	mr sp, r31        # Pop the stack
+	lmw r30, -8(sp)   # Restore r30, r31
+	blr
+
+color_to_costume_id:
+	# R3 should be the css_id
+	# R4 should be the color, 0=red 1=blue 2=green
+	# R3 on return will be the (local) costume id
+	# - Clobbers r3, r4
+	stmw r30, -8(sp) # Save r30, r31
+    mflr r30         # Backup LR
+	mr r31, sp       # Backup SP
+	stwu sp, -16(sp)  # Grow stack
+
+	mulli r3, r3, 4 # table entries are 5b each
+	addi r3, r3, 1  # skip the first 2 bytes
+	add r3, r3, r4  # get color offset
 	bl BEGIN_CHAR_ID_TABLE
 	mflr r4         # the table itself
 	add r4, r4, r3
@@ -317,18 +402,12 @@ VALID_SELECTION:
 	blr
 
 BEGIN_CODE:
-
-    # Set alpha to 0.5 or 1 depending if character is selected
-	# (Not dependent on keypress, just use existing state)
-
-
 	# Check if we're P1 (so it only runs once per frame)
 p1:
 	lbz r3, 4(r31)
 	cmpi 0, r3, 1
 	bne p2
 
-		b p1_update_frame
 		# Check if P1 actually has a character selected
 	    load r3, 0x803F0E08 # P1 char select data
 	    lbz r3, 3(r3)
@@ -365,11 +444,34 @@ p1_update_frame:
 	    bl int_to_float
 
 		# Now apply costume
+		# First check if team mode is active:
+		load r9, 0x804807C8 # Team mode flag
+		lbz r9, 0(r9)
+		cmpi 0, r9, 0
 		fmr f3, f1 # Char frame ID
+		beq p1_update_costume
+
+		# else Team mode!
+	    load r3, 0x803F0E06 # P1 char select data
+	    lbz r4, 0(r3) # Which team
+
+	    load r3, 0x803F0E08 # P1 char select data
+	    lbz r3, 3(r3)
+		bl color_to_costume_id
+	    bl int_to_float
+		
+		b p1_animate_costume
+
+
+p1_update_costume:
+		# No team mode, just do costume:
 	    load r3, 0x803F0E08 # P1 char select data
 	    lbz r3, 1(r3)
 	    bl int_to_float # f1 contains costume id
 	    
+p1_animate_costume:
+	    load r3, 0x803F0E08 # P1 char select data
+	    lbz r3, 1(r3)
 		bl FP_CONST_30
 		mflr r3
 		lfs f2, 0(r3) # 30
@@ -379,10 +481,45 @@ p1_update_frame:
         # Set frame
         load r3, css_p5_portrait # (P5 portrait JObj*) *
 	    lwz r3, 0(r3)
-	    load r4, css_manually_animate # Load function addr from globals
-	    lwz r4, 0(r4)
-	    mtctr r4
+		mr r4, r3 # Calc DObj*
+		lwz r4, 0x18(r4) # First DObj
+	    load r5, css_manually_animate # Load function addr from globals
+	    lwz r5, 0(r5)
+	    mtctr r5
         bctrl
+
+		# Update P1 background color
+		# Easy TODO to save instructions, combine this logic / store register state
+		# for previous team check
+		load r9, 0x804807C8 # Team mode flag
+		lbz r9, 0(r9)
+		cmpi 0, r9, 0
+		beq p1_orange_background
+
+		# Team mode!
+	    load r3, 0x803F0E06 # P1 char select data
+	    lbz r4, 0(r3) # Which team: R B G
+		bl BG_COLOR_TABLE
+	    mflr r5
+		mulli r4, r4, 4
+		add r5, r5, r4
+		lwz r4, 0(r5) # R4 contains corresponding team color
+
+		b set_p1_background
+p1_orange_background:
+		# No team mode
+		load r4, 0xff982600 # P5 Orange
+
+set_p1_background:
+		load r3, css_p5_bg
+		lwz r3, 0(r3)  # R3 contains P5 BG JObj*
+		# Get RGB ptr
+		lwz r3, 0x18(r3)
+		lwz r3, 0x08(r3)
+		lwz r3, 0x1c(r3)
+		lwz r3, 0x08(r3)
+		subi r3, r3, 4
+		stw r4, 0(r3)
 
 		# Update text for current character
         load r3, css_p5_text_gobj
@@ -392,68 +529,184 @@ p1_update_frame:
 	    load r5, 0x803F0E08 # P1 char select data
 	    lbz r5, 3(r5) # CSS ID
 		bl set_css_text
+	    
+		# Check if actually selected or hovering
+		load r3, 0x81119ec0
+		lbz r3, 5(r3)
+		cmpi 0, r3, 0
+		beq p1_opaque
+		# else 
+			bl FP_CONST_0_5
+			mflr r4
+			b set_p1_alpha
+p1_opaque:
+		bl FP_CONST_1
+		mflr r4
+set_p1_alpha:
+		# Set alpha based on above
+        load r3, css_p5_portrait # (P5 portrait JObj*) *
+	    lwz r3, 0(r3)
+		lfs f1, 0(r4) # f1 alpha value
+		# Set alpha for job
+			lwz r3, 0x18(r3)
+			lwz r3, 0x8(r3)
+			lwz r3, 0xc(r3)
+			stfs f1, 0xc(r3)
 
 
 p2:
-run_debug_code:
-	b RETURN
-
-	# Check if P1 A button is pressed
-	load r3, 0x804C1FAC # Controller 1 Data
-	lwz r4, 0(r3)
-	rlwinm. r4, r4, 0, 0x17, 0x17 # Check if A
-	beq RETURN
-
-	# Check previous frame was 0
-	load r3, 0x804C1FB0 # Controller 1 Data Prev Frame
-	lwz r4, 0(r3)
-	rlwinm. r4, r4, 0, 0x17, 0x17 # Check if A was prev not pressed
+	# r31 should be unmodified by us, and should contain player
+	lbz r3, 4(r31)
+	cmpi 0, r3, 2
 	bne RETURN
 
-	li r3, 5
-	load r4, css_open_doors
-	lwz r4, 0(r4)
-	mtctr r4
+	# Check if P2 actually has a character selected
+	load r3, 0x803F0E2C # P2 char select data
+	lbz r3, 3(r3)
+	cmpi 0, r3, 0x19
+	bne p2_update_frame # 0x19 is after the end of the CSS
+
+	# Else, nothing selected
+		# Set hidden flag for JObj
+		load r3, css_p6_portrait # (P5 portrait JObj*) *
+		lwz r3, 0(r3)
+		li r4, 1
+		bl jobj_set_hidden
+		
+		# Hide text
+		load r3, css_p6_text_gobj
+		lwz r3, 0(r3) # GObj *
+		load r4, css_p6_text_subtext
+		lwz r4, 0(r4) # Subtext JObj *
+		li r5, 400
+		bl set_css_text
+
+		b RETURN # Done with p2
+
+p2_update_frame:
+	# Remove hidden flag from JObj
+	load r3, css_p6_portrait # (P5 portrait JObj*) *
+	lwz r3, 0(r3)
+	li r4, 0
+	bl jobj_set_hidden
+
+	# Convert to External ID
+	load r3, 0x803F0E2C # P2 char select data
+	lbz r3, 3(r3)
+	bl convert_css_to_external_id
+	bl int_to_float
+
+	# Now apply costume
+	# First check if team mode is active:
+	fmr f3, f1 # Char frame ID
+	load r9, 0x804807C8 # Team mode flag
+	lbz r9, 0(r9)
+	cmpi 0, r9, 0
+	beq p2_update_costume
+
+	# else Team mode!
+	load r3, 0x803F0E2A # P2 char select data
+	lbz r4, 0(r3) # Which team
+
+	load r3, 0x803F0E2C # P1 char select data
+	lbz r3, 3(r3)
+	bl color_to_costume_id
+	bl int_to_float
+	
+	b p2_animate_costume
+
+p2_update_costume:
+	# No team mode, just do costume:
+	load r3, 0x803F0E2C # P2 char select data
+	lbz r3, 1(r3)
+	bl int_to_float # f1 contains costume id
+	
+p2_animate_costume:
+	load r3, 0x803F0E2C # P2 char select data
+	lbz r3, 1(r3)
+	bl FP_CONST_30
+	mflr r3
+	lfs f2, 0(r3) # 30
+	fmul f1, f1, f2 # Costume offset
+	fadd f1, f1, f3 # Result frame (e.g. 0x2 + (1 * 0x30)) = 0x32, fox's orange (first) costume
+
+	# Set frame
+	load r3, css_p6_portrait # (P5 portrait JObj*) *
+	lwz r3, 0(r3)
+	mr r4, r3 # Calc DObj*
+	lwz r4, 0x18(r4) # First DObj
+	load r5, css_manually_animate # Load function addr from globals
+	lwz r5, 0(r5)
+	mtctr r5
 	bctrl
 
-	b RETURN
+	# Update P2 background color
+	load r9, 0x804807C8 # Team mode flag
+	lbz r9, 0(r9)
+	cmpi 0, r9, 0
+	beq p2_purple_background
 
-# Debug code - DOES NOT RUN - keeping for reference
-    # Get current frame
-	load r3, css_backup_space
-	lfs f1, 0(r3) # Current frame
+	# Team mode!
+	load r3, 0x803F0E2A # P2 char select data
+	lbz r4, 0(r3) # Which team: R B G
+	# TODO function?
+	bl BG_COLOR_TABLE
+	mflr r5
+	mulli r4, r4, 4
+	add r5, r5, r4
+	lwz r4, 0(r5) # R4 contains corresponding team color
 
-    load r3, css_p5_portrait # (P5 portrait JObj*) *
+	b set_p2_background
+p2_purple_background:
+	# No team mode
+	load r4, 0x984ce500 # P6 Purple
+	nop
+	nop
+	nop
+	nop
+
+set_p2_background:
+	load r3, css_p6_bg
+	lwz r3, 0(r3)  # R3 contains P5 BG JObj*
+	# Get RGB ptr
+	lwz r3, 0x18(r3)
+	lwz r3, 0x08(r3)
+	lwz r3, 0x1c(r3)
+	lwz r3, 0x08(r3)
+	subi r3, r3, 4
+	stw r4, 0(r3)
+
+	# Update text for current character
+	load r3, css_p6_text_gobj
+	lwz r3, 0(r3) # GObj *
+	load r4, css_p6_text_subtext
+	lwz r4, 0(r4) # Subtext JObj *
+	load r5, 0x803F0E2C # P2 char select data
+	lbz r5, 3(r5) # CSS ID
+	bl set_css_text
+	
+	# Check if actually selected or hovering
+	load r3, 0x8111acc0
+	lbz r3, 5(r3)
+	cmpi 0, r3, 0
+	beq p2_opaque
+	# else 
+		bl FP_CONST_0_5
+		mflr r4
+		b set_p2_alpha
+p2_opaque:
+	bl FP_CONST_1
+	mflr r4
+set_p2_alpha:
+	# Set alpha based on above
+	load r3, css_p6_portrait # (P5 portrait JObj*) *
 	lwz r3, 0(r3)
-	mtctr r28
-    bctrl
-
-	# Increment frame
-	load r3, css_backup_space
-	lfs f1, 0(r3) # Current frame
-
-	bl FP_CONST_0
-	mflr r3
-	lfs f2, 0(r3) # 1
-	fadd f1, f1, f2
-
-	load r3, css_backup_space
-	stfs f1, 0(r3)
-		
-	## Check if P1 A button is pressed
-	#load r3, 0x804C1FAC # Controller 1 Data
-	#lwz r4, 0(r3)
-	#rlwinm. r4, r4, 0, 0x17, 0x17 # Check if A
-	#beq RETURN
-
-	## Check previous frame was 0
-	#load r3, 0x804C1FB0 # Controller 1 Data Prev Frame
-	#lwz r4, 0(r3)
-	#rlwinm. r4, r4, 0, 0x17, 0x17 # Check if A was prev not pressed
-	#bne RETURN
-		
-
-after_inc_portrait:
+	lfs f1, 0(r4) # f1 alpha value
+	# Set alpha for job
+		lwz r3, 0x18(r3)
+		lwz r3, 0x8(r3)
+		lwz r3, 0xc(r3)
+		stfs f1, 0xc(r3)
 
 # Return / original value
 RETURN:
