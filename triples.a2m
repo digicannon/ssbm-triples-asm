@@ -111,7 +111,6 @@
 @file 266CE0 asm/css_exit.asm
 
 @file 25C00C asm/css_text.asm
-#@file 2662D0 asm/dbg_text_writer.asm
 @file 262614 asm/css_text_update.asm
 @file 266830 asm/css_load_rescale_ui.asm
 

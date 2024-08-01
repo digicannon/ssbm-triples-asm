@@ -409,11 +409,15 @@ p1:
 	bne p2
 
 		# Check if P1 actually has a character selected
-	    load r3, 0x803F0E08 # P1 char select data
-	    lbz r3, 3(r3)
-		cmpi 0, r3, 0x19
+		lis r3, 0x803F
+		lbz r4, 0x0E08(r3) # P1 player type
+		cmpli 0, r4, 3
+		beq p1_no_character
+		lbz r4, 0x0E0B(r3) # P1 char select data
+		cmpi 0, r4, 0x19
 		bne p1_update_frame # 0x19 is after the end of the CSS
 
+p1_no_character:
 		# Set hidden flag for JObj
         load r3, css_p5_portrait # (P5 portrait JObj*) *
 	    lwz r3, 0(r3)
@@ -561,12 +565,16 @@ p2:
 	bne RETURN
 
 	# Check if P2 actually has a character selected
-	load r3, 0x803F0E2C # P2 char select data
-	lbz r3, 3(r3)
-	cmpi 0, r3, 0x19
+	lis r3, 0x803F
+	lbz r4, 0x0E2C(r3) # P2 player type
+    cmpli 0, r4, 3
+	beq p2_no_character
+	lbz r4, 0x0E2F(r3) # P2 char select data
+	cmpi 0, r4, 0x19
 	bne p2_update_frame # 0x19 is after the end of the CSS
 
 	# Else, nothing selected
+p2_no_character:
 		# Set hidden flag for JObj
 		load r3, css_p6_portrait # (P5 portrait JObj*) *
 		lwz r3, 0(r3)
