@@ -3,30 +3,14 @@
 
 @title Triples Dat
 
-# ===== MEMORY MAP =====
-#* 002800 - 0028FF reserved for P5/P6 ConvertRawInput output.
-            CSS State, CSS Dirty Flag, unused, unused *#
-# Noah says I can remove this whole memory map because he's going to relocate it
-#@set 002900 00000000
-##           unused, unused, unused, unused
-#@set 002904 00000000
-#@set 002910 00000000 # P1 CSS data.
-#@set 002914 00000000
-#@set 002918 00000000 # P2 CSS data.
-#@set 00291C 00000000
-#@set 002920 00000000 # P3 CSS data.
-#@set 002924 00000000
-#@set 002928 00000000 # P4 CSS data.
-#@set 00292C 00000000
-# End removal
-# 002A00 - 002AFF reserved for USB data.
-# ======================
-
 # Notice on title screen.
 @set 1A218C 60000000
-# "333"
-@set 3EA6C8 33333300
-@set 3EA6CC 00000000
+# "3 v0"
+@set 3EA6C8 33207630
+# ".2  "
+@set 3EA6CC 2E322020
+# "PGH"
+@set 3EA6D0 50474800
 
 # Enable OSReport print on crash (1.02) [UnclePunch]
 @set 397878 4800020C
@@ -38,7 +22,8 @@
 @set 45C370 FF0000FF # Disable items.
 @set 45C380 00000000 # Disable rumble for all.
 @set 45C384 00000100 # Deflicker off! Stop making your TV blurry AF.
-@set 45C388 070000B0 # Legal stages only for Random.
+#@set 45C388 070000B0 # Legal stages only for Random.
+@set  45C388 170000C0 # Legal stages for PGH Family Reunion.
 
 # Unlock characters & stages.
 @set 45BF28 FFFFFFFF
@@ -47,21 +32,8 @@
 # Disable Trophy Messages (1.02) [Achilles]
 @set 15D984 4E800020
 
-# Skip Result Screen & KO Star Count = Placement (v1.02) [Sham Rock]
-@branch  1A415C
-3803FFFF 2C000004
-40820060 2C0B0020
-41820058 3A400000
-3E808047 62949D58
-3EA0804D 62B5672F
-8E1400A8 8A340001
-2C10004E 4080000C
-9E350001 4800000C
-3A310001 9E350001
-3A520001 2C120004
-41A0FFD8 3A000000
-3A200000 3A800000
-3AA00000 38000000
+# Skip Results Screen [https://raw.githubusercontent.com/dansalvato/20XXTE/master/source/loader/code/skip_results_screen.mgc]
+@file 1B15E4 asm/skip_results_screen.asm
 
 # Disable Screen Shake for Teams [UnclePunch]
 # https://smashboards.com/threads/disable-screen-shake-in-teams-mode.442101/
@@ -71,56 +43,72 @@
 4E800020 7C0802A6
 60000000
 
-# Spoof Controller Plugins (1.02) [Achilles]
-#@set 376BD4 38000000
-#@set 376BDC 38000000
-#@set 376BF0 380000D8
-#@set 376C04 38000001
-# HMN Always Available on CSS (v1.02) [Dan Salvato]
-#@set 260508 38000003
-#@set 261adc 38060000
+# "RANDOM" is Default Highlighted on Stage Select Screen (1.02) [Jorgasms]
+@set 25AA10 38E0001D
 
-# Start Vs. With only 1 Player [UnclePunch]
-#@branch  263064
-#7C0802A6 90010004
-#9421FF00 BE810008
-#7C9F2378 3D808015
-#618CCC34 7D8903A6
-#4E800421 88830002
-#2C040000 40820018
-#88830003 2C040000
-#4082000C 2C1F0001
-#48000008 2C1F0002
-#BA810008 80010104
-#38210100 7C0803A6
-#60000000
+# Hold L+R+A+Start During Stage Load to Return to the CSS (1.02) [Jorgasms]
+@set 25B8BC 38600002
 
+# Stage striking [Sham Rock, Dan Salvato]
+@branch  259C40
+39600000 3D408045
+614AC388 38600000
+3C80803F 608406D0
+28000013 4082000C
+39600001 48000010
+28000000 408200C0
+48000034 2C03001D
+408000B4 2C0B0002
+4182004C 1CA3001C
+7CA52214 88C5000A
+80AA0000 7CA53430
+54A507FF 40820088
+4800002C 806DB600
+5460056B 4082001C
+546006F7 40820008
+48000074 39600002
+38600000 4BFFFFB0
+886DB60E 2C03001D
+4080005C 1CA3001C
+7CA52214 38C00000
+2C0B0002 40820008
+38C00002 98C50008
+80A50000 2C030016
+41800008 80A50010
+3CC04400 2C0B0002
+40820008 38C00000
+90C50038 38C0001E
+98CDB60E 2C0B0000
+4182000C 38630001
+4BFFFF4C 800DB604
+28000000
 
-
-@file 263334 asm/css.asm
-# Disable writing "no entry" to preload table when loading CSS.
-# Otherwise the CSS for P5/P6 will erase the data for P1-4.
-@set  0174C8 60000000
-# Disable Player card on CSS
-#@set  25ee70 ba6100ac
-# Disable CSS Background (Blackout for easier readability)
-#@set  2644c0 60000000
+# Unrestricted pause camera [Dan Salvato]
+@set 02CF64 60000000
+@set 02BBD4 4800001C
 
 # Punkline's Toggleable GObj Mod for Debugging
-@set 390ff8 2C000000
-@set 390ffC 40800024
-@set 390f38 2C000000
-@set 390f3C 40800024
+#@set 390ff8 2C000000
+#@set 390ffC 40800024
+#@set 390f38 2C000000
+#@set 390f3C 40800024
 
-@file 1B14B8 asm/css_enter_dirty.asm
-@file 25C00C asm/css_text.asm
-@file 266B48 asm/css_char_preload.asm
+# ====================================
+
+# Input.
+
+@file 377988 asm/convert_raw_input_for_usb.asm
+@file 377998 asm/convert_raw_input_menu.asm
+@file 06B028 asm/inputs_to_player.asm
+
+# CSS.
+
+@file 263334 asm/css.asm
 @file 266CE0 asm/css_exit.asm
 
-@file 377600 asm/convert_raw_input_css.asm
-@file 377988 asm/convert_raw_input_ingame.asm
-#@file 06B028 asm/inputs_to_player.asm
-@file 2662D0 asm/dbg_text_writer.asm
-@file 262614 asm/css_text_update.asm
-@file 266830 asm/css_load_rescale_ui.asm
-@file 36fb70 asm/dbg.asm
+# In game.
+
+@file 16E510 asm/neutral_spawn.asm
+
+# C-Stick in Single Player
+@set 16B480 60000000

@@ -2,6 +2,8 @@
 #  Insert at 8006B028
 # ====================
 
+.include "triples.s"
+
 # Registers.
 .set player_data,    31
 
@@ -12,15 +14,10 @@
     cmpli 0, r4, 4
     blt return
 
-    # Read "raw" USB data converted by the game.
-	# Commenting out this temporarily while I work on CSS because Noah says he can relocate it, and it's clobbering my exec memory.
-	b return
-
-
     subi r4, r4, 4 # Make P5 offset 0.
     mulli r4, r4, 0x44 # Multiply by size of input struct.
-    oris r4, r4, 0x8000
-    ori r4, r4, 0x2800
+    oris r4, r4, triples_converted_output @h
+    ori r4, r4, triples_converted_output @l
     sync
 read_usb:
     # Load buttons.

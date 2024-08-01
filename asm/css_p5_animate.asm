@@ -3,7 +3,7 @@
 # ====================
 
 .include "common.s"
-.include "triples_globals.s"
+.include "triples.s"
 
 # Preserve some registers
 load r24, css_backup_space

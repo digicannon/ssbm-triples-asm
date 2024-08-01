@@ -4,7 +4,7 @@
 #  Insert at 8025d5ac
 # ====================
 
-.include "triples_globals.s"
+.include "triples.s"
 
 ForceZelda:
     # Change local variable to zelda (Forces flashing animation)

@@ -3,7 +3,7 @@
 # ====================
 
 .include "common.s"
-.include "triples_globals.s"
+.include "triples.s"
 
 b START_CODE
 # Begin data table
@@ -937,44 +937,6 @@ finished_card_translate_loop:
 	mflr r5
 	lfs f2, 0(r5) # Y Offset
 	bl create_text
-
-
-# Create P5 Doors
-    load r3, 0x810feea0  # P1 Door
-    bl copy_jobj
-	load r7, css_p5_door_jobj
-	stw r3, 0(r7) # P5 Door 0x81136e80
-
-	# Register animation from P1's door
-	load r4, 0x80f485ec # AnimJoint
-	load r5, 0x80f53f9c # MatJoint
-	li   r6, 0          # ShapeAnimJoint
-	#branchl r12, 0x8036fb5c # HSD_JObjAddAnimAll
-	branchl r12, 0x8036FA10 # HSD_JObjAddAnim
-
-	# Debug code for easy bp
-	load r7, begin_triples_globals
-	load r4, 0xc0ffeeee
-	stw r4, 0(r7)
-
-	# Restore door jobj back
-	load r7, css_p5_door_jobj
-	lwz r3, 0(r7) # P5 Door 0x81136e80
-
-	# Scale and move
-		bl FP_CONST_POINT_SIX_SIX
-		mflr r7
-		lfs f4, 0(r7)
-		stfs f4, x_scale_offset(r3)
-
-		bl FP_CONST_11
-		mflr r7
-		lfs f4, 0(r7)
-		stfs f4, x_pos_offset(r3)
-		bl FP_CONST_NEG_2_3
-		mflr r7
-		lfs f4, 0(r7)
-		stfs f4, y_pos_offset(r3)
 
 # Create P5 HMN tag
     load r3, 0x81103400 # HMN tag

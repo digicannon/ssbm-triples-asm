@@ -3,7 +3,7 @@
 # ====================
 
 .include "common.s"
-.include "triples_globals.s"
+.include "triples.s"
 
 b BEGIN_CODE
 FP_CONST_NINE_TWO:
@@ -328,6 +328,7 @@ p1:
 	cmpi 0, r3, 1
 	bne p2
 
+		b p1_update_frame
 		# Check if P1 actually has a character selected
 	    load r3, 0x803F0E08 # P1 char select data
 	    lbz r3, 3(r3)
@@ -395,6 +396,7 @@ p1_update_frame:
 
 p2:
 run_debug_code:
+	b RETURN
 
 	# Check if P1 A button is pressed
 	load r3, 0x804C1FAC # Controller 1 Data

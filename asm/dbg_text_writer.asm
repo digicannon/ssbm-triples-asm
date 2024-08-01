@@ -2,7 +2,7 @@
 # Address: 0x802662D0
 ################################################################################
 .include "common.s"
-.include "triples_globals.s"
+.include "triples.s"
 
 .set REG_TextGObj,31
 .set REG_TextProperties,30
