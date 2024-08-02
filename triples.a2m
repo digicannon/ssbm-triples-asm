@@ -7,10 +7,12 @@
 @set 1A218C 60000000
 # "3 v0"
 @set 3EA6C8 33207630
-# ".2  "
-@set 3EA6CC 2E322020
-# "PGH"
-@set 3EA6D0 50474800
+# ".2.1"
+@set 3EA6CC 2E322E31
+# " PGH"
+@set 3EA6D0 20504748
+# Null terminator.
+@set 3EA6D4 00000000
 
 # Enable OSReport print on crash (1.02) [UnclePunch]
 @set 397878 4800020C
