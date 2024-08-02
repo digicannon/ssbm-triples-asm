@@ -139,6 +139,9 @@
 # Disable Rules Menu from CSS
 @set 2616d4 c03f000c
 
+# Disable Nametag Menu from CSS
+@set 261ea0 c042ca10 
+
 # ==========
 # In game.
 # ==========
