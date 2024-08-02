@@ -217,7 +217,7 @@ create_text:
 	stmw r30, -8(sp) # Save r30, r31
     mflr r30         # Backup LR
 	mr r31, sp       # Backup SP
-	stwu sp, -34(sp) # Grow stack
+	stwu sp, -36(sp) # Grow stack
 
     stfs f1, 12(sp)  # Store X on stack
     stfs f2, 16(sp)  # Store Y on stack
