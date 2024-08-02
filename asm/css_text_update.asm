@@ -359,6 +359,18 @@ jobj_set_hidden:
 	lmw r30, -8(sp)   # Restore r30, r31
 	blr
 
+set_card_color:
+    # R3 is the JObj * of the portrait
+    # R4 is RGB
+	# - Clobbers r3
+	lwz r3, 0x18(r3)
+	lwz r3, 0x08(r3)
+	lwz r3, 0x1c(r3)
+	lwz r3, 0x08(r3)
+	subi r3, r3, 4
+	stw r4, 0(r3)
+ 	blr   
+
 set_css_text:
     # R3 is the GObj * of the text
     # R4 is the subtext *
@@ -376,7 +388,6 @@ set_css_text:
 	cmpi  0, r5, 0x19
 	bgt   INVALID_SELECTION
 	b VALID_SELECTION
-    
 INVALID_SELECTION:
 	# Just make the index 'valid'
 	li r5, 0x19
@@ -404,19 +415,28 @@ VALID_SELECTION:
 BEGIN_CODE:
 	# Check if we're P1 (so it only runs once per frame)
 p1:
-	lbz r3, 4(r31)
-	cmpi 0, r3, 1
-	bne p2
+		lbz r3, 4(r31)
+		cmpi 0, r3, 1
+		bne p2
 
-		# Check if P1 actually has a character selected
+		# Check if P1 is disabled
 		lis r3, 0x803F
 		lbz r4, 0x0E08(r3) # P1 player type
 		cmpli 0, r4, 3
-		beq p1_no_character
+		beq p1_disabled
+
+		# Check if P1 actually has a character selected
 		lbz r4, 0x0E0B(r3) # P1 char select data
 		cmpi 0, r4, 0x19
 		bne p1_update_frame # 0x19 is after the end of the CSS
+		b p1_no_character
 
+p1_disabled:
+		# Set BG to gray before hiding portrait
+		load r4, 0x65656500 # Disabled gray
+		load r3, css_p5_bg
+		lwz r3, 0(r3)  # R3 contains P5 BG JObj*
+		bl set_card_color
 p1_no_character:
 		# Set hidden flag for JObj
         load r3, css_p5_portrait # (P5 portrait JObj*) *
@@ -517,13 +537,7 @@ p1_orange_background:
 set_p1_background:
 		load r3, css_p5_bg
 		lwz r3, 0(r3)  # R3 contains P5 BG JObj*
-		# Get RGB ptr
-		lwz r3, 0x18(r3)
-		lwz r3, 0x08(r3)
-		lwz r3, 0x1c(r3)
-		lwz r3, 0x08(r3)
-		subi r3, r3, 4
-		stw r4, 0(r3)
+		bl set_card_color
 
 		# Update text for current character
         load r3, css_p5_text_gobj
@@ -564,16 +578,24 @@ p2:
 	cmpi 0, r3, 2
 	bne RETURN
 
-	# Check if P2 actually has a character selected
+	# Check if P2 is disabled
 	lis r3, 0x803F
 	lbz r4, 0x0E2C(r3) # P2 player type
     cmpli 0, r4, 3
-	beq p2_no_character
+	beq p2_disabled
+
+	# Check if P2 has anything selected
 	lbz r4, 0x0E2F(r3) # P2 char select data
 	cmpi 0, r4, 0x19
 	bne p2_update_frame # 0x19 is after the end of the CSS
+	b p2_no_character
 
-	# Else, nothing selected
+p2_disabled:
+		# Set BG to gray before hiding portrait
+		load r4, 0x65656500 # Disabled gray
+		load r3, css_p6_bg
+		lwz r3, 0(r3)  # R3 contains P5 BG JObj*
+		bl set_card_color
 p2_no_character:
 		# Set hidden flag for JObj
 		load r3, css_p6_portrait # (P5 portrait JObj*) *
@@ -668,21 +690,11 @@ p2_animate_costume:
 p2_purple_background:
 	# No team mode
 	load r4, 0x984ce500 # P6 Purple
-	nop
-	nop
-	nop
-	nop
 
 set_p2_background:
 	load r3, css_p6_bg
 	lwz r3, 0(r3)  # R3 contains P5 BG JObj*
-	# Get RGB ptr
-	lwz r3, 0x18(r3)
-	lwz r3, 0x08(r3)
-	lwz r3, 0x1c(r3)
-	lwz r3, 0x08(r3)
-	subi r3, r3, 4
-	stw r4, 0(r3)
+	bl set_card_color
 
 	# Update text for current character
 	load r3, css_p6_text_gobj
