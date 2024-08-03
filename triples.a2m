@@ -95,6 +95,9 @@
 @set 390f38 2C000000
 @set 390f3C 40800024
 
+# UCF 0.8 Shield Drop only.
+@file 0998A4 asm/ucf/shield_drop.asm
+
 # ====================================
 
 # ==========
