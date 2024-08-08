@@ -304,20 +304,68 @@ blrl
     .float 110,280
 # Kongo Jungle 64
 .long 0x1E                  #Stage ID
-  #Singles Data
+  # Singles Data
     .float -60,5
     .float 60,5
     .float -34,-7
     .float 34,-7
     .float -61,55
     .float 61,55
-  #Teams Data
+  # Teams Data
     .float -61,55
     .float -60,5
     .float -34,-7
     .float 61,55
     .float 60,5
     .float 34,-7
+# Kongo Jungle
+.long 0x05
+  # Singles Data
+    .float -32,0
+    .float 32,0
+    .float -32,26
+    .float 32,40
+    .float -32,60
+    .float 32,69
+  # Doubles Data
+    .float -32,0
+    .float -32,26
+    .float -32,60
+    .float 32,0
+    .float 32,40
+    .float 32,69
+# Green Greens
+.long 0x11                  #Stage ID
+  # Singles Data
+    .float -30,0
+    .float 30,0
+    .float -77,-5
+    .float 77,-5
+    .float -30,28
+    .float 30,28
+  # Teams Data
+    .float -30,0
+    .float -77,-5
+    .float -30,28
+    .float 30,0
+    .float 77,-5
+    .float 30,28
+# Fourside
+.long 0x12
+  # Singles Data
+    .float -110,33
+    .float -80,33
+    .float 20,3
+    .float 100,-15
+    .float -80,0
+    .float 40,3
+  # Teams Data
+    .float -110,33
+    .float -80,33
+    .float -80,0
+    .float 20,3
+    .float 100,-15
+    .float 40,3
 #Terminator
 .long -1
 .align 2
