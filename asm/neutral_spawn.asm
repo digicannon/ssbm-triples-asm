@@ -14,9 +14,9 @@ backup
   bne Exit
 
 #Check if teams
-  lbz	r3, 0x24D0 (MatchInfo)
-  cmpwi r3,1
-  bne Exit
+  #lbz	r3, 0x24D0 (MatchInfo)
+  #cmpwi r3,1
+  #bne Exit
 
 #Create an array
 CreateTeamArray:
@@ -196,8 +196,8 @@ blrl
     .float 60,10
     .float -20,10
     .float 20,10
-    .float 20,10
-    .float 20,10
+    .float -40,10
+    .float 40,10
   #Teams Data
     .float -20,10
     .float -40,10
@@ -212,8 +212,8 @@ blrl
     .float 38.8,35.2
     .float 0,8
     .float 0,62.4
-    .float 0,62.4
-    .float 0,62.4
+    .float -58.8,5
+    .float 58.8,5
   #Teams Data
     .float -58.8,5
     .float -38.8,35.2
@@ -228,15 +228,15 @@ blrl
     .float 42,28
     .float 0,46.9
     .float 0,4.9
-    .float 0,4.9
-    .float 0,4.9
+    .float -42,5
+    .float 42,5
   #Teams Data
     .float -42,26.6
     .float -42,5
+    .float -30,5
     .float 42,28
     .float 42,5
-    .float 42,5
-    .float 42,5
+    .float 30,5
 #Dream Land
 .long 0x1C                  #Stage ID
   #Singles Data
@@ -244,8 +244,8 @@ blrl
     .float 47.4,37.3
     .float 0,7
     .float 0,58.5
-    .float 0,58.5
-    .float 0,58.5
+    .float -61.4,5
+    .float 62.4,5
   #Teams Data
     .float -61.4,5
     .float -46.6,37.2
@@ -254,6 +254,7 @@ blrl
     .float 47.4,37.3
     .float 37.4,5
 #FoD
+# Only here to allow singles/doubles.  Don't bother making real 5/6 spawns.
 .long 0x02                  #Stage ID
   #Singles Data
     .float -41.25,21
@@ -265,8 +266,8 @@ blrl
   #Teams Data
     .float -41.25,21
     .float -41.25,5
+    .float -41.25,5
     .float 41.25,27
-    .float 41.25,5
     .float 41.25,5
     .float 41.25,5
 #Pokemon Stadium
@@ -276,8 +277,8 @@ blrl
     .float 40,32
     .float 70,7
     .float -70,7
-    .float -70,7
-    .float -70,7
+    .float -40,5
+    .float 40,5
   #Teams Data
     .float -70,5
     .float -40,32
@@ -288,12 +289,12 @@ blrl
 # Corneria
 .long 0x07                  #Stage ID
   #Singles Data
-    .float -40,32
-    .float 40,32
-    .float 70,7
-    .float -70,7
-    .float -70,7
-    .float -70,7
+    .float -110,298
+    .float 30,332
+    .float -85,294
+    .float 75,278
+    .float -60,290
+    .float 110,280
   #Teams Data
     .float -110,298
     .float -85,294
@@ -304,12 +305,12 @@ blrl
 # Kongo Jungle 64
 .long 0x1E                  #Stage ID
   #Singles Data
-    .float -40,32
-    .float 40,32
-    .float 70,7
-    .float -70,7
-    .float -70,7
-    .float -70,7
+    .float -60,5
+    .float 60,5
+    .float -34,-7
+    .float 34,-7
+    .float -61,55
+    .float 61,55
   #Teams Data
     .float -61,55
     .float -60,5
