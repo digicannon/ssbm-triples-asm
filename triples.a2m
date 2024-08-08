@@ -98,6 +98,25 @@
 # UCF 0.8 Shield Drop only.
 @file 0998A4 asm/ucf/shield_drop.asm
 
+# ==========
+# Stage Changes
+# ==========
+
+# --- Green Greens ---
+# Disable Initial Bricks [Zauron]
+@set 2146EC 60000000
+# Disable Falling Bricks [Zauron]
+@set 216B24 60000000
+# Disable Tree Wind and Apples [Zauron]
+@set 213C10 4E800020
+
+# --- Corneria ---
+# Disabled.  Just holding on to these in case people want them.
+# Disable Ship Spawn [Zauron]
+#@set 1DDA48 60000000
+# Disable Great Fox's Gun (no shots or collision) [Zauron]
+#@set 1E1390 40800430
+
 # ====================================
 
 # ==========
