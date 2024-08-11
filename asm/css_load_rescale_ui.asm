@@ -213,6 +213,7 @@ create_text_below:
 blrl
 create_text:
     # R3 should be a char*
+	# R4 GObj
 	# F1 should be X offset
 	# F2 should be Y offset
 	# R3 return value is the GObj *
@@ -221,19 +222,13 @@ create_text:
 	mr r31, sp       # Backup SP
 	stwu sp, -36(sp) # Grow stack
 
-    stfs f1, 12(sp)  # Store X on stack
+	stw r4,  20(sp)  # Store GObj return on stack
     stfs f2, 16(sp)  # Store Y on stack
+    stfs f1, 12(sp)  # Store X on stack
     stw  r3,  8(sp)  # Store char * on stack
 
-    # Create the text GObj
-    li r3, 0
-	li r4, 0
-	branchl r12, 0x803a6754 # CreateTextGObj
-
-	# Store GObj return on stack
-	stw r3,  20(sp)
-
     # Set text spacing to TIGHT in GObj
+	mr r3, r4
 	li r4, 1
 	stb r4, 0x49(r3)
 	# Set text to center around x
@@ -940,6 +935,10 @@ finished_card_translate_loop:
 		stfs f4, y_pos_offset(r28)
 
 # Create P5 Text Label
+    li r3, 0
+	li r4, 0
+	branchl r12, 0x803a6754 # CreateTextGObj
+	mr r4, r3
 	bl CONST_STR_TRIPLES
 	mflr r3
 	bl FP_CONST_155
@@ -958,6 +957,10 @@ finished_card_translate_loop:
 	stw r4, 0(r5)
 
 # Create P6 Text Label
+    li r3, 0
+	li r4, 0
+	branchl r12, 0x803a6754 # CreateTextGObj
+	mr r4, r3
 	bl CONST_STR_TRIPLES
 	mflr r3
 	bl FP_CONST_255

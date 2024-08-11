@@ -151,7 +151,8 @@
 # In game.
 # ==========
 
-@file 16e2c0 asm/pre_match.asm
+#@file 266834 asm/pre_match.asm # Pre-CSS debug
+@file 2f65ec asm/pre_match.asm # Real pre-match
 #@file 16E510 asm/neutral_spawn.asm # Commented out pending a2m fix for memory
 
 # C-Stick in Single Player

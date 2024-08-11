@@ -33,6 +33,11 @@ BEGIN_CODE:
 	lwz r30, 0(r30)
 
 # Create some text 
+	# Create the text GObj
+		li r3, 2
+		li r4, 1
+		branchl r12, 0x803a6754 # CreateTextGObj
+		mr r4, r3
 	bl CONST_STR_TRIPLES
 	mflr r3
 	bl FP_CONST_0
@@ -41,10 +46,10 @@ BEGIN_CODE:
 	bl FP_CONST_0
 	mflr r5
 	lfs f2, 0(r5) # Y Offset
-
-	# r30 contrains move_trxt
+	# r30 contrains create_text
 	mtctr r30
 	bctrl 
+
 	# r3 is the GObj
 	# r4 is the subtext 
 
@@ -55,4 +60,5 @@ BEGIN_CODE:
 
 # Done our code
 # Original instruction
-	lis	r3, 0x8047
+	lbz r3, 0(r29)
+	#lwz	r0, 0x01EC (sp) # pre-css
