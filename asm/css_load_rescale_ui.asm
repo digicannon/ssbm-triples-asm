@@ -209,6 +209,8 @@ set_jobj_alpha:
 	stfs f1, 0xc(r3)
 	blr
 
+create_text_below:
+blrl
 create_text:
     # R3 should be a char*
 	# F1 should be X offset
@@ -384,32 +386,13 @@ START_CODE:
 .set func_jobj_set_flags,          0x80371d00
 .set func_jobj_hide,               func_jobj_set_flags
 .set func_dobj_set_flags,          0x8035DDB8
-load r11, jobj_x30
-load r7, known_flags
 
-# Indev / debug loop to find the correct address for the JObj. This can be removed once functionallity is complete.
-# Loop its children until find a flags of known_flags
-# That's the one to try and hide.
-    lwz r11, 0x10(r11) # Child of JObj
-    li r9, 15
-    li r10, 0
-loop:
-    # if (i == 16)
-    cmp 0, r9, r10
-    beq finished_loop
 
-    # compare JOBj flags to known dbg values of known_flags
-    lwz r8, 0x14(r11)
-	cmp 0, r8, r7
-	beq found_match
-
-    # next itr
-	lwz r11, 0x08(r11) # curr = curr->next
-	addi r10, r10, 1   # ++i
-	b loop
-found_match:
-    nop #nop for BP
-finished_loop:
+# Store address of create_text
+load r3, fn_create_text
+bl create_text_below
+mflr r4
+stw r4, 0(r3)
 
 # Make some stack room
 	stmw r28, -16(sp) # Save r28 .. r31

@@ -25,7 +25,7 @@
 @set 45C380 00000000 # Disable rumble for all.
 @set 45C384 00000100 # Deflicker off! Stop making your TV blurry AF.
 #@set 45C388 070000B0 # Legal stages only for Random.
-@set  45C388 170000C0 # Legal stages for PGH Family Reunion.
+#@set  45C388 170000C0 # Legal stages for PGH Family Reunion.
 
 # Unlock characters & stages.
 @set 45BF28 FFFFFFFF
@@ -151,7 +151,8 @@
 # In game.
 # ==========
 
-@file 16E510 asm/neutral_spawn.asm
+@file 16e2c0 asm/pre_match.asm
+#@file 16E510 asm/neutral_spawn.asm # Commented out pending a2m fix for memory
 
 # C-Stick in Single Player
 @set 16B480 60000000

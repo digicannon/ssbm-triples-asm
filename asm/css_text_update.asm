@@ -393,11 +393,6 @@ INVALID_SELECTION:
 	li r5, 0x19
     
 VALID_SELECTION:
-	#lis   r5, dbg_text_gobj @h
-	#ori   r3, r5, dbg_text_gobj @l
-	#ori   r4, r5, dbg_subtext_str @l
-	#lwz   r4, 0(r4)
-	#lwz   r3, 0(r3)
 	# r3 should still be the GObj
 	# r4 should still be subtext *
     mr r7, r5 # Move to r7 for temp storage
