@@ -19,13 +19,12 @@
 
 # Tournament settings.
 @set 45BF10 00340102 # Stock mode.
-@set 45BF14 04000A00 # 4 Stocks & 1.0 damage ratio.
+@set 45BF14 03000A00 # 3 Stocks & 1.0 damage ratio.
 @set 45BF18 08010100 # 8min timer & friendly fire.
 @set 45C370 FF0000FF # Disable items.
 @set 45C380 00000000 # Disable rumble for all.
 @set 45C384 00000100 # Deflicker off! Stop making your TV blurry AF.
-#@set 45C388 070000B0 # Legal stages only for Random.
-@set  45C388 170000C0 # Legal stages for PGH Family Reunion.
+@set 45C388 170000C0 # Legal stages for random selection.
 
 # Unlock characters & stages.
 @set 45BF28 FFFFFFFF
@@ -134,7 +133,7 @@
 @file 263334 asm/css.asm
 @file 266CE0 asm/css_exit.asm
 
-@file 25C00C asm/css_text.asm
+#@file 25C00C asm/css_text.asm
 @file 262614 asm/css_text_update.asm
 @file 266830 asm/css_load_rescale_ui.asm
 
@@ -176,6 +175,8 @@
 # ==========
 # In game.
 # ==========
+
+@file 2F9A3C asm/pal_stock_icons.asm
 
 @file 16E510 asm/neutral_spawn.asm
 
