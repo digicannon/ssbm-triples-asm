@@ -167,6 +167,13 @@
 @set 261ea0 c042ca10 
 
 # ==========
+# Stage select / match load.
+# ==========
+
+@file 16D978 asm/input_override_hold_a_for_sheik.asm
+@file 16BA0C asm/input_override_stock_steal.asm
+
+# ==========
 # In game.
 # ==========
 
