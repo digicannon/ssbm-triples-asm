@@ -5,6 +5,13 @@
 .include "common.s"
 .include "triples.s"
 
+	# Don't do anything if not on main CSS (ID 2).
+	lis r17, 0x8047
+	ori r17, r17, 0x9D30
+	lbz r17, 0(r17)
+	cmpi 0, r17, 2
+	bne RETURN_ORIGINAL
+
 b START_CODE
 # Begin data table
 FP_CONST_NEG_10:
@@ -1005,4 +1012,5 @@ RETURN:
 	lmw r28, -16(sp)   # Restore r28 .. r31
 
     mr r3, r7
+RETURN_ORIGINAL:
 	lmw	r17, 0x011C(sp)

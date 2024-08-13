@@ -413,6 +413,13 @@ VALID_SELECTION:
 	blr
 
 BEGIN_CODE:
+    # Don't do anything if not on main CSS (ID 2).
+    lis r19, 0x8047
+    ori r19, r19, 0x9D30
+    lbz r19, 0(r19)
+    cmpi 0, r19, 2
+    bne RETURN
+
 	# Check if we're P1 (so it only runs once per frame)
 p1:
 		lbz r3, 4(r31)
