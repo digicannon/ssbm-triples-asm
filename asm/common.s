@@ -372,6 +372,9 @@ add \reg, r3, r4
 .set FG_UserDisplay,0x80005618
 
 # The rest of these are NTSC v1.02 functions
+
+.set ZeroAreaLength,0x8000c160
+
 ## HSD functions
 .set HSD_Randi,0x80380580
 .set HSD_MemAlloc,0x8037f1e4

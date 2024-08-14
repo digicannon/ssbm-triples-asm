@@ -168,6 +168,9 @@
 # Disable Nametag Menu from CSS
 @set 261ea0 c042ca10 
 
+# Allow 1 player to go to stage select.
+@set 263064 2C040001
+
 # ==========
 # Stage select / match load.
 # ==========
@@ -178,6 +181,8 @@
 # ==========
 # In game.
 # ==========
+
+@file 2F6690 asm/transparent_hud.asm
 
 @file 16E510 asm/neutral_spawn.asm
 

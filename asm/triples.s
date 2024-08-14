@@ -10,7 +10,6 @@
 .set triples_nintendont_data,  0x803FC500 # Reserved size 0x100, more than required.
 .set triples_converted_output, 0x803FC600 # Size 0x88.
 
-#.set begin_triples_globals, 0x803fa3e8
 .set begin_triples_globals, 0x803FC700
 .set dbg_text_gobj, begin_triples_globals + 16
 .set dbg_subtext_str, dbg_text_gobj + 4
