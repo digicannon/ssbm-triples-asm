@@ -7,10 +7,10 @@
 @set 1A218C 60000000
 # "3 v0"
 @set 3EA6C8 33207630
-# ".2.2"
-@set 3EA6CC 2E322E32
-# " PGH"
-@set 3EA6D0 20504748
+# ".3.0"
+@set 3EA6CC 2E332E30
+# " dbg"
+@set 3EA6D0 20646267
 # Null terminator.
 @set 3EA6D4 00000000
 
@@ -20,7 +20,7 @@
 # Tournament settings.
 @set 45BF10 00340102 # Stock mode.
 @set 45BF14 03000A00 # 3 Stocks & 1.0 damage ratio.
-@set 45BF18 08010100 # 8min timer & friendly fire.
+@set 45BF18 08010000 # 8min timer & friendly fire.  Pause off.
 @set 45C370 FF0000FF # Disable items.
 @set 45C380 00000000 # Disable rumble for all.
 @set 45C384 00000100 # Deflicker off! Stop making your TV blurry AF.
@@ -43,6 +43,9 @@
 2C070000 41820008
 4E800020 7C0802A6
 60000000
+
+# Unplugging closes CSS door [UnclePunch]
+@set 2605FC 38C00003
 
 # "RANDOM" is Default Highlighted on Stage Select Screen (1.02) [Jorgasms]
 @set 25AA10 38E0001D
