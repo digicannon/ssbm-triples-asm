@@ -179,7 +179,7 @@
 @file 16E510 asm/neutral_spawn.asm
 
 @file 2F9A3C asm/pal_stock_icons.asm
-@file 2FCC9C asm/always_show_player_indicator.asm
+@file 16CF38 asm/always_show_player_indicator.asm
 
 # C-Stick in Single Player
 @set 16B480 60000000
