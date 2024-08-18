@@ -18,10 +18,14 @@
     blt not_in_game 
     bgt return # Unknown case.
     # Check the minor scene to see if we are in a game.
-    # 2 is in game.  >2 is unknown case.
+    # 2 is in game.
+    # 3 is in sudden death.
+    # 4 is in results screen.
     lbz r4, 3(r3)
+    cmpli 0, r4, 4
+    beq not_in_game # On results screen.
     cmpli 0, r4, 2
-    bge return
+    bge return # Either in game, sudden death, or an unknown case.
 not_in_game:
 
 .set counter, 24

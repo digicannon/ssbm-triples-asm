@@ -33,9 +33,6 @@
 # Disable Trophy Messages (1.02) [Achilles]
 @set 15D984 4E800020
 
-# Skip Results Screen [https://raw.githubusercontent.com/dansalvato/20XXTE/master/source/loader/code/skip_results_screen.mgc]
-@file 1B15E4 asm/skip_results_screen.asm
-
 # Disable Screen Shake for Teams [UnclePunch]
 # https://smashboards.com/threads/disable-screen-shake-in-teams-mode.442101/
 @branch  030E44
@@ -136,7 +133,6 @@
 @file 263334 asm/css.asm
 @file 266CE0 asm/css_exit.asm
 
-#@file 25C00C asm/css_text.asm
 @file 262614 asm/css_text_update.asm
 @file 266830 asm/css_load_rescale_ui.asm
 
@@ -158,7 +154,6 @@
 @set 3F0E5C C1300000
 @set 3F0E7C C0900000 # P4 [-4.5, -0.5]
 @set 3F0E80 BF000000
-
 # Remove the KO Stars rendering
 @set 25d22c 3ba00000
 
@@ -188,6 +183,9 @@
 
 @file 2F9A3C asm/pal_stock_icons.asm
 @file 16CF38 asm/always_show_player_indicator.asm
+
+# On-exit fixes for the results screen.
+@file 16EBA8 asm/fix_results_screen.asm
 
 # C-Stick in Single Player
 @set 16B480 60000000
