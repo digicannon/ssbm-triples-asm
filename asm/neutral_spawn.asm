@@ -189,73 +189,9 @@ blrl
   .set  SpawnX,0x0
   .set  SpawnY,0x4
 
-#FD
-.long 0x20                  #Stage ID
-  #Singles Data
-    .float -60,10
-    .float 60,10
-    .float -20,10
-    .float 20,10
-    .float -40,10
-    .float 40,10
-  #Teams Data
-    .float -20,10
-    .float -40,10
-    .float -60,10
-    .float 20,10
-    .float 40,10
-    .float 60,10
-#Battlefield
-.long 0x1F                  #Stage ID
-  #Singles Data
-    .float -38.8,35.2
-    .float 38.8,35.2
-    .float 0,8
-    .float 0,62.4
-    .float -58.8,5
-    .float 58.8,5
-  #Teams Data
-    .float -58.8,5
-    .float -38.8,35.2
-    .float -38.8,5
-    .float 58.8,5
-    .float 38.8,35.2
-    .float 38.8,5
-#Yoshi's Story
-.long 0x08                  #Stage ID
-  #Singles Data
-    .float -42,26.6
-    .float 42,28
-    .float 0,46.9
-    .float 0,4.9
-    .float -42,5
-    .float 42,5
-  #Teams Data
-    .float -42,26.6
-    .float -42,5
-    .float -30,5
-    .float 42,28
-    .float 42,5
-    .float 30,5
-#Dream Land
-.long 0x1C                  #Stage ID
-  #Singles Data
-    .float -46.6,37.2
-    .float 47.4,37.3
-    .float 0,7
-    .float 0,58.5
-    .float -61.4,5
-    .float 62.4,5
-  #Teams Data
-    .float -61.4,5
-    .float -46.6,37.2
-    .float -36.6,5
-    .float 62.4,5
-    .float 47.4,37.3
-    .float 37.4,5
-#FoD
+# Fountain of Dreams
 # Only here to allow singles/doubles.  Don't bother making real 5/6 spawns.
-.long 0x02                  #Stage ID
+.long 0x02
   #Singles Data
     .float -41.25,21
     .float 41.25,27
@@ -270,8 +206,8 @@ blrl
     .float 41.25,27
     .float 41.25,5
     .float 41.25,5
-#Pokemon Stadium
-.long 0x03                  #Stage ID
+# Pokemon Stadium
+.long 0x03
   #Singles Data
     .float -40,32
     .float 40,32
@@ -280,44 +216,28 @@ blrl
     .float -40,5
     .float 40,5
   #Teams Data
-    .float -70,5
     .float -40,32
     .float -40,5
-    .float 70,5
+    .float -70,5
     .float 40,32
     .float 40,5
-# Corneria
-.long 0x07                  #Stage ID
-  #Singles Data
-    .float -110,298
-    .float 30,332
-    .float -85,294
-    .float 75,278
-    .float -60,290
-    .float 110,280
-  #Teams Data
-    .float -110,298
-    .float -85,294
-    .float -60,290
-    .float 30,332
-    .float 75,278
-    .float 110,280
-# Kongo Jungle 64
-.long 0x1E                  #Stage ID
+    .float 70,5
+# Peach's Castle
+.long 0x04
   # Singles Data
-    .float -60,5
-    .float 60,5
-    .float -34,-7
-    .float 34,-7
-    .float -61,55
-    .float 61,55
+    .float -60,90
+    .float 60,90
+    .float -40,90
+    .float 40,90
+    .float -80,85
+    .float 80,85
   # Teams Data
-    .float -61,55
-    .float -60,5
-    .float -34,-7
-    .float 61,55
-    .float 60,5
-    .float 34,-7
+    .float -60,90
+    .float -40,90
+    .float -80,85
+    .float 60,90
+    .float 40,90
+    .float 80,85
 # Kongo Jungle
 .long 0x05
   # Singles Data
@@ -327,15 +247,79 @@ blrl
     .float 32,40
     .float -32,60
     .float 32,69
-  # Doubles Data
+  # Teams Data
     .float -32,0
     .float -32,26
     .float -32,60
     .float 32,0
     .float 32,40
     .float 32,69
+# Corneria
+.long 0x07
+  #Singles Data
+    .float -110,298
+    .float 30,332
+    .float -85,294
+    .float 75,278
+    .float -60,290
+    .float 110,280
+  #Teams Data
+    .float -110,298
+    .float -85,294
+    .float -60,290
+    .float 30,332
+    .float 75,278
+    .float 110,280
+# Yoshi's Story
+.long 0x08
+  #Singles Data
+    .float -42,26.6
+    .float 42,28
+    .float 0,46.9
+    .float 0,4.9
+    .float -42,5
+    .float 42,5
+  #Teams Data
+    .float -42,26.6
+    .float -42,5
+    .float -30,5
+    .float 42,28
+    .float 42,5
+    .float 30,5
+# Rainbow Cruise
+.long 0x0B
+  # Singles Data
+    .float -32,50
+    .float -47,52
+    .float -17,45
+    .float 55,63
+    .float 20,45
+    .float 14,73
+  # Teams Data
+    .float -32,50
+    .float -47,52
+    .float -17,45
+    .float 55,63
+    .float 20,45
+    .float 14,73
+# Jungle Japes
+.long 0x0C
+  # Singles Data
+    .float -38,3
+    .float 38,3
+    .float -90,15
+    .float 90,15
+    .float -23,3
+    .float 23,3
+  # Teams Data
+    .float -38,3
+    .float -90,15
+    .float -23,3
+    .float 38,3
+    .float 90,15
+    .float 23,3
 # Green Greens
-.long 0x11                  #Stage ID
+.long 0x11
   # Singles Data
     .float -30,0
     .float 30,0
@@ -366,7 +350,87 @@ blrl
     .float 20,3
     .float 100,-15
     .float 40,3
-#Terminator
+# Venom
+.long 0x16
+  # Singles Data
+    .float -43,28
+    .float -58,-20
+    .float -73,42
+    .float 43,28
+    .float 58,-20
+    .float 73,42
+  # Teams Data
+    .float -43,28
+    .float -58,-20
+    .float -73,42
+    .float 43,28
+    .float 58,-20
+    .float 73,42
+# Dream Land
+.long 0x1C
+  #Singles Data
+    .float -46.6,37.2
+    .float 47.4,37.3
+    .float 0,7
+    .float 0,58.5
+    .float -61.4,5
+    .float 62.4,5
+  #Teams Data
+    .float -61.4,5
+    .float -46.6,37.2
+    .float -36.6,5
+    .float 62.4,5
+    .float 47.4,37.3
+    .float 37.4,5
+# Kongo Jungle 64
+.long 0x1E
+  # Singles Data
+    .float -60,5
+    .float 60,5
+    .float -34,-7
+    .float 34,-7
+    .float -61,55
+    .float 61,55
+  # Teams Data
+    .float -61,55
+    .float -60,5
+    .float -34,-7
+    .float 61,55
+    .float 60,5
+    .float 34,-7
+# Battlefield
+.long 0x1F
+  #Singles Data
+    .float -38.8,35.2
+    .float 38.8,35.2
+    .float 0,8
+    .float 0,62.4
+    .float -58.8,5
+    .float 58.8,5
+  #Teams Data
+    .float -58.8,5
+    .float -38.8,35.2
+    .float -38.8,5
+    .float 58.8,5
+    .float 38.8,35.2
+    .float 38.8,5
+# Final Destination
+.long 0x20
+  #Singles Data
+    .float -60,10
+    .float 60,10
+    .float -20,10
+    .float 20,10
+    .float -40,10
+    .float 40,10
+  #Teams Data
+    .float -20,10
+    .float -40,10
+    .float -60,10
+    .float 20,10
+    .float 40,10
+    .float 60,10
+# Terminator
 .long -1
 .align 2
 
