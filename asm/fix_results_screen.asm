@@ -67,7 +67,7 @@ find_winner:
     b find_winner.exit
 find_winner.continue:
     addi reg_idx, reg_idx, 1
-    cmpi 0, reg_idx, 4
+    cmpi 0, reg_idx, 6 # All six players must be checked.
     blt find_winner
 find_winner.exit:
 
