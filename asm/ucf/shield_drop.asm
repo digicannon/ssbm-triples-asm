@@ -1,6 +1,7 @@
 ################################################################################
 # Address: 0x800998A4
 # Tags: [affects-gameplay]
+# https://github.com/project-slippi/slippi-ssbm-asm/blob/0ca890f4a0a6dfe2ce42570892218428327a3168/External/UCF%200.8/Logic/UCF%20SD.asm
 ################################################################################
 
 .include "../common.s"
