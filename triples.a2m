@@ -133,6 +133,8 @@
 @file 263334 asm/css.asm
 @file 266CE0 asm/css_exit.asm
 
+@file 2662D0 asm/css_version_text.asm
+
 @file 262614 asm/css_text_update.asm
 @file 266830 asm/css_load_rescale_ui.asm
 
