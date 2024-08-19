@@ -170,6 +170,8 @@
 # Stage select / match load.
 # ==========
 
+@file 259F00 asm/stage_select_color.asm
+
 @file 16D978 asm/input_override_hold_a_for_sheik.asm
 @file 16BA0C asm/input_override_stock_steal.asm
 
@@ -184,7 +186,7 @@
 @file 2F9A3C asm/pal_stock_icons.asm
 @file 16CF38 asm/always_show_player_indicator.asm
 
-# On-exit fixes for the results screen.
+# On-exit (quit out or Game!) results screen patch.
 @file 16EBA8 asm/fix_results_screen.asm
 
 # C-Stick in Single Player
