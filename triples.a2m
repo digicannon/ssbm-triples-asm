@@ -30,6 +30,9 @@
 @set 45BF28 FFFFFFFF
 @set 45BF2C FFFFFFFF
 
+# Prevent data re-initialization on reset.
+@set 1A4234 60000000
+
 # Disable Trophy Messages (1.02) [Achilles]
 @set 15D984 4E800020
 
