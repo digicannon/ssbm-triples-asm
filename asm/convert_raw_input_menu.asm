@@ -22,10 +22,8 @@
     # 3 is in sudden death.
     # 4 is in results screen.
     lbz r4, 3(r3)
-    cmpli 0, r4, 4
-    beq not_in_game # On results screen.
     cmpli 0, r4, 2
-    bge return # Either in game, sudden death, or an unknown case.
+    bge return
 not_in_game:
 
 .set counter, 24
