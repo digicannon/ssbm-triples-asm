@@ -2,12 +2,6 @@
 #  Insert at 8025C00C
 # ====================
 
-    # Only do this for P5/6's CSS.
-    lis r14, 0x8000
-    lbz r14, 0x2900(r14)
-    cmpli 0, r14, 0
-    beq return
-
     # Load address of mode text.
     subi r3, r3, 40
     lis r14, 0x8045
@@ -28,12 +22,12 @@ store:
     b return
 load_text:
     blrl
-    .long 0x1A1A1A1A
-    .long 0x20192005
-    .long 0x1A202420
-    .long 0x3120271A
-    .long 0x20192006
-    .long 0
+    .long 0x1A1A201d
+    .long 0x2035202c
+    .long 0x2033202f
+    .long 0x20282036
+    .long 0x20ec1A1A
+	.long 0
 
 return:
 	lwz r0, 0x0014(sp)

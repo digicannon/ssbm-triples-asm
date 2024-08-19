@@ -1,0 +1,30 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Dolphin",
+            "type": "shell",
+            "windows": {
+                "command": "$env:PATH += \\\";C:\\devkitPro\\devkitPPC\\bin\\\"; ..\\asm2memcard\\a2m --dolphin --clean --no-loader triples.a2m",
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build Loader Dolphin",
+            "type": "shell",
+            "windows": {
+                "command": "$env:PATH += \\\";C:\\devkitPro\\devkitPPC\\bin\\\"; ..\\asm2memcard\\a2m --dolphin --clean triples.a2m",
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+            }
+        }
+    ]
+}
