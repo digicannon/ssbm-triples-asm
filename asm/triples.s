@@ -11,7 +11,8 @@
 .set triples_converted_output, 0x803FC600 # Size 0x88.
 
 .set begin_triples_globals, 0x803FC700
-.set dbg_text_gobj, begin_triples_globals + 16
+.set match_frames_since_indicator_switch, begin_triples_globals
+.set dbg_text_gobj, match_frames_since_indicator_switch + 12
 .set dbg_subtext_str, dbg_text_gobj + 4
 .set css_run_once, dbg_subtext_str + 4
 .set css_p5_border_jobj, css_run_once + 4
