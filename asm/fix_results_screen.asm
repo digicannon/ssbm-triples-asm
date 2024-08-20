@@ -116,8 +116,8 @@ copy_loop:
     cmpli 0, reg_temp, player_type_inactive
     beq copy_loop.continue
     # Is this player on the winning team?
-    lbz reg_temp, rb_placement(reg_result)
-    cmpli 0, reg_temp, 0
+    lbz reg_temp, rb_team_id(reg_result)
+    cmpl 0, reg_temp, reg_winning_team
     bne copy_loop.continue
     # Copy them to the replacement index and exit.
     mr r4, reg_result # src
