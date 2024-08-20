@@ -26,7 +26,7 @@ stage_types:
     .byte stage_type_frozen  # 09, Green Greens.
     .byte stage_type_neutral # 0A, Corneria.
     .byte stage_type_neutral # 0B, Venom.
-    .byte stage_type_vanilla # 0C, Brinstar.
+    .byte stage_type_neutral # 0C, Brinstar.
     .byte stage_type_vanilla # 0D, Brinstar Depths.
     .byte stage_type_vanilla # 0E, Onett.
     .byte stage_type_neutral # 0F, Fourside.
@@ -39,7 +39,7 @@ stage_types:
     .byte stage_type_vanilla # 16, Icicle Mountain.
     .byte stage_type_vanilla # 17, Flat Zone.
     .byte stage_type_neutral # 18, Battlefield.
-    .byte stage_type_neutral # 19, Final Destination.
+    .byte stage_type_frozen  # 19, Final Destination.
     .byte stage_type_neutral # 1A, Dreamland 64.
     .byte stage_type_vanilla # 1B, Yoshi 64.
     .byte stage_type_neutral # 1C, Kongo Jungle 64.

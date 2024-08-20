@@ -189,6 +189,8 @@ blrl
   .set  SpawnX,0x0
   .set  SpawnY,0x4
 
+# Stages are identified by their external ID.
+
 # Fountain of Dreams
 # Only here to allow singles/doubles.  Don't bother making real 5/6 spawns.
 .long 0x02
@@ -254,6 +256,22 @@ blrl
     .float 32,0
     .float 32,40
     .float 32,69
+# Brinstar
+.long 0x06
+  # Singles Data
+    .float -30,5
+    .float 26,5
+    .float -60,32
+    .float 58,25
+    .float -50,5
+    .float 50,0
+  # Teams Data
+    .float -30,5
+    .float -60,32
+    .float -50,5
+    .float 26,5
+    .float 58,25
+    .float 50,0
 # Corneria
 .long 0x07
   #Singles Data

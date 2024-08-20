@@ -107,6 +107,10 @@
 # Stage Changes
 # ==========
 
+# --- Final Destination ---
+# Disable Final Destination Background Transitions [Achilles, Dan Salvato]
+@set 21AAE4 60000000
+
 # --- Green Greens ---
 # Disable Initial Bricks [Zauron]
 @set 2146EC 60000000
