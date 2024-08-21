@@ -167,13 +167,13 @@
 @set 3F0E7C C0900000 # P4 [-4.5, -0.5]
 @set 3F0E80 BF000000
 # Remove the KO Stars rendering
-@set 25d22c 3ba00000
+@set 25D22C 3BA00000
 
 # Disable Rules Menu from CSS
-@set 2616d4 c03f000c
+@set 2616D4 C03F000C
 
 # Disable Nametag Menu from CSS
-@set 261ea0 c042ca10 
+@set 261EA0 C042CA10
 
 # Allow 1 player to go to stage select.
 @set 263064 2C040001
