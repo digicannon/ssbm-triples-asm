@@ -111,14 +111,6 @@
 # Disable Final Destination Background Transitions [Achilles, Dan Salvato]
 @set 21AAE4 60000000
 
-# --- Green Greens ---
-# Disable Initial Bricks [Zauron]
-@set 2146EC 60000000
-# Disable Falling Bricks [Zauron]
-@set 216B24 60000000
-# Disable Tree Wind and Apples [Zauron]
-@set 213C10 4E800020
-
 # --- Corneria ---
 # Disabled.  Just holding on to these in case people want them.
 # Disable Ship Spawn [Zauron]
