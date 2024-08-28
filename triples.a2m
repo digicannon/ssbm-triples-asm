@@ -201,5 +201,40 @@
 # On-exit (quit out or Game!) results screen patch.
 @file 16EBA8 asm/fix_results_screen.asm
 
+# ==========
+# UnclePunch's stage expansion code.
+# This must come last due to the size of the main injection.
+# ==========
+
+@set 3E52F4 80202C48 #JungleJapesFreeze.asm
+@set 1FCFE8 60000000 #MK2Freeze.asm
+@set 1CD638 60000000 #PeachCastleFreeze.asm
+@set 1CD640 60000000 #PeachCastleFreeze2.asm
+@set 2021DC 38A00000 #YosterFreeze.asm
+@set 3E7970 800115F4 #FlatZone Freeze/Disable Event Changes.asm
+@set 217230 48000118 #FlatZone Freeze/Disable NonPlatform Events.asm
+@set 3E79AC 00000000 #FlatZone Freeze/Disable Platform Changes.asm
+@file 21819C asm/up_stage_expansion/flatzone_random_legal_platform_layout.asm
+@set 21470C 60000000 #Greens Freeze/Disable Block Fall.asm
+@set 21508C 60000000 #Greens Freeze/Disable Block Hurtboxes.asm
+@set 1EFE28 60000000 #Mute City Freeze/Disable Camera Movement.asm
+@set 1F015C 60000000 #Mute City Freeze/Disable Platform Hidden Change.asm
+@set 1F01F8 60000000 #Mute City Freeze/Disable Platform Movement.asm
+@set 1F2608 60000000 #Mute City Freeze/Disable Screen Rumble.asm
+@set 1E3D6C 60000000 #Onett Freeze/Disable Awning1 Movement.asm
+@set 1E3D7C 60000000 #Onett Freeze/Disable Awning2 Movement.asm
+@set 1E379C 60000000 #Onett Freeze/Disable Cars.asm
+@set 1E3D24 60000000 #Onett Freeze/Disable Sign Movement.asm
+@set 1FF6FC 60000000 #Rainbow Cruise Freeze/Disable Object Fade Ins.asm
+@set 1FF7E0 60000000 #Rainbow Cruise Freeze/Disable Ship Animation.asm
+@set 3E4E70 00000000 #Rainbow Cruise Freeze/Disable Ship Camera Boundary Texture.asm
+@set 1FF5E8 60000000 #Rainbow Cruise Freeze/Disable TickTock Animation.asm
+@set 1FFADC 4E800020 #Rainbow Cruise Freeze/Freeze Camera.asm
+@file 1FF62C asm/up_stage_expansion/rainbow_cruise_enable_ticktock.asm
+@file 16E800 asm/up_stage_expansion/stage_file_edits.asm
+
+# asm2memcard bug causes last code to have null terminator.
+# Ending in @set prevents it.
+
 # C-Stick in Single Player
 @set 16B480 60000000
