@@ -7,8 +7,8 @@
 @set 1A218C 60000000
 # "3 v0"
 @set 3EA6C8 33207630
-# ".3.0"
-@set 3EA6CC 2E332E30
+# ".3.1"
+@set 3EA6CC 2E332E31
 # " dbg"
 @set 3EA6D0 20646267
 # Null terminator.

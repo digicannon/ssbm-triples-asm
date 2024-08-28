@@ -426,6 +426,12 @@ p1:
 		cmpi 0, r3, 1
 		bne p2
 
+		# Check if P5 is plugged in.
+		load r3, triples_converted_output
+		lbz r3, 0x41(r3) # Controller error status.
+		cmpli 0, r3, 0 # Nonzero is error.
+		bne p1_disabled
+
 		# Check if P1 is disabled
 		lis r3, 0x803F
 		lbz r4, 0x0E08(r3) # P1 player type
@@ -584,6 +590,12 @@ p2:
 	lbz r3, 4(r31)
 	cmpi 0, r3, 2
 	bne RETURN
+
+	# Check if P6 is plugged in.
+	load r3, triples_converted_output + 0x44
+	lbz r3, 0x41(r3) # Controller error status.
+	cmpli 0, r3, 0 # Nonzero is error.
+	bne p2_disabled
 
 	# Check if P2 is disabled
 	lis r3, 0x803F

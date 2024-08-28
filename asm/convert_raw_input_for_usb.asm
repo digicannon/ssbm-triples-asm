@@ -33,11 +33,7 @@
     lis r3, 0
     lis r25, triples_nintendont_data@h
     ori r25, r25, triples_nintendont_data@l
-cache_loop:
     dcbi r3, r25
-    #addi r3, r3, 4
-    #cmpwi r3, 24
-    #blt cache_loop
 
     lis src_ptr, OUR_SRC_ADDR@h
     ori src_ptr, src_ptr, OUR_SRC_ADDR@l

@@ -52,6 +52,18 @@ loop:
     # Right stick.
     li r3, 0x1A
     bl copy_stick
+    # Did the right stick copy?
+    cmpli 0, r3, 0
+    beq loop.no_right_stick
+    # Copy the float values for the right stick.
+    # Yes, this is only to allow menu camera manipulation. :)
+    # C-Stick X float.
+    lwz r3, 0x28(src)
+    stw r3, 0x28(dest)
+    # C-Stick Y float.
+    lwz r3, 0x2C(src)
+    stw r3, 0x2C(dest)
+loop.no_right_stick:
     # Loop check.  Return if !0, else add 1.
     cmpli 0, counter, 0
     bne return
@@ -64,6 +76,7 @@ loop:
 
 # r3 = Input data offset to copy.
 # If dest[r3] is zero, dest[r3] = src[r3].
+# Returns nonzero in r3 if copy occurred.
 copy_stick:
     add r4, dest, r3
     add r3, src, r3
@@ -84,7 +97,12 @@ copy_stick:
     # Perform the copy of both X and Y.
     lhz r5, 0(r3)
     sth r5, 0(r4)
+    # Return true.
+    li r3, 1
+    blr
 copy_stick_ret:
+    # Return false.
+    li r3, 0
     blr
 
 return:
