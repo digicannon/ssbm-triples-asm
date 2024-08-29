@@ -7,39 +7,39 @@
     b entry
 
 .set stage_type_neutral, 0 # Neutral starts supported.
-.set stage_type_frozen, 1  # Neutral starts supported + modified stage codes.
+.set stage_type_modded, 1  # Neutral starts supported + modified stage codes.
 .set stage_type_vanilla, 2 # Unchanged, unfair starting positions for 5+6.
 
 .set reg_stage_index, 30
 
 stage_types:
     blrl
-    .byte stage_type_frozen  # 00, Peach's Castle.
-    .byte stage_type_frozen  # 01, Rainbow Cruise.
+    .byte stage_type_modded  # 00, Peach's Castle.
+    .byte stage_type_modded  # 01, Rainbow Cruise.
     .byte stage_type_neutral # 02, Kongo Jungle.
-    .byte stage_type_frozen  # 03, Jungle Japes.
-    .byte stage_type_frozen  # 04, Great Bay.
+    .byte stage_type_modded  # 03, Jungle Japes.
+    .byte stage_type_modded  # 04, Great Bay.
     .byte stage_type_vanilla # 05, Hyrule Temple.
     .byte stage_type_neutral # 06, Yoshi's Story.
-    .byte stage_type_frozen  # 07, Yoshi's Island.
+    .byte stage_type_modded  # 07, Yoshi's Island.
     .byte stage_type_neutral # 08, Fountain of Dreams.
-    .byte stage_type_frozen  # 09, Green Greens.
+    .byte stage_type_modded  # 09, Green Greens.
     .byte stage_type_neutral # 0A, Corneria.
     .byte stage_type_neutral # 0B, Venom.
     .byte stage_type_neutral # 0C, Brinstar.
     .byte stage_type_vanilla # 0D, Brinstar Depths.
-    .byte stage_type_frozen  # 0E, Onett.
-    .byte stage_type_frozen  # 0F, Fourside.
-    .byte stage_type_frozen  # 10, Mute City.
+    .byte stage_type_modded  # 0E, Onett.
+    .byte stage_type_modded  # 0F, Fourside.
+    .byte stage_type_modded  # 10, Mute City.
     .byte stage_type_vanilla # 11, Big Blue.
     .byte stage_type_neutral # 12, Pokemon Stadium.
     .byte stage_type_vanilla # 13, Pokefloats.
-    .byte stage_type_frozen  # 14, Mushroom Kingdom.
-    .byte stage_type_frozen  # 15, Mushroom Kingdom II.
+    .byte stage_type_modded  # 14, Mushroom Kingdom.
+    .byte stage_type_modded  # 15, Mushroom Kingdom II.
     .byte stage_type_vanilla # 16, Icicle Mountain.
-    .byte stage_type_frozen  # 17, Flat Zone.
+    .byte stage_type_modded  # 17, Flat Zone.
     .byte stage_type_neutral # 18, Battlefield.
-    .byte stage_type_frozen  # 19, Final Destination.
+    .byte stage_type_modded  # 19, Final Destination.
     .byte stage_type_neutral # 1A, Dreamland 64.
     .byte stage_type_vanilla # 1B, Yoshi 64.
     .byte stage_type_neutral # 1C, Kongo Jungle 64.
@@ -49,7 +49,7 @@ stage_types:
 color_table:
     blrl
     .long 0xFFFFFFFF # 0, neutral.
-    .long 0x7070FFFF # 1, frozen or modified.
+    .long 0x7070FFFF # 1, modified.
     .long 0xFF6060FF # 2, vanilla.
     .align 4
 

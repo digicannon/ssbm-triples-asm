@@ -19,12 +19,11 @@
 
 # Tournament settings.
 @set 45BF10 00340102 # Stock mode.
-@set 45BF14 03000A00 # 3 Stocks & 1.0 damage ratio.
+@set 45BF14 04000A00 # 4 Stocks & 1.0 damage ratio.
 @set 45BF18 08010100 # 8min timer & friendly fire.  Pause on.
 @set 45C370 FF0000FF # Disable items.
 @set 45C380 00000000 # Disable rumble for all.
 @set 45C384 00000100 # Deflicker off! Stop making your TV blurry AF.
-@set 45C388 170000C0 # Legal stages for random selection.
 
 # Unlock characters & stages.
 @set 45BF28 FFFFFFFF
