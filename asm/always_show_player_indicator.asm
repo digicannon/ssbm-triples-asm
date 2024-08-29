@@ -43,7 +43,7 @@ loop_control:
 
     # Determine the behavior we want.
     cmpli 0, reg_player_count, 5
-    blt choose_default # Match has always in been at most 4 players.
+    blt choose_default # Match has always been at most 4 players.
     cmpli 0, reg_alive_count, 5
     blt choose_fade # Match was previously more than 4 players.
     # Match is currently more than 4 players.
