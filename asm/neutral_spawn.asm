@@ -304,70 +304,166 @@ blrl
     .float 42,28
     .float 42,5
     .float 30,5
+# Onett
+.long 0x09
+  #Singles Data
+    .float -54,5
+    .float 54,5
+    .float -31.5,5
+    .float 31.5,5
+    .float -54,32
+    .float 54,32
+  #Teams Data
+    .float -54,5
+    .float -31.5,5
+    .float -54,32
+    .float 54,5
+    .float 31.5,5
+    .float 54,32
+# Mute City
+.long 0x0A
+  # Singles Data
+    .float -48,10
+    .float 48,10
+    .float -24,10
+    .float 24,10
+    .float -64,46
+    .float 64,46
+  #Teams Data
+    .float -48,10
+    .float -24,10
+    .float -64,46
+    .float 48,10
+    .float 24,10
+    .float 64,46
 # Rainbow Cruise
 .long 0x0B
   # Singles Data
-    .float -32,50
-    .float -47,52
-    .float -17,45
-    .float 55,63
-    .float 20,45
-    .float 14,73
+    .float -45.98,10
+    .float 46.42,10
+    .float -15.62,10
+    .float 14.74,10
+    .float -15.62,40
+    .float 14.74,40
   # Teams Data
-    .float -32,50
-    .float -47,52
-    .float -17,45
-    .float 55,63
-    .float 20,45
-    .float 14,73
+    .float -45.98,10
+    .float -15.62,10
+    .float -15.62,40
+    .float 46.42,10
+    .float 14.74,10
+    .float 14.74,40
 # Jungle Japes
 .long 0x0C
   # Singles Data
-    .float -38,3
-    .float 38,3
-    .float -90,15
-    .float 90,15
-    .float -23,3
-    .float 23,3
+    .float -55,5
+    .float 62.4,5
+    .float -22.5,5
+    .float 29.95,5
+    .float -38.75,5
+    .float 46.17,5
   # Teams Data
-    .float -38,3
-    .float -90,15
-    .float -23,3
-    .float 38,3
-    .float 90,15
-    .float 23,3
+    .float -55,5
+    .float -22.5,5
+    .float -38.75,5
+    .float 62.4,5
+    .float 29.95,5
+    .float 46.17,5
+# Great Bay
+.long 0x0D
+  # Singles Data
+    .float -91.8,20
+    .float 85,57
+    .float -53.67,20
+    .float 0,20
+    .float 48.33,32
+    .float 85,37
+  # Teams Data
+    .float -91.8,20
+    .float -61.9,20
+    .float -32,20
+    .float 85,57
+    .float 48.33,32
+    .float 85,37
+# Yoshi's Island
+.long 0x10
+  # Singles Data
+    .float -38.25,10
+    .float 38.25,10
+    .float -21.25,10
+    .float 21.25,10
+    .float -29.75,10
+    .float 29.75,10
+  # Teams Data
+    .float -38.25,10
+    .float -21.25,10
+    .float -29.75,10
+    .float 38.25,10
+    .float 21.25,10
+    .float 29.75,10
 # Green Greens
 .long 0x11
   # Singles Data
-    .float -30,0
-    .float 30,0
-    .float -77,-5
-    .float 77,-5
+    .float -30,5
+    .float 30,5
     .float -30,28
     .float 30,28
+    .float -70,5
+    .float 70,5
   # Teams Data
-    .float -30,0
-    .float -77,-5
+    .float -30,5
     .float -30,28
-    .float 30,0
-    .float 77,-5
+    .float -70,5
+    .float 30,5
     .float 30,28
+    .float 70,5
 # Fourside
 .long 0x12
   # Singles Data
-    .float -110,33
-    .float -80,33
-    .float 20,3
-    .float 100,-15
-    .float -80,0
-    .float 40,3
+    .float -70.5,5
+    .float 41.25,5
+    .float -45.25,5
+    .float 16,5
+    .float -57.87,5
+    .float 28.62,5
   # Teams Data
-    .float -110,33
-    .float -80,33
-    .float -80,0
-    .float 20,3
-    .float 100,-15
-    .float 40,3
+    .float -70.5,5
+    .float -45.25,5
+    .float -57.87,5
+    .float 41.25,5
+    .float 16,5
+    .float 28.62,5
+# Mushroom Kingdom I
+.long 0x13
+  # Singles Data
+    .float -30.6,10
+    .float 30.6,10
+    .float -12.75,10
+    .float 12.75,10
+    .float -69,10
+    .float 69,10
+  # Teams Data
+    .float -30.6,10
+    .float -12.75,10
+    .float -69,10
+    .float 30.6,10
+    .float 12.75,10
+    .float 69,10
+# Mushroom Kingdom II
+.long 0x14
+  # Singles Data
+    .float -43.4,10
+    .float 43.4,10
+    .float -22.4,10
+    .float 22.4,10
+    .float -64.4,10
+    .float 64.4,10
+  # Teams Data
+    .float -43.4,10
+    .float -22.4,10
+    .float -64.4,10
+    .float 43.4,10
+    .float 22.4,10
+    .float 64.4,10
 # Venom
 .long 0x16
   # Singles Data
@@ -384,6 +480,22 @@ blrl
     .float 43,28
     .float 58,-20
     .float 73,42
+# Flat Zone
+.long 0x1B
+  #Singles Data
+    .float -61.6,-20
+    .float 61.6,-20
+    .float -31.6,-20
+    .float 31.6,-20
+    .float -31.6,40
+    .float 31.6,40
+  #Teams Data
+    .float -61.6,-20
+    .float -31.6,-20
+    .float -31.6,40
+    .float 61.6,-20
+    .float 31.6,-20
+    .float 31.6,40
 # Dream Land
 .long 0x1C
   #Singles Data
