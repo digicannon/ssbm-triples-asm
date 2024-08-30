@@ -131,7 +131,6 @@
 # CSS.
 # ==========
 
-@file 263334 asm/css.asm
 @file 266CE0 asm/css_exit.asm
 
 @file 2662D0 asm/css_version_text.asm
