@@ -7,33 +7,63 @@
 @set 1A218C 60000000
 # "3 v0"
 @set 3EA6C8 33207630
-# ".3.1"
-@set 3EA6CC 2E332E31
+# ".4.0"
+@set 3EA6CC 2E342E30
 # " dbg"
 @set 3EA6D0 20646267
 # Null terminator.
 @set 3EA6D4 00000000
 
+# ================
+# Base game setup.
+# ================
+
 # Enable OSReport print on crash (1.02) [UnclePunch]
 @set 397878 4800020C
 
+# Redirect "Tournament Melee" to normal CSS.
+# We overwrite Tournament Melee menu code.
+@set 22D638 38000002
+
 # Tournament settings.
-@set 45BF10 00340102 # Stock mode.
-@set 45BF14 04000A00 # 4 Stocks & 1.0 damage ratio.
-@set 45BF18 08010100 # 8min timer & friendly fire.  Pause on.
-@set 45C370 FF0000FF # Disable items.
-@set 45C380 00000000 # Disable rumble for all.
+@set 3D4A48 00340102 # Stock mode. [Magus]
+@set 3D4A4C 04000A00 # 4 Stocks & 1.0 damage ratio. [Magus]
+@set 3D4A50 08010100 # 8 Minutes, friendly fire, pause on. [Magus]
+@set 3D4A60 FF000000 # No Items [Magus]
+
+@set 3D4A70 00000000 # Disable rumble for all. [Project Slippi]
 @set 45C384 00000100 # Deflicker off! Stop making your TV blurry AF.
 
-# Unlock characters & stages.
-@set 45BF28 FFFFFFFF
-@set 45BF2C FFFFFFFF
+# Unlock everything. [Datel]
+@set 15EE98 38600001
+@set 15EDDC 38600001
+@set 164B14 38600001
+@set 1648F4 38600001
+@set 15EE4C 38600001
+@set 15EE14 38600001
+@set 15D968 38600001
+@set 15D9D8 38600001
+@set 17229C 38600000
+@set 1737B0 38600000
+@set 164658 38600001
+@set 1644E8 38600001
+@set 30490C 38600063
+@set 3044F0 38600001
+
+# Disable Special Messages [Most]
+@set 15D94C 4E800020
+# Disable Trophy Messages (1.02) [Achilles]
+@set 15D984 4E800020
+# Disable memory card prompts.
+# https://github.com/project-slippi/slippi-ssbm-asm/blob/07c581d0d177b3da2b90ee89aba30e36c39003d1/External/Skip%20Memcard%20Prompt/Skip%20Memcard%20Prompt.asm
+@file 1AF6F4 asm/skip_memcard_prompt.asm
 
 # Prevent data re-initialization on reset.
 @set 1A4234 60000000
 
-# Disable Trophy Messages (1.02) [Achilles]
-@set 15D984 4E800020
+# ========================
+# Unsorted external codes.
+# ========================
 
 # Disable Screen Shake for Teams [UnclePunch]
 # https://smashboards.com/threads/disable-screen-shake-in-teams-mode.442101/

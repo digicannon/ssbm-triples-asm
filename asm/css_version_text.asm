@@ -95,7 +95,7 @@ blrl
 
 TEXT:
 blrl
-.string "Triples v0.3.0"
+.string "Triples v0.4.0"
 .align 2
 
 #**************************************************#
