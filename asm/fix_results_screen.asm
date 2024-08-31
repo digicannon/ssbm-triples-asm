@@ -27,20 +27,90 @@
 .set rb_sub_placement, 6
 .set rb_team_id, 7
 
+.set result_block_p5, 0x8047A09C
+.set result_block_p6, 0x8047A144
+
 .set player_type_cpu, 1
 .set player_type_inactive, 3
+
+# ===============================================
+# Ensure everyone's placement is in bounds [0,3].
+# ===============================================
+
+.set reg_result, 3
+.set reg_idx, 4
+.set reg_temp, 7
+    li reg_idx, 0
+placement_bounds_check:
+    load reg_result, results_block
+    mulli reg_temp, reg_idx, results_block_size
+    add reg_result, reg_result, reg_temp
+    # Did this player get worse than 4th place?
+    # Remember that placement is 0-based.
+    lbz reg_temp, rb_placement(reg_result)
+    cmpli 0, reg_temp, 4 # Logical comparison here ensures it cannot be negative.
+    blt placement_bounds_check.continue
+    li reg_temp, 3 # 4th place.
+    stb reg_temp, rb_placement(reg_result)
+    stb reg_temp, rb_sub_placement(reg_result)
+placement_bounds_check.continue:
+    addi reg_idx, reg_idx, 1
+    cmpi 0, reg_idx, 6 # All six players must be checked.
+    blt placement_bounds_check
+
+# =================
+# Begin copy check.
+# =================
 
     # Skip teams logic if not in teams mode.
     lis r3, 0x8048
     lbz r3, 0x7C8(r3)
     cmpli 0, r3, 0
-    beq return
+    bne teams_mode
 
-    .set reg_result, 3
-    .set reg_idx, 4
-    .set reg_winning_team, 5
-    .set reg_replace_ptr, 6
-    .set reg_temp, 7
+# ========================
+# Begin free for all mode.
+# ========================
+
+    # Check if player 5 won.
+    load r3, results_block # P1 block.
+    load r4, result_block_p5
+    lbz r5, rb_placement(r4)
+    cmpli 0, r5, 0
+    beq ffa_copy
+
+    # Check if player 6 won.
+    load r3, results_block + results_block_size # P2 block.
+    load r4, result_block_p6
+    lbz r5, rb_placement(r4)
+    cmpli 0, r5, 0
+    beq ffa_copy
+
+    # Neither player won, no copy required.
+    b return
+
+    # r3 = Address of destination player block.
+    # r4 = Address of winning player block.
+ffa_copy:
+    li r5, results_block_size # size
+    branchl r6, memcpy
+    # Set the replacement to a CPU so nobody has to press start for it.
+    # It would be unclear who is in control, the replaced controller or player 5/6?
+    # memcpy leaves r3, the destination, untouched.
+    li r4, player_type_cpu
+    stb r4, rb_player_type(r3)
+
+    b return
+
+# =================
+# Begin teams mode.
+# =================
+
+.set reg_result, 3
+.set reg_idx, 4
+.set reg_winning_team, 5
+.set reg_replace_ptr, 6
+.set reg_temp, 7
 
 .macro idx_to_result_ptr
     load reg_result, results_block
@@ -50,6 +120,7 @@
 
     # Find the winning team ID by finding the player in 1st place and saving their team ID.
 
+teams_mode:
     li reg_idx, 0
     li reg_winning_team, 0
 find_winner:
@@ -135,10 +206,12 @@ copy_loop.continue:
     cmpli 0, reg_idx, 6
     blt copy_loop
 
+# =================================================
+# Begin shared code between teams and free for all.
+# =================================================
+
 return:
     # Always delete players 5 and 6 to prevent a crash.
-.set result_block_p5, 0x8047A09C
-.set result_block_p6, 0x8047A144
 
     # Player 5, zero.
     load r3, result_block_p5
