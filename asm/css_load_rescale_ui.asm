@@ -360,93 +360,79 @@ manually_animate:
 # Begin actual code
 START_CODE:
 .set jobj_x30_ptr,       0x804d6cc0
-.set jobj_x30,           0x810dc540
-.set jobj_x30_5,         0x810ea2a0
-.set jobj_x30_8,         0x810ed820
-.set jobj_x30_8_1,       0x810ed8c0
-.set jobj_x30_8_2,       0x810eda00
-.set jobj_x30_8_3,       0x810edaa0
-.set jobj_x30_8_4,       0x810edb40
-.set jobj_x30_12,        0x810fe0c0
-.set jobj_x30_13,        0x810ff760
-.set jobj_x30_14,        0x81100ae0
-.set jobj_x30_15,        0x81101f00
-.set jobj_x30_15_1_2,    0x81102a00
-.set jobj_x30_16,        0x811032c0
-.set jobj_x30_16_1,      0x81103360
-.set jobj_x30_16_2,      0x81103b00
-.set jobj_x30_16_3,      0x81104380
-.set jobj_x30_16_4,      0x81104c00
-.set jobj_x30_16_1_1,    0x81103400
-.set jobj_x30_16_1_1_d1_p, 0x811036c0
-.set jobj_x30_16_1_1_d2_p, 0x811030c0
-.set jobj_x30_16_1_1_d3_p, 0x81103180
-.set jobj_x30_16_2_1,    0x81103ba0
-.set jobj_x30_16_3_1,    0x81104420
-.set jobj_x30_16_4_1,    0x81104ca0
-.set known_flags,       0x20000208
+.set jobj_x30_base,      0x810dc540
+# .set jobj_x30_5,         0x810ea2a0
+# .set jobj_x30_8,         0x810ed820
+# .set jobj_x30_8_1,       0x810ed8c0
+# .set jobj_x30_8_2,       0x810eda00
+# .set jobj_x30_8_3,       0x810edaa0
+# .set jobj_x30_8_4,       0x810edb40
+# .set jobj_x30_12,        0x810fe0c0
+# .set jobj_x30_13,        0x810ff760
+# .set jobj_x30_14,        0x81100ae0
+# .set jobj_x30_15,        0x81101f00
+# .set jobj_x30_15_1_2,    0x81102a00
+# .set jobj_x30_16,        0x811032c0
+# .set jobj_x30_16_1,      0x81103360
+# .set jobj_x30_16_2,      0x81103b00
+# .set jobj_x30_16_3,      0x81104380
+# .set jobj_x30_16_4,      0x81104c00
+.set jobj_x30_16_1_1,    (0x81103400 - jobj_x30_base)
+# .set jobj_x30_16_1_1_d1_p, 0x811036c0
+# .set jobj_x30_16_1_1_d2_p, 0x811030c0
+# .set jobj_x30_16_1_1_d3_p, 0x81103180
+.set jobj_x30_16_2_1,    (0x81103ba0 - jobj_x30_base)
+# .set jobj_x30_16_3_1,    0x81104420
+# .set jobj_x30_16_4_1,    0x81104ca0
 .set func_text_update_subtext_pos, 0x803a746c
 .set func_jobj_remove,             0x80371370
 .set func_jobj_remove_anim_all,    0x8036f6b4
 .set func_jobj_set_flags,          0x80371d00
 .set func_jobj_hide,               func_jobj_set_flags
 .set func_dobj_set_flags,          0x8035DDB8
-load r11, jobj_x30
-load r7, known_flags
 
-# Indev / debug loop to find the correct address for the JObj. This can be removed once functionallity is complete.
-# Loop its children until find a flags of known_flags
-# That's the one to try and hide.
-    lwz r11, 0x10(r11) # Child of JObj
-    li r9, 15
-    li r10, 0
-loop:
-    # if (i == 16)
-    cmp 0, r9, r10
-    beq finished_loop
+.set reg_jobj_x30_base, r27
 
-    # compare JOBj flags to known dbg values of known_flags
-    lwz r8, 0x14(r11)
-	cmp 0, r8, r7
-	beq found_match
+.macro load_jobj_addr reg, x30_offset
+	load \reg, \x30_offset
+	add \reg, reg_jobj_x30_base, \reg
+.endm
+.macro load_jobj_addr_abs reg, x30_address
+	load \reg, (\x30_address - jobj_x30_base)
+	add \reg, reg_jobj_x30_base, \reg
+.endm
 
-    # next itr
-	lwz r11, 0x08(r11) # curr = curr->next
-	addi r10, r10, 1   # ++i
-	b loop
-found_match:
-    nop #nop for BP
-finished_loop:
-
-# Make some stack room
-	stmw r28, -16(sp) # Save r28 .. r31
+	# Make some stack room
+	stmw r27, -20(sp) # Save r28 .. r31
 	mr r31, sp        # Backup SP
-	stwu sp, -24(sp)  # Grow stack 6 words
+	stwu sp, -28(sp)  # Grow stack 6 words
+
+	loadwz reg_jobj_x30_base, jobj_x30_ptr
 
 # Hide extra artifacts we don't want anymore, like P1-P4 italics
 .set func_m_set_alpha, 0x80363C2C
 # Hide weird extra rectangles around char string
 	li r4, 0
-    load r3, 0x810f7ce0 # x30_9_5_d1_p
+    load_jobj_addr_abs r3, 0x810f7ce0 # x30_9_5_d1_p
 	sth r4, 0xe(r3) # n_display
-	load r3, 0x810f78e0 # x30_9_5_d2_p
+	load_jobj_addr_abs r3, 0x810f78e0 # x30_9_5_d2_p
 	sth r4, 0xe(r3) # n_display
-	load r3, 0x810f75a0 # x30_9_5_d3_p
+	load_jobj_addr_abs r3, 0x810f75a0 # x30_9_5_d3_p
 	sth r4, 0xe(r3) # n_display
-	load r3, 0x810f7540 # x30_9_5_d4_p
+	load_jobj_addr_abs r3, 0x810f7540 # x30_9_5_d4_p
 	sth r4, 0xe(r3) # n_display
 
 # Hide italic "text" P1-4
 	li r4, 0
-	load r3, 0x81103180 # x30_16_1_1_d3_p
+	load_jobj_addr_abs r3, 0x81103180 # x30_16_1_1_d3_p
 	sth r4, 0xe(r3) # n_display
-	load r3, 0x81103d40 # x30_16_2_1_d3_p
+	load_jobj_addr_abs r3, 0x81103d40 # x30_16_2_1_d3_p
 	sth r4, 0xe(r3) # n_display
-	load r3, 0x811045c0 # x30_16_3_1_d3_p
+	load_jobj_addr_abs r3, 0x811045c0 # x30_16_3_1_d3_p
 	sth r4, 0xe(r3) # n_display
-	load r3, 0x81104e40 # x30_16_4_1_d3_p
+	load_jobj_addr_abs r3, 0x81104e40 # x30_16_4_1_d3_p
 	sth r4, 0xe(r3) # n_display
-
+	b RETURN
 
 # Scale card to FP_CONST_... X size
     mr r7, r3
@@ -457,57 +443,60 @@ finished_loop:
 	bl FP_CONST_POINT_SIX_SIX
 	mflr r5
 
-b scale_card_loop
+	b scale_card_loop
+
 scale_p1_vars:
-blrl
+	blrl
 # P1
-    .long 0x810ea340    # Rectangle border
-	.long 0x810ecae0    # Char portrait
-	.long 0x810eba00    # Category logo
-	.long 0x81103400    # HMN tag
-	.long 0x810feea0    # Door
-	.long 0x810fe4a0    # Door curved inner anim pt1
-	.long 0x810fe540    # ^ pt2
-	.long 0x810ed8c0    # Team tag
+    .long (0x810ea340 - jobj_x30_base) # Rectangle border
+	.long (0x810ecae0 - jobj_x30_base) # Char portrait
+	.long (0x810eba00 - jobj_x30_base) # Category logo
+	.long (0x81103400 - jobj_x30_base) # HMN tag
+	.long (0x810feea0 - jobj_x30_base) # Door
+	.long (0x810fe4a0 - jobj_x30_base) # Door curved inner anim pt1
+	.long (0x810fe540 - jobj_x30_base) # ^ pt2
+	.long (0x810ed8c0 - jobj_x30_base) # Team tag
 # P2
-    .long 0x810EA3E0    # Rectangle border
-    .long 0x810ecb80    # Char portrait
-	.long 0x810ebb20    # Category logo
-	.long 0x81103ba0    # HMN tag
-	.long 0x811002a0    # Door
-	.long 0x810ff940    # Door curved inner anim
-	.long 0x810ffb00    # ^ pt2
-	.long 0x810eda00    # Team tag
+    .long (0x810EA3E0 - jobj_x30_base) # Rectangle border
+    .long (0x810ecb80 - jobj_x30_base) # Char portrait
+	.long (0x810ebb20 - jobj_x30_base) # Category logo
+	.long (0x81103ba0 - jobj_x30_base) # HMN tag
+	.long (0x811002a0 - jobj_x30_base) # Door
+	.long (0x810ff940 - jobj_x30_base) # Door curved inner anim
+	.long (0x810ffb00 - jobj_x30_base) # ^ pt2
+	.long (0x810eda00 - jobj_x30_base) # Team tag
 # P3
-    .long 0x810ea480    # Rectangle border
-	.long 0x810ecca0    # Char portrait
-	.long 0x810ebbc0    # Category logo
-	.long 0x81104420    # HMN tag
-	.long 0x811016c0    # Door
-	.long 0x81100de0    # Door curved inner anim
-	.long 0x81100e80    # ^ pt2
-	.long 0x810edaa0    # Team tag
+    .long (0x810ea480 - jobj_x30_base) # Rectangle border
+	.long (0x810ecca0 - jobj_x30_base) # Char portrait
+	.long (0x810ebbc0 - jobj_x30_base) # Category logo
+	.long (0x81104420 - jobj_x30_base) # HMN tag
+	.long (0x811016c0 - jobj_x30_base) # Door
+	.long (0x81100de0 - jobj_x30_base) # Door curved inner anim
+	.long (0x81100e80 - jobj_x30_base) # ^ pt2
+	.long (0x810edaa0 - jobj_x30_base) # Team tag
 # P4
-    .long 0x810ea580    # Rectanlge border
-    .long 0x810ecd40    # Char portrait
-	.long 0x810ebc60    # Category logo
-	.long 0x81104ca0    # HMN tag
-	.long 0x81102a00    # Door
-	.long 0x811020e0    # Door curved inner anim
-	.long 0x81102180    # ^ pt2
-	.long 0x810edb40    # Team tag
+    .long (0x810ea580 - jobj_x30_base) # Rectanlge border
+    .long (0x810ecd40 - jobj_x30_base) # Char portrait
+	.long (0x810ebc60 - jobj_x30_base) # Category logo
+	.long (0x81104ca0 - jobj_x30_base) # HMN tag
+	.long (0x81102a00 - jobj_x30_base) # Door
+	.long (0x811020e0 - jobj_x30_base) # Door curved inner anim
+	.long (0x81102180 - jobj_x30_base) # ^ pt2
+	.long (0x810edb40 - jobj_x30_base) # Team tag
+
 text_label_gobjs:
-blrl
-    .long 0x80bd5c88    # P1 Char Label
-	.long 0x80bd5f68    # P2 Char Label
-	.long 0x80bd6418    # P3 Char Label
-	.long 0x80bd68c8    # P4 Char Label
+	blrl
+    .long (0x80bd5c88 - jobj_x30_base) # P1 Char Label
+	.long (0x80bd5f68 - jobj_x30_base) # P2 Char Label
+	.long (0x80bd6418 - jobj_x30_base) # P3 Char Label
+	.long (0x80bd68c8 - jobj_x30_base) # P4 Char Label
+
 text_background_jobjs:
-blrl
-    .long 0x810ef040    # P1 Text BG
-    .long 0x810f1380    # P2 Text BG
-    .long 0x810f3600    # P3 Text BG
-    .long 0x810f5880    # P4 Text BG
+	blrl
+    .long (0x810ef040 - jobj_x30_base) # P1 Text BG
+    .long (0x810f1380 - jobj_x30_base) # P2 Text BG
+    .long (0x810f3600 - jobj_x30_base) # P3 Text BG
+    .long (0x810f5880 - jobj_x30_base) # P4 Text BG
 
 scale_card_loop:
 .set x_pos_offset, 0x38
@@ -520,6 +509,7 @@ scale_card_loop:
 
     # main loop logic, get each JObj and scale it
     lwz r3, 0(r6)
+	add r3, reg_jobj_x30_base, r3
 	lfs f4, 0(r5)
 	stfs f4, x_scale_offset(r3)
 
@@ -550,6 +540,7 @@ translate_card_loop:
 
     # main loop logic, get each JObj and translate it
     lwz r3, 0(r6) # Current JObj
+	add r3, reg_jobj_x30_base, r3
 	lfs f4, 0(r5) # X = Translate amount
 	lfs f5, x_pos_offset(r3) # Current pos
 	cmpi 0, r10, 8 # if we're on P1, no mul
@@ -592,24 +583,28 @@ finished_card_translate_loop:
 
 	# Begin func calls to translate
     lwz r3, 0(r28)  # P1 Label GObj ptr
+	add r3, reg_jobj_x30_base, r3
 	fmr f1, f8
 	lis r4, 0 # Subtext Idx
 	branchl r12, func_text_update_subtext_pos
 
     addi r28, r28, 4
     lwz r3, 0(r28)  # P2 Label GObj ptr
+	add r3, reg_jobj_x30_base, r3
 	fmr f1, f9
 	lis r4, 0 # Subtext Idx
 	branchl r12, func_text_update_subtext_pos
 
 	addi r28, r28, 4
     lwz r3, 0(r28)  # P3 Label GObj ptr
+	add r3, reg_jobj_x30_base, r3
 	fmr f1, f10
 	lis r4, 0 # Subtext Idx
 	branchl r12, func_text_update_subtext_pos
 
 	addi r28, r28, 4
     lwz r3, 0(r28)  # P4 Label GObj ptr
+	add r3, reg_jobj_x30_base, r3
 	fmr f1, f11
 	lis r4, 0 # Subtext Idx
 	branchl r12, func_text_update_subtext_pos
@@ -643,21 +638,25 @@ finished_card_translate_loop:
 
 
 	lwz r3, 0x0(r28) # P1 BG JObj
+	add r3, reg_jobj_x30_base, r3
 	stfs f8, x_pos_offset(r3)
 	stfs f2, y_pos_offset(r3)
 	stfs f3, x_scale_offset(r3)
 	stfs f4, y_scale_offset(r3)
 	lwz r3, 0x4(r28) # P2 BG JObj
+	add r3, reg_jobj_x30_base, r3
 	stfs f9, x_pos_offset(r3)
 	stfs f2, y_pos_offset(r3)
 	stfs f3, x_scale_offset(r3)
 	stfs f4, y_scale_offset(r3)
 	lwz r3, 0x8(r28) # P3 BG JObj
+	add r3, reg_jobj_x30_base, r3
 	stfs f10, x_pos_offset(r3)
 	stfs f2, y_pos_offset(r3)
 	stfs f3, x_scale_offset(r3)
 	stfs f4, y_scale_offset(r3)
 	lwz r3, 0xc(r28) # P4 BG JObj
+	add r3, reg_jobj_x30_base, r3
 	stfs f11, x_pos_offset(r3)
 	stfs f2,  y_pos_offset(r3)
 	stfs f3, x_scale_offset(r3)
@@ -681,30 +680,30 @@ finished_card_translate_loop:
 	lfs f8, 0(r7)
 
 	# P1 Team Tag
-	load r3, 0x810ed8c0
+	load_jobj_addr_abs r3, 0x810ed8c0
 	stfs f4, y_pos_offset(r3)
 	stfs f5, x_pos_offset(r3)
 	# P2 Team Tag
-	load r3, 0x810eda00
+	load_jobj_addr_abs r3, 0x810eda00
 	stfs f4, y_pos_offset(r3)
 	stfs f6, x_pos_offset(r3)
 	# P3 Team Tag
-	load r3, 0x810edaa0
+	load_jobj_addr_abs r3, 0x810edaa0
 	stfs f4, y_pos_offset(r3)
 	stfs f7, x_pos_offset(r3)
 	# P4 Team Tag
-	load r3, 0x810edb40
+	load_jobj_addr_abs r3, 0x810edb40
 	stfs f4, y_pos_offset(r3)
 	stfs f8, x_pos_offset(r3)
 
 # Create P5 & 6
-    load r3, 0x810ea340 # P1 JObj
+    load_jobj_addr_abs r3, 0x810ea340 # P1 JObj
     bl copy_jobj
     mr r28, r3 # P5 JObj
 	# Store background in global
 	load r3, css_p5_bg
 	stw r28, 0(r3)
-	load r3, 0x810ea340 # P1 JObj
+	load_jobj_addr_abs r3, 0x810ea340 # P1 JObj
     bl copy_jobj
     mr r29, r3 # P6 Jobj
 	# Store background in global
@@ -728,7 +727,7 @@ finished_card_translate_loop:
 	stfs f4, x_pos_offset(r29)
 
 # Copy & Move P1 Italic image to P5
-	load r3, jobj_x30_16_1_1
+	load_jobj_addr r3, jobj_x30_16_1_1
 	bl copy_jobj
 	# Move & Shrink
 	bl FP_CONST_10_8
@@ -758,7 +757,7 @@ finished_card_translate_loop:
 	sth r6, 0xe(r5) # n_display; hide shadow
 
 # Copy & Move P2 Italic image to P6
-	load r3, jobj_x30_16_2_1
+	load_jobj_addr r3, jobj_x30_16_2_1
 	bl copy_jobj
 	# Store the copy in a global
 	load r4, css_p6_p2_label
@@ -823,7 +822,7 @@ finished_card_translate_loop:
 	stw r4, 4(r3)
 
 # Create P5 Player Portrait
-    load r3, 0x810ecae0 # Portrait
+    load_jobj_addr_abs r3, 0x810ecae0 # Portrait
     bl copy_jobj
     mr r28, r3 # JObj
 
@@ -871,7 +870,7 @@ finished_card_translate_loop:
 		bl set_jobj_alpha
 
 # Create P6 Player Portrait
-    load r3, 0x810ecae0 # Portrait
+    load_jobj_addr_abs r3, 0x810ecae0 # Portrait
     bl copy_jobj
     mr r28, r3 # JObj
 	
@@ -912,7 +911,7 @@ finished_card_translate_loop:
 		bl set_jobj_alpha
 
 # Create P5 Nametag
-    load r3, 0x810ef040 # Text Label BG
+    load_jobj_addr_abs r3, 0x810ef040 # Text Label BG
     bl copy_jobj
     mr r28, r3 # JObj
 
@@ -938,7 +937,7 @@ finished_card_translate_loop:
 		stfs f4, y_pos_offset(r28)
 
 # Create P6 Nametag
-    load r3, 0x810ef040 # Text Label BG
+    load_jobj_addr_abs r3, 0x810ef040 # Text Label BG
     bl copy_jobj
     mr r28, r3 # JObj
 
@@ -1004,12 +1003,10 @@ mflr r3
 load r4, css_manually_animate
 stw r3, 0(r4)
 
-b RETURN
-
 # Return / original value
 RETURN:
 	mr sp, r31         # Pop the stack
-	lmw r28, -16(sp)   # Restore r28 .. r31
+	lmw r27, -20(sp)   # Restore r28 .. r31
 
     mr r3, r7
 RETURN_ORIGINAL:
