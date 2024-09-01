@@ -161,12 +161,15 @@
 # CSS.
 # ==========
 
-@file 266CE0 asm/css_exit.asm
-
 @file 2662D0 asm/css_version_text.asm
 
-@file 262614 asm/css_text_update.asm
 @file 266830 asm/css_load_rescale_ui.asm
+@file 262614 asm/css_text_update.asm
+
+@file 266CE0 asm/css_exit.asm
+
+@set 22F7D4 60000000 # Prevent custom rules blackout on return to CSS.
+@file 22F7D8 asm/css_reload_on_rules_exit.asm
 
 # Set Team tag hitboxes for Kyle's Sick CSS (KSCSS)
 @set 3F0E18 C1F00000 # P1 [-30, -25.5]
@@ -188,9 +191,6 @@
 @set 3F0E80 BF000000
 # Remove the KO Stars rendering
 @set 25D22C 3BA00000
-
-# Disable Rules Menu from CSS
-@set 2616D4 C03F000C
 
 # Disable Nametag Menu from CSS
 @set 261EA0 C042CA10
