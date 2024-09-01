@@ -72,19 +72,27 @@ placement_bounds_check.continue:
 # Begin free for all mode.
 # ========================
 
-    # Check if player 5 won.
+    # Check if player 5 is active and won.
     load r3, results_block # P1 block.
     load r4, result_block_p5
+    lbz r5, rb_player_type(r4)
+    cmpli 0, r5, player_type_inactive
+    beq ffa_skip5
     lbz r5, rb_placement(r4)
     cmpli 0, r5, 0
     beq ffa_copy
+ffa_skip5:
 
-    # Check if player 6 won.
+    # Check if player 6 is active and won.
     load r3, results_block + results_block_size # P2 block.
     load r4, result_block_p6
+    lbz r5, rb_player_type(r4)
+    cmpli 0, r5, player_type_inactive
+    beq ffa_skip6
     lbz r5, rb_placement(r4)
     cmpli 0, r5, 0
     beq ffa_copy
+ffa_skip6:
 
     # Neither player won, no copy required.
     b return
