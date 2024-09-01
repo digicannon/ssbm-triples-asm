@@ -218,6 +218,10 @@
 @file 2F9A3C asm/pal_stock_icons.asm
 @file 16CF38 asm/always_show_player_indicator.asm
 
+# Taken from Slippi, this code hides nametags when invisible from a Zelda/Sheik/Mewtwo up-B.
+# It also overrides our "always show player indicator" code.
+@file 2FCCD8 asm/hide_nametag_when_invisible.asm
+
 # On-exit (quit out or Game!) results screen patch.
 @file 16EBA8 asm/fix_results_screen.asm
 
