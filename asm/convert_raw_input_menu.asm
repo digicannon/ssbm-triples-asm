@@ -41,6 +41,13 @@ not_in_game:
     ori src, src, triples_converted_output @l
 .endif
 loop:
+    # Check for source controller status.
+    lbz r3, 0x41(src)
+    cmpli 0, r3, 0 # 0 = plugged in and OK.
+    bne loop.control
+    # Ensure destination controller is enabled.
+    li r3, 0
+    stb r3, 0x41(dest)
     # Buttons.
     lwz r3, 0(dest)
     lwz r4, 0(src)
@@ -64,6 +71,7 @@ loop:
     lwz r3, 0x2C(src)
     stw r3, 0x2C(dest)
 loop.no_right_stick:
+loop.control:
     # Loop check.  Return if !0, else add 1.
     cmpli 0, counter, 0
     bne return
