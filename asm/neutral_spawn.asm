@@ -69,8 +69,16 @@ SearchForPlayerID_IncLoop:
   cmpwi REG_Count,6
   blt SearchForPlayerID_Loop
 SearchForPlayerID_Exit:
+  bl get_match_player_count
+  mr r4, REG_Count
+  cmpli 0, r3, 5
+  bge SearchForPlayerID_SetSpawn # Use triples spawns.
+  # Adjust for doubles.
+  cmpli 0, REG_Count, 2
+  blt SearchForPlayerID_SetSpawn
+  addi r4, r4, 1 # Skip 3rd spawn.
+SearchForPlayerID_SetSpawn:
   mr  r3,REG_PlayerSlot
-  mr  r4,REG_Count
   lbz	r5, 0x24D0 (MatchInfo)
   bl  SetSpawn
   b Exit
@@ -176,6 +184,28 @@ SetSpawn_Exit:
   restore
   blr
 #endregion
+
+get_match_player_count:
+.set player_block, 0x80453080
+.set player_block_size, 0xE90
+.set reg_player_count, 3
+.set reg_player, 4
+  li reg_player_count, 0
+  load reg_player, player_block
+get_match_player_count.loop:
+  # Offset 8 is player type, uint32.  Check != 3 (NONE).
+  lwz r5, 8(reg_player)
+  cmpli 0, r5, 3
+  beq get_match_player_count.control
+  # This player is active.
+  addi reg_player_count, reg_player_count, 1
+get_match_player_count.control:
+  addi reg_player, reg_player, player_block_size
+  # while (player_block <= player_block_p6)
+  load r5, (player_block + (player_block_size * 5))
+  cmpl 0, reg_player, r5
+  ble get_match_player_count.loop
+  blr
 
 ######################
 NeutralSpawnTable:
@@ -538,12 +568,12 @@ blrl
     .float -58.8,5
     .float 58.8,5
   #Teams Data
-    .float -58.8,5
     .float -38.8,35.2
     .float -38.8,5
-    .float 58.8,5
+    .float -58.8,5
     .float 38.8,35.2
     .float 38.8,5
+    .float 58.8,5
 # Final Destination
 .long 0x20
   #Singles Data
@@ -554,12 +584,12 @@ blrl
     .float -40,10
     .float 40,10
   #Teams Data
+    .float -60,10
     .float -20,10
     .float -40,10
-    .float -60,10
+    .float 60,10
     .float 20,10
     .float 40,10
-    .float 60,10
 # Terminator
 .long -1
 .align 2
