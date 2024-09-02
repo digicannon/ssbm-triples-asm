@@ -5,14 +5,13 @@
 
 # Notice on title screen.
 @set 1A218C 60000000
-# "3 v0"
-@set 3EA6C8 33207630
-# ".4.0"
-@set 3EA6CC 2E342E30
-# " dbg"
-@set 3EA6D0 20646267
+# Build title.  Shows on title screen and crash report.
+@set 3EA6C8 54726970
+@set 3EA6CC 6C657320
+@set 3EA6D0 76302E34
+@set 3EA6D4 2E300000
 # Null terminator.
-@set 3EA6D4 00000000
+@set 3EA6D8 00000000
 
 # ================
 # Base game setup.
