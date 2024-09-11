@@ -5,9 +5,9 @@
 .include "common.s"
 
     lis r3, 0x8047
-	ori r3, r3, 0x9D30
-	lbz r3, 0(r3)
-	cmpi 0, r3, 2
+    ori r3, r3, 0x9D30
+    lbz r3, 0(r3)
+    cmpi 0, r3, 2
     bne return_original
 
     li r3, 2

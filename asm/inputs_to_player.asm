@@ -7,7 +7,7 @@
 # Registers.
 .set player_data,    31
 
-    stw	r0, 0x065C(r31) # Default code line.
+    stw r0, 0x065C(r31) # Default code line.
 
     lbz r4, 0xC(player_data)
     # Only do anything for player 5 and 6.

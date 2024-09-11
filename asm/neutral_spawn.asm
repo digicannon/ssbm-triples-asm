@@ -79,7 +79,7 @@ SearchForPlayerID_Exit:
   addi r4, r4, 1 # Skip 3rd spawn.
 SearchForPlayerID_SetSpawn:
   mr  r3,REG_PlayerSlot
-  lbz	r5, 0x24D0 (MatchInfo)
+  lbz r5, 0x24D0 (MatchInfo)
   bl  SetSpawn
   b Exit
 #endregion

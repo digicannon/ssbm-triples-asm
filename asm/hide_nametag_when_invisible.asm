@@ -35,4 +35,4 @@ HideNametag:
   bctr
 
 Original:
-  cmplwi	r30, 0
+  cmplwi r30, 0

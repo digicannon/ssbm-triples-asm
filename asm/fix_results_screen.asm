@@ -240,4 +240,4 @@ return:
     stb r4, rb_player_type(r3)
 
     # Original code line.
-    lwz	r0, 0x001C(sp)
+    lwz r0, 0x001C(sp)

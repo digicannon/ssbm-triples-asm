@@ -83,4 +83,4 @@ write:
 
 return:
     # Original code line.
-    lmw	r27, 0x1C(sp)
+    lmw r27, 0x1C(sp)

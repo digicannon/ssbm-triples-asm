@@ -80,4 +80,4 @@ entry:
 return:
     # Undo clobber + original code line.
     li r3, 4
-    stw	r28, 0x0030(sp)
+    stw r28, 0x0030(sp)
