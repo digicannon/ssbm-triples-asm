@@ -1,5 +1,5 @@
 # ====================
-#  Insert at 80266CE0
+#  Insert at 80263334
 # ====================
 
 .include "common.s"
@@ -69,4 +69,4 @@ control:
     blt loop
 
 return:
-    li r3, 1
+    lwz r0, 0x34(r1)
