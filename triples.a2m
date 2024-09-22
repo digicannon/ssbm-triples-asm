@@ -60,6 +60,13 @@
 # Prevent data re-initialization on reset.
 @set 1A4234 60000000
 
+# Widescreen support.
+# These are the C2 codes that Nintendont can't write on its own.
+# They are disabled by default.
+@file 2FCFC4 asm/widescreen/adjust_nametag_background_x_scale.asm
+# The CObj code conflicts with Nintendon'ts widescreen patch.
+#@file 36A4A8 asm/widescreen/overwrite_cobj_values.asm
+
 # ========================
 # Unsorted external codes.
 # ========================
