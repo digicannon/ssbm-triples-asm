@@ -49,6 +49,21 @@
     b set_pointers
 .endif
 
+    # Skip HID check while in game.
+    load r3, 0x80479D30
+    lbz r4, 0(r3)
+    cmpli 0, r4, 2
+    blt not_in_game
+    bgt hid_status_ok # Unknown case.
+    # Check the minor scene to see if we are in a game.
+    # 2 is in game.
+    # 3 is in sudden death.
+    # 4 is in results screen.
+    lbz r4, 3(r3)
+    cmpli 0, r4, 2
+    bge hid_status_ok
+not_in_game:
+
     loadwz r3, HID_STATUS
     cmpwi r3, 0
     beq hid_status_bad
