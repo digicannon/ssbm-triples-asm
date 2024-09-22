@@ -71,14 +71,6 @@
 # Unsorted external codes.
 # ========================
 
-# Disable Screen Shake for Teams [UnclePunch]
-# https://smashboards.com/threads/disable-screen-shake-in-teams-mode.442101/
-@branch  030E44
-3CE08048 88E707C8
-2C070000 41820008
-4E800020 7C0802A6
-60000000
-
 # Unplugging closes CSS door [UnclePunch]
 @set 2605FC 38C00003
 
@@ -217,6 +209,8 @@
 # In game.
 # ==========
 
+@file 16E9A8 asm/match_store_player_count.asm
+
 @file 2F6690 asm/transparent_hud.asm
 
 @file 16E510 asm/neutral_spawn.asm
@@ -227,6 +221,8 @@
 # Taken from Slippi, this code hides nametags when invisible from a Zelda/Sheik/Mewtwo up-B.
 # It also overrides our "always show player indicator" code.
 @file 2FCCD8 asm/hide_nametag_when_invisible.asm
+
+@file 030E44 asm/disable_screen_shake.asm
 
 # On-exit (quit out or Game!) results screen patch.
 @file 16EBA8 asm/fix_results_screen.asm
