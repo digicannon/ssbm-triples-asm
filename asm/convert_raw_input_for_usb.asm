@@ -8,7 +8,6 @@
 .set HID_STATUS, 0x93003440
 .set HID_CTRL, 0x93005000
 .set HID_PACKET_BASE, 0x930050F0
-.set HID_PACKET_BASE_ALIGN32, 0x930050E0
 
 .set port_type_normal, 0x10
 .set port_type_wavebird, 0x22
@@ -92,8 +91,8 @@ hid_status_ok:
     dcbi r3, r4
     sync
 .endm
-    cache_invalidate HID_PACKET_BASE_ALIGN32
-    cache_invalidate (HID_PACKET_BASE_ALIGN32 + 0x20)
+    cache_invalidate HID_PACKET_BASE
+    cache_invalidate (HID_PACKET_BASE + 0x10)
 
 .set reg_idx, 3
 .set reg_packet, 4
@@ -159,12 +158,16 @@ loop.control:
     cmpwi reg_idx, 2
     blt loop
 
-    # Invalidate cash for the data we just wrote.
-    # The pad data is less than 32 bytes.
+    # Flush cash for the data we just wrote.
+.macro cache_flush addr
     li r3, 0
-    load r4, triples_nintendont_datA
+    load r4, \addr
     dcbf r3, r4
     sync
+.endm
+    cache_flush triples_nintendont_data
+    cache_flush (triples_nintendont_data + 0x10)
+    cache_flush (triples_nintendont_data + 0x20)
 
 set_pointers:
     # This function is about to increment this value by 12.
