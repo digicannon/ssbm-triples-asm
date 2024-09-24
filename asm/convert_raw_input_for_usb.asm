@@ -48,20 +48,17 @@
     b set_pointers
 .endif
 
-    # Skip HID check while in game.
-    load r3, 0x80479D30
-    lbz r4, 0(r3)
-    cmpli 0, r4, 2
-    blt not_in_game
-    bgt hid_status_ok # Unknown case.
-    # Check the minor scene to see if we are in a game.
-    # 2 is in game.
-    # 3 is in sudden death.
-    # 4 is in results screen.
-    lbz r4, 3(r3)
-    cmpli 0, r4, 2
-    bge hid_status_ok
-not_in_game:
+    # Invalidate cache for all the USB data.
+.macro cache_invalidate addr
+    li r3, 0
+    load r4, \addr
+    dcbi r3, r4
+    sync
+.endm
+    cache_invalidate HID_STATUS
+    cache_invalidate HID_CTRL
+    cache_invalidate HID_PACKET_BASE
+    cache_invalidate (HID_PACKET_BASE + 0x10)
 
     loadwz r3, HID_STATUS
     cmpwi r3, 0
@@ -83,16 +80,6 @@ hid_status_bad:
     # Skip reading HID data.
     b set_pointers
 hid_status_ok:
-
-    # Invalidate cache for the packet buffer.
-.macro cache_invalidate addr
-    li r3, 0
-    load r4, \addr
-    dcbi r3, r4
-    sync
-.endm
-    cache_invalidate HID_PACKET_BASE
-    cache_invalidate (HID_PACKET_BASE + 0x10)
 
 .set reg_idx, 3
 .set reg_packet, 4
