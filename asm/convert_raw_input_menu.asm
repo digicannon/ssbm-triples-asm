@@ -4,26 +4,36 @@
 
 # DO NOT MODIFY REGISTER 23!
 
+.include "common.s"
 .include "triples.s"
 
 # This never moves.
 .set controller_data, 0x804C1FAC
 .set port_size, 0x44
 
-    # Don't do anything if not in a menu.
-    lis r3, 0x8047
-    ori r3, r3, 0x9D30
+    # Don't do anything if not in game.
+    load r3, 0x80479D30
     lbz r4, 0(r3)
     cmpli 0, r4, 2
     blt not_in_game 
     bgt return # Unknown case.
     # Check the minor scene to see if we are in a game.
+    # 0 is in character select.
+    # 1 is in stage select.
     # 2 is in game.
     # 3 is in sudden death.
     # 4 is in results screen.
     lbz r4, 3(r3)
-    cmpli 0, r4, 2
-    bge return
+    cmpli 0, r4, 1
+    bgt return # In game.
+    blt not_in_game # In character select.
+    # We are on stage select.
+    # Don't do anything if a stage is being loaded.
+    # This is to prevent P5/6 forcing 1/2 to hold A for Sheik.
+    # This byte is nonzero after a stage has been selected.
+    loadbz r3, 0x804D6CAF
+    cmpwi r3, 0
+    bne return
 not_in_game:
 
 .set counter, 24
@@ -31,14 +41,12 @@ not_in_game:
 .set src, 26
 
     li counter, 0
-    lis dest, controller_data @h
-    ori dest, dest, controller_data @l
+    load dest, controller_data
 .if DEBUG
     # P3 and P4 go to P1 and P2.
     addi src, dest, 0x88
 .else
-    lis src, triples_converted_output @h
-    ori src, src, triples_converted_output @l
+    load src, triples_converted_output
 .endif
 loop:
     # Check for source controller status.
