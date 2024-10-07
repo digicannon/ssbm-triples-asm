@@ -5,6 +5,15 @@
 .include "common.s"
 .include "triples.s"
 
+    b begin
+
+default_card_data:
+    blrl
+    .long 0x1A030000
+    .long 0x00FF0000
+    .long 0x09007800
+
+begin:
     # Don't do anything if not on main CSS (ID 2).
     loadbz r3, 0x80479D30
     cmpi 0, r3, 2
@@ -39,18 +48,20 @@ loop:
     lbz r4, pad_offset_error(reg_pad_data)
     cmpli 0, r4, pad_err_ok
     bne load_none
-    # Load the player data to copy.
-    lwz r4, 0(reg_player_data)
-    lwz r5, 7(reg_player_data)
+    # Set source player data pointer.
+    mr r4, reg_player_data
     b store
 load_none:
-    # These are the default values for closed player cards on the CSS.
-    load r4, 0x1A030000
-    load r5, 0x00090078
+    bl default_card_data
+    mflr r4
 store:
-    # Offsets 0 and 7 but +0x90 (player_size * 4).
-    stw r4, 0x90(reg_player_data)
-    stw r5, 0x97(reg_player_data)
+    # Dest is offset by (player_size * 4), 0x90.
+    lwz r5, 0(r4)
+    stw r5, 0x90(reg_player_data)
+    lwz r5, 4(r4)
+    stw r5, 0x94(reg_player_data)
+    lwz r5, 8(r4)
+    stw r5, 0x98(reg_player_data)
     # If the player being stored is active, expand the HUD to 6 slots.
     # We check this instead of the controller status because p5/p6 may not be playing.
     lbz r4, 0x91(reg_player_data)
