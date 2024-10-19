@@ -13,7 +13,7 @@
 .set indicator_flags, 0x804D6D70
 
 .set match_frame_counter, 0x80479D60
-.set frames_to_flicker, 210 # 3.5 seconds.
+.set frames_to_flicker, 150 # 2.5 seconds.
 
 .set reg_player_count, 3
 .set reg_alive_count, 4
