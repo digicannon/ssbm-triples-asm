@@ -7,7 +7,7 @@
     b entry
 
 .set stage_type_neutral, 0 # Neutral starts supported.
-.set stage_type_modded, 1  # Neutral starts supported + modified stage codes.
+.set stage_type_modded,  1 # Neutral starts supported + modified stage codes.
 .set stage_type_vanilla, 2 # Unchanged, unfair starting positions for 5+6.
 
 .set reg_stage_index, 30

@@ -13,7 +13,7 @@
 .set indicator_flags, 0x804D6D70
 
 .set match_frame_counter, 0x80479D60
-.set frames_to_flicker, 150 # 2.5 seconds.
+.set frames_to_flicker, 120 # 2 seconds.
 
 .set reg_player_count, 3
 .set reg_alive_count, 4
@@ -66,8 +66,7 @@ choose_fade:
     stw r4, 0(r3)
     # Determine flicker frame.
     loadwz r4, match_frame_counter
-    # Shift 2nd LSB to LSB and mask it off.
-    rlwinm r4, r4, 31, 31, 31
+    andi. r4, r4, 1
     b write
 choose_default:
     li r4, 0

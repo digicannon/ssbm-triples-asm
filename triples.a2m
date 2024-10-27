@@ -164,7 +164,7 @@
 @file 266830 asm/css_load_rescale_ui.asm
 @file 262614 asm/css_text_update.asm
 
-@file 263334 asm/css_update.asm
+@file 263334 asm/css_player_data_update.asm
 
 @set 22F7D4 60000000 # Prevent custom rules blackout on return to CSS.
 @file 22F7D8 asm/css_reload_on_rules_exit.asm
@@ -259,8 +259,10 @@
 @file 1FF62C asm/up_stage_expansion/rainbow_cruise_enable_ticktock.asm
 @file 16E800 asm/up_stage_expansion/stage_file_edits.asm
 
+# ==========
 # asm2memcard bug causes last code to have null terminator.
 # Ending in @set prevents it.
+# ==========
 
 # C-Stick in Single Player
 @set 16B480 60000000
