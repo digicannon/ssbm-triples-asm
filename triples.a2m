@@ -166,7 +166,14 @@
 
 @file 263334 asm/css_player_data_update.asm
 
-@set 22F7D4 60000000 # Prevent custom rules blackout on return to CSS.
+# Rules menu exit fixes.
+# Remove screen blackout.
+@set 22F520 60000000
+@set 22F724 60000000
+@set 22F7D4 60000000
+# Reload instead of return.
+@file 22F524 asm/css_reload_on_rules_exit.asm
+@file 22F728 asm/css_reload_on_rules_exit.asm
 @file 22F7D8 asm/css_reload_on_rules_exit.asm
 
 # Set Team tag hitboxes for Kyle's Sick CSS (KSCSS)
