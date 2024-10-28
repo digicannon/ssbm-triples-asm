@@ -6,10 +6,11 @@
 # Notice on title screen.
 @set 1A218C 60000000
 # Build title.  Shows on title screen and crash report.
+# This must end with one newline!
 @set 3EA6C8 54726970
 @set 3EA6CC 6C657320
 @set 3EA6D0 76302E34
-@set 3EA6D4 2E320000
+@set 3EA6D4 2E320A00
 # Null terminator.
 @set 3EA6D8 00000000
 
@@ -17,8 +18,15 @@
 # Base game setup.
 # ================
 
-# Enable OSReport print on crash (1.02) [UnclePunch]
-@set 397878 4800020C
+# Crash report codes.
+@set 397878 4800020C # Enable OSReport print on crash. [UnclePunch]
+@set 228AEC 60000000 # Remove compile date from OSReport (assertion failure). [UnclePunch]
+@set 228BF0 60000000 # Remove compile date from OSReport (invalid read). [UnclePunch]
+@set 394AFC 7C1D4040 # Only show first 8 lines of stacktrace. [UnclePunch]
+# Reboot game with LRA+Start on OSReport. [UnclePunch]
+@file 397C10 asm/crash_reboot.asm
+# Clear bootup OSReports and log our own.
+@file 160154 asm/crash_report_header.asm
 
 # Redirect "Tournament Melee" to normal CSS.
 # We overwrite Tournament Melee menu code.
