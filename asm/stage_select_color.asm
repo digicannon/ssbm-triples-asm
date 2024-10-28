@@ -39,7 +39,7 @@ stage_types:
     .byte stage_type_vanilla # 16, Icicle Mountain.
     .byte stage_type_modded  # 17, Flat Zone.
     .byte stage_type_neutral # 18, Battlefield.
-    .byte stage_type_modded  # 19, Final Destination.
+    .byte stage_type_neutral # 19, Final Destination.
     .byte stage_type_neutral # 1A, Dreamland 64.
     .byte stage_type_vanilla # 1B, Yoshi 64.
     .byte stage_type_neutral # 1C, Kongo Jungle 64.
