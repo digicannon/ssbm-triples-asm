@@ -1,4 +1,5 @@
 .ifndef TRIPLES_S
+.set TRIPLES_S, 1
 
 .set DEBUG, 0
 
@@ -12,7 +13,11 @@
 
 .set begin_triples_globals, 0x803FC700
 .set widescreen_enabled, begin_triples_globals # Nintendont depends on this being at this address.
-.set match_player_count, widescreen_enabled + 4
+.set p5_stick_neutral, widescreen_enabled + 4
+.set p6_stick_neutral, p5_stick_neutral + 4
+.set p5_recalibration_timer, p6_stick_neutral + 4
+.set p6_recalibration_timer, p5_recalibration_timer + 4
+.set match_player_count, p6_recalibration_timer + 4
 .set match_frames_since_indicator_switch, match_player_count + 4
 .set dbg_text_gobj, match_frames_since_indicator_switch + 12
 .set dbg_subtext_str, dbg_text_gobj + 4
@@ -35,5 +40,4 @@
 .set css_p6_p2_label, css_p6_text_subtext + 4
 .set css_p1_door, css_p6_p2_label + 4
 
-.set TRIPLES_S, 1
 .endif

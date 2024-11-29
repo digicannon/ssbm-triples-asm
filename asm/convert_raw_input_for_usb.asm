@@ -25,6 +25,8 @@
 .set pad_ofst_err, 10
 .set pad_ofst_padding, 11
 
+.set recalibration_request_time, 90
+
 # This is executed after the zero based port number is incremented.
 # If r24 is 2, the game is *about* to handle port 1.
 #   It is about to increment the source pointer in r25 by 68
@@ -102,6 +104,19 @@ loop:
     stb r7, pad_ofst_err(reg_pad)
     b loop.control
 plugged_in:
+    # Was the controller just plugged in?
+    lbz r7, pad_ofst_err(reg_pad)
+    cmpwi r7, 0xFF
+    bne not_recalibrating
+    # We are recalibrating now.
+    load r7, p5_stick_neutral
+    mulli r6, reg_idx, 4 # Move to P6 if on P6.
+    add r6, r7, r6
+    # Load and store all 4 stick bytes at once.
+    lwz r7, 4(reg_packet)
+    stw r7, 0(r6)
+not_recalibrating:
+
     # Write 0 to the last 4 bytes of the pad,
     # which includes the error field.
     li r7, 0
@@ -123,17 +138,57 @@ plugged_in:
     or r0, r0, r6
     sth r0, pad_ofst_button(reg_pad)
 
+    # Check for recalibration input.
+    load r7, p5_recalibration_timer
+    mulli r6, reg_idx, 4 # Move to P6 if on P6.
+    add r6, r7, r6
+    # r0 still has the button inputs from the button parser.
+    cmpwi r0, 0x1C00
+    bne not_holding_recalibrate
+    # Controller is holding recalibration input.
+    lwz r7, 0(r6)
+    addi r7, r7, 1
+    stw r7, 0(r6)
+    cmpwi r7, recalibration_request_time
+    blt skip_holding_recalibrate
+    # Disconnect controller.
+    li r7, 0xFF
+    stb r7, pad_ofst_err(reg_pad)
+    b loop.control
+not_holding_recalibrate:
+    # Reset recalibration timer.
+    li r0, 0
+    stw r0, 0(r6)
+skip_holding_recalibrate:
+
     # Sticks.
-.macro convert_stick packet_offset, pad_offset
+.macro convert_stick neutral_offset, packet_offset, pad_offset
+    # Load neutral position.
+    load r7, p5_stick_neutral
+    mulli r6, reg_idx, 4 # Move to P6 if on P6.
+    add r6, r7, r6
+    lbz r6, \neutral_offset(r6)
+    subi r6, r6, 0x80
+    extsb r6, r6
+    # Load USB position.
     lbz r7, \packet_offset(reg_packet)
-    subi r7, 7, 0x80
+    subi r7, r7, 0x80
     extsb r7, r7
+    # Get neutral point.
+    cmpwi r6, 0
+    blt loop.add_neutral.\neutral_offset
+    sub r7, r7, r6
+    b loop.neutral_exit.\neutral_offset
+loop.add_neutral.\neutral_offset:
+    add r7, r7, r6
+loop.neutral_exit.\neutral_offset:
     stb r7, \pad_offset(reg_pad)
 .endm
-    convert_stick 4, pad_ofst_left_stick_x
-    convert_stick 5, pad_ofst_left_stick_y
-    convert_stick 6, pad_ofst_right_stick_x
-    convert_stick 7, pad_ofst_right_stick_y
+
+    convert_stick 0, 4, pad_ofst_left_stick_x
+    convert_stick 1, 5, pad_ofst_left_stick_y
+    convert_stick 2, 6, pad_ofst_right_stick_x
+    convert_stick 3, 7, pad_ofst_right_stick_y
 
     # Triggers.
     lhz r7, 8(reg_packet)
