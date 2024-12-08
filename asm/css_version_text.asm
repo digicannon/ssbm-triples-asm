@@ -4,9 +4,11 @@
 ################################################################################
 .include "common.s"
 
+# We overwrite this with the triples version text.
+.set build_title, 0x803EA6C8
+
 .set REG_TextGObj,31
 .set REG_TextProperties,30
-
 
 NTSC102:
 	.set	Injection,0x802662D0
@@ -68,8 +70,7 @@ backup
 
 #Initialize Line of Text
 	mr r3,REG_TextGObj       #struct pointer
-	bl 	TEXT
-	mflr 	r4		#pointer to ASCII
+	load r4, build_title, #pointer to ASCII
 	lfs f1,0x0(REG_TextProperties) #X offset of REG_TextGObj
 	lfs f2,0x4(REG_TextProperties) #Y offset of REG_TextGObj
 	branchl r12,Text_InitializeSubtext
@@ -92,11 +93,6 @@ blrl
 .float 0.45		#REG_TextGObj scaling
 .float 0.1		#canvas scaling
 
-
-TEXT:
-blrl
-.string "Triples v0.4.2"
-.align 2
 
 #**************************************************#
 end:

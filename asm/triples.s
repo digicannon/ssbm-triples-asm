@@ -1,4 +1,5 @@
 .ifndef TRIPLES_S
+.set TRIPLES_S, 1
 
 .set DEBUG, 0
 
@@ -35,5 +36,4 @@
 .set css_p6_p2_label, css_p6_text_subtext + 4
 .set css_p1_door, css_p6_p2_label + 4
 
-.set TRIPLES_S, 1
 .endif
