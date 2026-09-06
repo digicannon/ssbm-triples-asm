@@ -6,8 +6,8 @@
 # This must end with one newline!
 @set 3EA6C8 54726970
 @set 3EA6CC 6C657320
-@set 3EA6D0 76302E34
-@set 3EA6D4 2E320A00
+@set 3EA6D0 76302E35
+@set 3EA6D4 2E300A00
 # Null terminator.
 @set 3EA6D8 00000000
 
@@ -24,6 +24,7 @@
 @file 397C10 asm/crash_reboot.asm
 # Clear bootup OSReports and log our own.
 @file 160154 asm/crash_report_header.asm
+@file 3882A0 asm/crash_report_heap.asm
 
 # Redirect "Tournament Melee" to normal CSS.
 # We overwrite Tournament Melee menu code.
@@ -71,6 +72,19 @@
 @file 2FCFC4 asm/widescreen/adjust_nametag_background_x_scale.asm
 # The CObj code conflicts with Nintendon'ts widescreen patch.
 #@file 36A4A8 asm/widescreen/overwrite_cobj_values.asm
+
+# ========================
+# General 6 player support.
+# ========================
+
+# 24MB ARAM, regardless of what ARGetSize reports.
+@set 015684 3C000180
+@set 01568C 60000000
+
+# AllA heap size 0x96C800 -> 0xD6C800 for six character animations.
+@set 3BA3BC 00D6C800
+
+@file 028494 asm/sfx_bank_six_players.asm
 
 # ========================
 # Unsorted external codes.
@@ -170,6 +184,8 @@
 @file 262614 asm/css_text_update.asm
 
 @file 263334 asm/css_player_data_update.asm
+@file 266BB4 asm/css_preload_p5_p6.asm
+@file 017BFC asm/preload_overflow_fallback.asm
 
 # Rules menu exit fixes.
 # Remove screen blackout.
