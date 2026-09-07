@@ -10,9 +10,12 @@
 # This never moves.
 .set controller_data, 0x804C1FAC
 .set port_size, 0x44
+.set scene, 0x80479D30 # Major scene at 0, minor at 3.
+.set scene_vs, 2
+.set minor_css, 0
 
     # Don't do anything if not in game.
-    load r3, 0x80479D30
+    load r3, scene
     lbz r4, 0(r3)
     cmpli 0, r4, 2
     blt not_in_game 
@@ -42,12 +45,7 @@ not_in_game:
 
     li counter, 0
     load dest, controller_data
-.if DEBUG
-    # P3 and P4 go to P1 and P2.
-    addi src, dest, 0x88
-.else
     load src, triples_converted_output
-.endif
 loop:
     # Check for source controller status.
     lbz r3, 0x41(src)
@@ -56,9 +54,21 @@ loop:
     # Ensure destination controller is enabled.
     li r3, 0
     stb r3, 0x41(dest)
-    # Buttons.
+    # On the CSS P5/P6 have their own hands, so only Start passes through.
     lwz r3, 0(dest)
     lwz r4, 0(src)
+    load r5, scene
+    lbz r0, 0(r5)
+    cmpli 0, r0, scene_vs
+    bne merge_all
+    lbz r0, 3(r5)
+    cmpli 0, r0, minor_css
+    bne merge_all
+    andi. r4, r4, BTN_MASK_START
+    or r3, r3, r4
+    stw r3, 0(dest)
+    b loop.control
+merge_all:
     or r3, r3, r4
     stw r3, 0(dest)
     # Left stick.

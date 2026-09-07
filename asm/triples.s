@@ -15,25 +15,7 @@
 .set widescreen_enabled, begin_triples_globals # Nintendont depends on this being at this address.
 .set match_player_count, widescreen_enabled + 4
 .set match_frames_since_indicator_switch, match_player_count + 4
-.set dbg_text_gobj, match_frames_since_indicator_switch + 12
-.set dbg_subtext_str, dbg_text_gobj + 4
-.set css_run_once, dbg_subtext_str + 4
-.set css_p5_border_jobj, css_run_once + 4
-.set css_backup_space, css_p5_border_jobj + 4
-.set css_backup_dbg, css_backup_space + 4
-.set css_end_backup_space, css_run_once + 64
-.set css_manually_animate, css_end_backup_space + 4
-.set css_open_doors, css_manually_animate + 4
-.set css_p5_bg, css_open_doors + 4
-.set css_p5_portrait, css_p5_bg + 4
-.set css_p5_door_jobj, css_p5_portrait + 4
-.set css_p5_text_gobj, css_p5_door_jobj + 4
-.set css_p5_text_subtext, css_p5_text_gobj + 4
-.set css_p6_bg, css_p5_text_subtext + 4
-.set css_p6_portrait, css_p6_bg + 4
-.set css_p6_text_gobj, css_p6_portrait + 4
-.set css_p6_text_subtext, css_p6_text_gobj + 4
-.set css_p6_p2_label, css_p6_text_subtext + 4
-.set css_p1_door, css_p6_p2_label + 4
+.set pause_56_images, match_frames_since_indicator_switch + 4 # Heap block, per match.
+.set css_56_blocks, pause_56_images + 4 # P5 and P6's CSS blocks, per CSS load.
 
 .endif

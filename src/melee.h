@@ -1,0 +1,377 @@
+// Fragments of the stock structs the C code touches.  Fields it does not
+// use are padding; offsets are pinned by the asserts.  Addresses come from
+// melee.ld.
+
+#ifndef MELEE_H
+#define MELEE_H
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef float f32;
+
+#define ASSERT_OFFSET(type, field, offset) \
+    _Static_assert(offsetof(type, field) == offset, #type "." #field)
+#define ASSERT_SIZE(type, size) _Static_assert(sizeof(type) == size, #type)
+
+typedef struct HSD_GObj {
+    u8 pad0[0x28];
+    void * hsd_obj;
+    void * user_data;
+} HSD_GObj;
+ASSERT_SIZE(HSD_GObj, 0x30);
+
+typedef struct HSD_ImageDesc {
+    void * image_ptr;
+    u16 width;
+    u16 height;
+    u32 format;
+    u32 mipmap;
+    f32 min_lod;
+    f32 max_lod;
+} HSD_ImageDesc;
+ASSERT_SIZE(HSD_ImageDesc, 0x18);
+
+typedef struct HSD_TObj {
+    u8 pad0[0x58];
+    HSD_ImageDesc * imagedesc;
+} HSD_TObj;
+
+typedef struct HSD_MObj {
+    u8 pad0[8];
+    HSD_TObj * tobj;
+} HSD_MObj;
+
+typedef struct HSD_PObj {
+    u8 pad0[0xE];
+    u16 display_count;
+} HSD_PObj;
+
+typedef struct HSD_DObj {
+    u8 pad0[4];
+    struct HSD_DObj * next;
+    HSD_MObj * mobj;
+    HSD_PObj * pobj;
+} HSD_DObj;
+
+typedef struct HSD_JObj {
+    u8 pad0[0x14];
+    u32 flags;
+    HSD_DObj * dobj;
+    u8 pad1[0x10];
+    f32 scale[3];
+    f32 translate[3];
+} HSD_JObj;
+ASSERT_OFFSET(HSD_JObj, scale, 0x2C);
+ASSERT_OFFSET(HSD_JObj, translate, 0x38);
+
+typedef struct HSD_JObjDesc {
+    u8 pad0[8];
+    struct HSD_JObjDesc * child;
+    struct HSD_JObjDesc * next;
+    u8 pad1[0x1C];
+    f32 position[3];
+    u8 pad2[8];
+} HSD_JObjDesc;
+ASSERT_SIZE(HSD_JObjDesc, 0x40);
+ASSERT_OFFSET(HSD_JObjDesc, position, 0x2C);
+
+// The CSS's MnSlChr file entries: joint desc, anim, mat anim, shape anim.
+typedef struct CSSAnim {
+    void * desc[4];
+} CSSAnim;
+
+// CSSCursorData.state: 1 while holding the puck, 3 for a hand the Start
+// check leaves out; 2 is a free hand.
+enum {
+    HAND_HOLDING = 1,
+    HAND_FREE = 2,
+};
+
+typedef struct CSSCursorData {
+    HSD_GObj * gobj;
+    u8 x4;
+    u8 state;
+    u8 x6;
+    u8 x7;
+    u8 pad0[4];
+    f32 x;
+    f32 y;
+} CSSCursorData;
+ASSERT_SIZE(CSSCursorData, 0x14);
+
+typedef struct CSSCharModel {
+    HSD_GObj * gobj;
+    u8 x4;
+    u8 x5;
+    u8 colour;
+    u8 refresh; // Refreshes the colour anim when it runs past 0x27.
+    f32 x;
+    f32 y;
+    f32 x10;
+    f32 x14;
+} CSSCharModel;
+ASSERT_SIZE(CSSCharModel, 0x18);
+
+typedef struct CSSDoor {
+    // emblem, costume, team, door, bg, indicator, slider name, cpu slider,
+    // cpu slider 2.
+    u8 joints[9];
+    u8 selected_since_load;
+    u8 team;
+    u8 p_kind;
+    u8 p_kind_prev;
+    u8 costume;
+    u8 sel_icon;
+    u8 sel_icon_prev;
+    u8 timers[4];
+    // HMN button left, right; team button left, right.
+    f32 bounds[4];
+} CSSDoor;
+ASSERT_SIZE(CSSDoor, 0x24);
+ASSERT_OFFSET(CSSDoor, bounds, 0x14);
+
+enum {
+    PKIND_CLOSED = 3,
+    ICON_COUNT = 0x19,
+    ICON_NONE = 0x19,
+};
+
+typedef struct Text {
+    f32 pos_x;
+    f32 pos_y;
+    f32 pos_z;
+    f32 box_size_x;
+    f32 box_size_y;
+    u8 pad0[0x10];
+    f32 font_size_x;
+    f32 font_size_y;
+    u8 pad1[0x1C];
+    u8 default_fitting;
+    u8 default_kerning;
+    u8 default_alignment;
+    u8 x4b;
+    u8 x4c;
+    u8 hidden;
+} Text;
+ASSERT_OFFSET(Text, font_size_x, 0x24);
+ASSERT_OFFSET(Text, hidden, 0x4D);
+
+typedef struct CSSTagData {
+    Text * text;
+    u8 pad0[0x16];
+    u8 state;
+    u8 use_tag;
+} CSSTagData;
+ASSERT_SIZE(CSSTagData, 0x1C);
+
+typedef struct CSSTag {
+    CSSTagData * data;
+    // panel, list, name, x7, KO star text.
+    u8 joints[5];
+    u8 pad0[3];
+} CSSTag;
+ASSERT_SIZE(CSSTag, 0xC);
+
+typedef struct CSSIcon {
+    u8 x0;
+    u8 char_kind;
+    u8 state;
+    u8 anim_timer;
+    u8 pad0[8];
+    f32 bound_l;
+    f32 bound_r;
+    f32 bound_u;
+    f32 bound_d;
+} CSSIcon;
+ASSERT_SIZE(CSSIcon, 0x1C);
+
+typedef struct Player {
+    u8 ckind;
+    u8 slot_type;
+    u8 stocks;
+    u8 color;
+    u8 pad0[4];
+    u8 handicap;
+    u8 team;
+    u8 pad1[5];
+    u8 cpu_level;
+    u8 pad2[0x14];
+} Player;
+ASSERT_SIZE(Player, 0x24);
+ASSERT_OFFSET(Player, handicap, 8);
+ASSERT_OFFSET(Player, cpu_level, 0xF);
+
+typedef struct TextCanvas {
+    struct TextCanvas * next;
+    u8 pad0[6];
+    u16 font;
+} TextCanvas;
+
+typedef int8_t s8;
+
+enum {
+    PAD_BUTTON_LEFT = 0x0001,
+    PAD_BUTTON_RIGHT = 0x0002,
+    PAD_BUTTON_DOWN = 0x0004,
+    PAD_BUTTON_UP = 0x0008,
+    PAD_TRIGGER_Z = 0x0010,
+    PAD_TRIGGER_R = 0x0020,
+    PAD_TRIGGER_L = 0x0040,
+    PAD_BUTTON_A = 0x0100,
+    PAD_BUTTON_B = 0x0200,
+    PAD_BUTTON_X = 0x0400,
+    PAD_BUTTON_Y = 0x0800,
+    PAD_BUTTON_START = 0x1000,
+};
+
+// The pad library's raw status, as PADRead fills it.
+typedef struct PADStatus {
+    u16 button;
+    s8 stick_x;
+    s8 stick_y;
+    s8 substick_x;
+    s8 substick_y;
+    u8 trigger_left;
+    u8 trigger_right;
+    u8 analog_a;
+    u8 analog_b;
+    s8 err;
+    u8 pad0;
+} PADStatus;
+ASSERT_SIZE(PADStatus, 0xC);
+
+// HSD's processed status.
+typedef struct PadStatus {
+    u8 pad0[0x41];
+    u8 err; // 0 while plugged in.
+    u8 pad1[2];
+} PadStatus;
+ASSERT_SIZE(PadStatus, 0x44);
+
+// One port of the GameCube adapter's USB report.
+typedef struct AdapterPort {
+    u8 status;
+    u8 buttons;
+    u8 buttons2;
+    u8 stick_x;
+    u8 stick_y;
+    u8 cstick_x;
+    u8 cstick_y;
+    u8 trigger_left;
+    u8 trigger_right;
+} AdapterPort;
+ASSERT_SIZE(AdapterPort, 9);
+
+typedef struct AdapterReport {
+    u8 id;
+    AdapterPort port[4];
+} AdapterReport;
+
+// Nintendont's HID device, as it publishes it to the game.
+typedef struct HidControl {
+    u32 vid;
+    u32 pid;
+} HidControl;
+
+// Our adapter ports as raw pads for the pad loop, and what it takes to
+// make them.
+typedef struct AdapterPads {
+    PADStatus pad[2];
+    AdapterPort origin[2];
+    bool plugged[2];
+} AdapterPads;
+ASSERT_OFFSET(AdapterPads, pad, 0);
+
+typedef struct GameRules {
+    u8 pad0[5];
+    u8 handicap;
+} GameRules;
+
+typedef struct PauseData {
+    HSD_JObj * background;
+    HSD_JObj * analog_stick;
+    HSD_JObj * lras;
+    HSD_JObj * z;
+    HSD_JObj * analog_stick_outline;
+    int slot; // The pauser.
+} PauseData;
+ASSERT_OFFSET(PauseData, slot, 0x14);
+
+typedef struct PauseImages PauseImages;
+
+void * memset(void * dst, int value, size_t size);
+void * memcpy(void * dst, const void * src, size_t size);
+
+void * HSD_MemAlloc(u32 size);
+void HSD_Free(void * block);
+HSD_GObj * GObj_Create(int type, int subclass, int priority);
+void GObj_AddUserData(HSD_GObj * gobj, int kind, void (*destructor)(void *), void * data);
+void GObj_AddProc(HSD_GObj * gobj, void (*proc)(HSD_GObj *), int priority);
+void GObj_AddToObj(HSD_GObj * gobj, int kind, void * obj);
+void GObj_SetupGXLink(HSD_GObj * gobj, void (*callback)(HSD_GObj *, int), int link, int priority);
+void HSD_GObj_JObjCallback(HSD_GObj * gobj, int pass);
+HSD_JObj * HSD_JObjLoadJoint(HSD_JObjDesc * desc);
+void HSD_JObjAddAnimAll(HSD_JObj * jobj, void * anim, void * matanim, void * shapeanim);
+void HSD_JObjReqAnim(HSD_JObj * jobj, f32 frame);
+void HSD_JObjReqAnimAll(HSD_JObj * jobj, f32 frame);
+void HSD_JObjAnimAll(HSD_JObj * jobj);
+void HSD_JObjSetFlagsAll(HSD_JObj * jobj, u32 flags);
+void HSD_JObjClearFlagsAll(HSD_JObj * jobj, u32 flags);
+void HSD_JObjAddChild(HSD_JObj * parent, HSD_JObj * child);
+void HSD_JObjResolveRefsAll(HSD_JObj * jobj, HSD_JObjDesc * desc);
+void HSD_JObjSetMtxDirty(HSD_JObj * jobj);
+void HSD_IDInsertToTable(void * table, void * id, void * data);
+void HSD_ForeachAnim(void * obj, u32 type, u32 mask, void (*fn)(), u32 arg_type, ...);
+void HSD_AObjStopAnim();
+void DCFlushRange(void * start, u32 size);
+void DCInvalidateRange(void * start, u32 size);
+void JObj_GetChild(HSD_JObj * root, HSD_JObj ** out, int index, int stop);
+void JObj_WorldPos(HSD_JObj * jobj, void * unused, f32 out[3]);
+bool lbLang_IsSavedLanguageUS();
+Text * Text_Create(int font, int canvas);
+void Text_InitSubtext(Text * text, f32 x, f32 y, const char * string);
+GameRules * gmMainLib_GetGameRules();
+
+void mnCharSel_CursorThink(HSD_GObj * gobj);
+void css_puck_think(HSD_GObj * gobj);
+void css_scene_think(HSD_GObj * gobj);
+void css_door_refresh(int slot);
+
+enum {
+    JOBJ_HIDDEN = 0x10,
+    TOBJ_MASK = 0x400,
+    ALL_TYPE_MASK = 0xFFFF,
+    HSD_TYPE_JOBJ = 6,
+};
+
+extern CSSAnim * css_anim_table;
+extern HSD_JObj * css_scene_root;
+extern CSSCursorData * css_hands[4];
+extern CSSCharModel * css_pucks[4];
+extern CSSDoor css_doors[4];
+extern CSSTag css_tags[4];
+extern CSSIcon css_icons[ICON_COUNT];
+extern u8 css_exit_bits[4];
+extern u8 css_is_teams;
+extern u8 css_door_count;
+extern u8 css_menu_id;
+extern u8 match_init_flags;
+extern Player players[6];
+extern PadStatus HSD_PadCopyStatus[4];
+extern TextCanvas * text_canvases;
+extern PauseData pause_data;
+extern PadStatus triples_converted_output[2];
+extern AdapterPads adapter_pads_data; // triples_nintendont_data in asm/triples.s.
+extern u32 hid_status;
+extern HidControl hid_ctrl;
+extern AdapterReport hid_report;
+extern PauseImages * pause_56_images; // Heap block, per match.
+
+#define CSS_DOOR_PITCH 10.3f // x spacing of the six squeezed doors.
+
+#endif

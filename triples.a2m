@@ -1,5 +1,7 @@
 @title Triples Dat
 
+@symbols src/melee.ld
+
 # Notice on title screen.
 @set 1A218C 60000000
 # Build title.  Shows on title screen and crash report.
@@ -170,6 +172,7 @@
 # Input.
 # ==========
 
+@c src/adapter_pads.c
 @file 377988 asm/convert_raw_input_for_usb.asm
 @file 377998 asm/convert_raw_input_menu.asm
 @file 06B028 asm/inputs_to_player.asm
@@ -180,12 +183,23 @@
 
 @file 2662D0 asm/css_version_text.asm
 
-@file 266830 asm/css_load_rescale_ui.asm
-@file 262614 asm/css_text_update.asm
+@texture css_digit_5 IA4 assets/css_digit_5.png
+@texture css_digit_6 IA4 assets/css_digit_6.png
+@c src/css.c
+@c src/css_rescale_doors.c
+@c src/css_56_cursor.c
+@c src/css_name_boxes.c
+@c src/css_player_data_update.c
+@c src/css_56_scene_anim.c
+@file 266830 asm/css_load.asm
 
 @file 263334 asm/css_player_data_update.asm
+@file 263064 asm/css_56_start_count.asm
+@file 2630E8 asm/css_56_start_teams.asm
+@file 26312C asm/css_56_start_cursor_holding.asm
 @file 266BB4 asm/css_preload_p5_p6.asm
 @file 017BFC asm/preload_overflow_fallback.asm
+@file 25FA9C asm/css_56_scene_anim.asm
 
 # Rules menu exit fixes.
 # Remove screen blackout.
@@ -197,32 +211,11 @@
 @file 22F728 asm/css_reload_on_rules_exit.asm
 @file 22F7D8 asm/css_reload_on_rules_exit.asm
 
-# Set Team tag hitboxes for Kyle's Sick CSS (KSCSS)
-@set 3F0E18 C1F00000 # P1 [-30, -25.5]
-@set 3F0E1C C1CC0000
-@set 3F0E3C C1A00000 # P2 [-20, -15.5]
-@set 3F0E40 C1780000
-@set 3F0E60 C1180000 # P3 [-9.5, -5.5]
-@set 3F0E64 C0B00000
-@set 3F0E84 00000000 # P4 [0, 4.75]
-@set 3F0E88 40980000
-# Set CPU tag hitboxes
-@set 3F0E10 C20C0000 # P1 [-35, -31]
-@set 3F0E14 C1F80000
-@set 3F0E34 C1C4CCCD # P2 [-24.6, -20.9]
-@set 3F0E38 C1A73333
-@set 3F0E58 C16CCCCD # P3 [-14.8, -11]
-@set 3F0E5C C1300000
-@set 3F0E7C C0900000 # P4 [-4.5, -0.5]
-@set 3F0E80 BF000000
 # Remove the KO Stars rendering
 @set 25D22C 3BA00000
 
 # Disable Nametag Menu from CSS
 @set 261EA0 C042CA10
-
-# Allow 1 player to go to stage select.
-@set 263064 2C040001
 
 # ==========
 # Stage select / match load.
@@ -238,6 +231,30 @@
 # ==========
 
 @file 16E9A8 asm/match_store_player_count.asm
+
+# Pausing by P5/P6: the stock searches four pads for Start, then reads the
+# pauser's buttons and sticks through four-entry tables.
+@file 16BDA8 asm/pause_56_get_pauser.asm
+@set 16BE58 2C1E0006 # Pad loop to six.
+@file 16CC4C asm/pause_56_unpause.asm
+@file 16CCAC asm/pause_56_unpause.asm
+@set 16CC2C 38000003 # Pad pairs to three.
+@file 16D0BC asm/pause_56_unpause_frame.asm
+@file 16D11C asm/pause_56_unpause_frame.asm
+@set 16D09C 38000003 # Pad pairs to three.
+@file 16D1C0 asm/pause_56_buttons_triggered.asm
+@file 16D238 asm/pause_56_buttons_triggered.asm
+@file 16D1E4 asm/pause_56_buttons_pressed.asm
+@file 02CB44 asm/pause_56_camera.asm
+@set 02CB3C 60000000 # Id 5 no longer means nobody.
+@texture pause_digit_5_us I4 assets/pause_digit_5_us.png
+@texture pause_digit_6_us I4 assets/pause_digit_6_us.png
+@texture pause_digit_5_jp I4 assets/pause_digit_5_jp.png
+@texture pause_digit_6_jp I4 assets/pause_digit_6_jp.png
+@c src/pause_56_banner.c
+@file 1A129C asm/pause_56_banner_load.asm
+@file 1A10E8 asm/pause_56_banner_label.asm
+@file 1A0E7C asm/pause_56_stick.asm
 
 @file 2F6690 asm/transparent_hud.asm
 
