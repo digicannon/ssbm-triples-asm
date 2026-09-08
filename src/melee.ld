@@ -55,8 +55,14 @@ css_exit_bits = 0x804D50C8; /* mnCharSel_804D50C8 */
 css_is_teams = 0x804807C8;
 css_door_count = 0x804D6CF5; /* mnCharSel_804D6CF5 */
 css_menu_id = 0x80479D30; /* state_machine; 2 on the main CSS */
+scene_major = 0x80479D30; /* state_machine byte 0 */
+scene_minor = 0x80479D33; /* state_machine byte 3 */
+sss_stage_picked = 0x804D6CAF; /* mnStageSel_804D6CAF */
+css_pending_scene_change = 0x804D6CF6; /* mnCharSel_804D6CF6; 5 inside the rules or nametag menu */
+menu_cur_menu = 0x804A04F0; /* mn_804A04F0.cur_menu */
 match_init_flags = 0x804807C0;
 players = 0x80480820;
+HSD_PadMasterStatus = 0x804C1FAC;
 HSD_PadCopyStatus = 0x804C20BC;
 text_canvases = 0x804D797C; /* HSD_SisLib_804D797C */
 

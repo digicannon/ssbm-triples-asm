@@ -175,6 +175,7 @@
 
 @c src/adapter_pads.c
 @file 377988 asm/convert_raw_input_for_usb.asm
+@c src/convert_raw_input_menu.c
 @file 377998 asm/convert_raw_input_menu.asm
 @file 06B028 asm/inputs_to_player.asm
 
@@ -201,16 +202,6 @@
 @file 266BB4 asm/css_preload_p5_p6.asm
 @file 017BFC asm/preload_overflow_fallback.asm
 @file 25FA9C asm/css_56_scene_anim.asm
-
-# Rules menu exit fixes.
-# Remove screen blackout.
-@set 22F520 60000000
-@set 22F724 60000000
-@set 22F7D4 60000000
-# Reload instead of return.
-@file 22F524 asm/css_reload_on_rules_exit.asm
-@file 22F728 asm/css_reload_on_rules_exit.asm
-@file 22F7D8 asm/css_reload_on_rules_exit.asm
 
 # Remove the KO Stars rendering
 @set 25D22C 3BA00000

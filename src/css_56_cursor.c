@@ -132,8 +132,15 @@ static void * copy_chain(const void * node, int kind) {
     return copy;
 }
 
+static void free_tree(void * node, int kind) {
+    if (!node) return;
+    free_tree(CHILD(node, kind), kind);
+    free_tree(NEXT(node, kind), kind);
+    HSD_Free(node);
+}
+
 // A copy of the scene's root of that kind whose only children are door 0's
-// pieces, in door_pieces order.
+// pieces, in door_pieces order.  Only needed while loading; free_tree after.
 static void * build_tree(int kind) {
     void * scene = css_anim_table[ANIM_SCENE].desc[kind];
     void * root = copy_node(scene, kind, false);
@@ -516,9 +523,9 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
 
 void css_56_create() {
     // One compact copy of the descs (joint, anim, mat anim) serves both ports.
-    void * joint_tree = build_tree(0);
-    void * anim_tree = build_tree(1);
-    void * matanim_tree = build_tree(2);
+    void * joint_tree = build_tree(KIND_JOINT);
+    void * anim_tree = build_tree(KIND_ANIM);
+    void * matanim_tree = build_tree(KIND_MATANIM);
 
     // The stock doors' name texts were laid out before css_rescale_doors.c
     // ran and are text, not joints; replace them like P5/P6's.
@@ -529,4 +536,7 @@ void css_56_create() {
     }
 
     for (int port = 4; port < 6; ++port) create_port(port, joint_tree, anim_tree, matanim_tree);
+    free_tree(joint_tree, KIND_JOINT);
+    free_tree(anim_tree, KIND_ANIM);
+    free_tree(matanim_tree, KIND_MATANIM);
 }

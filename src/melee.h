@@ -262,11 +262,36 @@ ASSERT_SIZE(PADStatus, 0xC);
 
 // HSD's processed status.
 typedef struct PadStatus {
-    u8 pad0[0x41];
+    u32 button;
+    u32 last_button;
+    u32 trigger;
+    u32 repeat;
+    u32 release;
+    int repeat_count;
+    s8 stick_x;
+    s8 stick_y;
+    s8 substick_x;
+    s8 substick_y;
+    u8 analog_l;
+    u8 analog_r;
+    u8 analog_a;
+    u8 analog_b;
+    f32 nml_stick_x;
+    f32 nml_stick_y;
+    f32 nml_substick_x;
+    f32 nml_substick_y;
+    f32 nml_analog_l;
+    f32 nml_analog_r;
+    f32 nml_analog_a;
+    f32 nml_analog_b;
+    u8 cross_dir;
     u8 err; // 0 while plugged in.
-    u8 pad1[2];
+    u8 pad0[2];
 } PadStatus;
 ASSERT_SIZE(PadStatus, 0x44);
+ASSERT_OFFSET(PadStatus, stick_x, 0x18);
+ASSERT_OFFSET(PadStatus, nml_substick_x, 0x28);
+ASSERT_OFFSET(PadStatus, err, 0x41);
 
 // One port of the GameCube adapter's USB report.
 typedef struct AdapterPort {
@@ -376,7 +401,13 @@ extern u8 css_door_count;
 extern u8 css_menu_id;
 extern u8 match_init_flags;
 extern Player players[6];
+extern PadStatus HSD_PadMasterStatus[4];
 extern PadStatus HSD_PadCopyStatus[4];
+extern u8 scene_major;
+extern u8 scene_minor;
+extern u8 sss_stage_picked;
+extern u8 css_pending_scene_change;
+extern u8 menu_cur_menu;
 extern TextCanvas * text_canvases;
 extern PauseData pause_data;
 extern PadStatus triples_converted_output[2];
