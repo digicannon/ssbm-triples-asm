@@ -3,7 +3,7 @@
 # ====================
 
 .include "common.s"
-.include "pause_56.s"
+.include "converted_pads.s"
 
 .set gm_GetButtonsTriggered, 0x801A36A0
 

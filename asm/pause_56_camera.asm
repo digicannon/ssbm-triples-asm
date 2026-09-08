@@ -6,7 +6,7 @@
 # and 5 means none (the @set drops its early return on 5).
 
 .include "common.s"
-.include "pause_56.s"
+.include "converted_pads.s"
 
 .set Camera_8002B694, 0x8002B694
 

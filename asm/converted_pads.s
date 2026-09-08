@@ -1,12 +1,12 @@
-# Shared by the pause hooks.  Pads 4 and 5 are P5/P6's converted inputs.
-.ifndef PAUSE_56_S
-.set PAUSE_56_S, 1
+.ifndef CONVERTED_PADS_S
+.set CONVERTED_PADS_S, 1
 
 .include "triples.s"
 
 .set pad_size, 0x44
 .set pad_ofst_pressed, 0 # u32.
 .set pad_ofst_triggered, 8 # u32.
+.set pad_ofst_err, 0x41 # u8, 0 while plugged in.
 
 # \reg = the address of pad \reg's converted pad.  Not r0.
 .macro converted_pad reg

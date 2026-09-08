@@ -3,7 +3,7 @@
 # ====================
 
 .include "common.s"
-.include "pause_56.s"
+.include "converted_pads.s"
 
     lwz r6, 0x14(r4) # PauseData.slot, the pauser.
     cmpwi r6, 4

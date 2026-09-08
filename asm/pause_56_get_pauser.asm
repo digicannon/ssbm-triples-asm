@@ -3,7 +3,7 @@
 # ====================
 
 .include "common.s"
-.include "pause_56.s"
+.include "converted_pads.s"
 
     cmpwi r30, 4
     blt stock

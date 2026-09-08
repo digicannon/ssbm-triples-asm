@@ -3,7 +3,7 @@
 # ====================
 
 .include "common.s"
-.include "pause_56.s"
+.include "converted_pads.s"
 
 .set gm_GetButtonsPressed, 0x801A3680
 

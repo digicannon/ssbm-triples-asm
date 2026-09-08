@@ -3,7 +3,7 @@
 # ====================
 
 .include "common.s"
-.include "pause_56.s"
+.include "converted_pads.s"
 
     cmplwi r4, 4
     blt stock

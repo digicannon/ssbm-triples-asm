@@ -280,6 +280,8 @@
 
 # On-exit (quit out or Game!) results screen patch.
 @file 16EBA8 asm/fix_results_screen.asm
+@file 177B48 asm/results_56_continue.asm
+@file 17858C asm/results_56_exit.asm
 
 # ==========
 # UnclePunch's stage expansion code.
