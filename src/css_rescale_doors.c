@@ -25,7 +25,7 @@ void css_rescale_doors() {
         f32 centre = x0 + CSS_DOOR_PITCH * i;
         // t = centre - s * x_i, so x' = s * x + t puts the card at centre.
         f32 t = centre - SQUEEZE * css_child(css_scene_root, BG_JOINT + i)->translate[0];
-        for (unsigned p = 0; p < sizeof pieces / sizeof pieces[0]; ++p) {
+        for (unsigned p = 0; p < sizeof(pieces) / sizeof(pieces[0]); ++p) {
             HSD_JObj * piece = css_child(css_scene_root, pieces[p][0] + pieces[p][1] * i);
             piece->scale[0] = SQUEEZE;
             piece->translate[0] = piece->translate[0] * SQUEEZE + t;

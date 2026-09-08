@@ -17,34 +17,30 @@
 extern const u8 css_digit_5[];
 extern const u8 css_digit_6[];
 
-enum {
-    PLATE_JOINT = 0x3D, // Door 0's name plate: skinned, six joints.
-    PLATE_JOINTS = 6,
-    SCENE_JOINTS = 0xAD, // Joints in the VS scene; grafts index from here.
-    GRAFT_JOINTS = 31, // Root plus door 0's pieces.
-    // The label: 32x24 IA4 in 8x4 tiles.
-    TILE_W = 8,
-    TILE_H = 4,
-    TILE = TILE_W * TILE_H,
-    LABEL_TILE_COLUMNS = 4,
-    LABEL_TILE_ROWS = 6,
-    LABEL_SIZE = LABEL_TILE_COLUMNS * LABEL_TILE_ROWS * TILE,
-};
+#define PLATE_JOINT 0x3D // Door 0's name plate: skinned, six joints.
+#define PLATE_JOINTS 6
+#define SCENE_JOINTS 0xAD // Joints in the VS scene; grafts index from here.
+#define GRAFT_JOINTS 31 // Root plus door 0's pieces.
+// The label: 32x24 IA4 in 8x4 tiles.
+#define TILE_W 8
+#define TILE_H 4
+#define TILE (TILE_W * TILE_H)
+#define LABEL_TILE_COLUMNS 4
+#define LABEL_TILE_ROWS 6
+#define LABEL_SIZE (LABEL_TILE_COLUMNS * LABEL_TILE_ROWS * TILE)
 
 // Where door 0's pieces land in the graft, in door_pieces order.
-enum {
-    G_BG = 1,
-    G_EMBLEM,
-    G_COSTUME,
-    G_TEAM,
-    G_PLATE, // Six joints.
-    G_CPUSLIDER2 = 8,
-    G_CPUSLIDER,
-    G_DOTS = 11,
-    G_NAME = 21,
-    G_DOOR,
-    G_INDICATOR = 30,
-};
+#define G_BG 1
+#define G_EMBLEM 2
+#define G_COSTUME 3
+#define G_TEAM 4
+#define G_PLATE 5 // Six joints.
+#define G_CPUSLIDER2 8
+#define G_CPUSLIDER 9
+#define G_DOTS 11
+#define G_NAME 21
+#define G_DOOR 22
+#define G_INDICATOR 30
 
 // Door 0's top-level joints in the VS scene with their group parents:
 // background, emblem, costume, team, name plate and sliders, stock dots,
@@ -142,7 +138,7 @@ static void * build_tree(int kind) {
     void * scene = css_anim_table[ANIM_SCENE].desc[kind];
     void * root = copy_node(scene, kind, false);
     void * prev = NULL;
-    for (unsigned i = 0; i < sizeof door_pieces / sizeof door_pieces[0]; ++i) {
+    for (unsigned i = 0; i < sizeof(door_pieces) / sizeof(door_pieces[0]); ++i) {
         int index = door_pieces[i][0];
         void * copy = copy_node(css_find_node(scene, kind, &index), kind, true);
         if (kind == KIND_JOINT) {
@@ -244,7 +240,7 @@ static void set_label(PortBlock * bk, HSD_JObj * joint) {
 
 // Requests the frame on the child and re-animates that subtree only, so
 // the rest of the model keeps the stock's frame count.
-static HSD_JObj * recolour(HSD_JObj * root, int child, int frame) {
+static HSD_JObj * recolor(HSD_JObj * root, int child, int frame) {
     HSD_JObj * joint = css_child(root, child);
     HSD_JObjReqAnim(joint, frame);
     HSD_JObjAnimAll(joint);
@@ -276,7 +272,7 @@ static void swap(void * a, void * b, size_t size) {
 // puts everything back, with the port's copies updated.
 static void swap_slot(PortBlock * bk) {
     swap(&HSD_PadCopyStatus[0], &triples_converted_output[bk->port - 4], sizeof(PadStatus));
-    swap(css_doors, bk->doors, sizeof css_doors);
+    swap(css_doors, bk->doors, sizeof(css_doors));
     swap(&players[0], &players[bk->port], sizeof(Player));
     swap(&css_hands[0], &bk->hand_slot, sizeof(void *));
     swap(&css_pucks[0], &bk->puck_slot, sizeof(void *));
@@ -324,9 +320,9 @@ static void hand_think(HSD_GObj * gobj) {
     mnCharSel_CursorThink(gobj);
     swap_out(bk);
 
-    // Stock colours the hand by port; in teams it uses the team colour.
+    // Stock colors the hand by port; in teams it uses the team color.
     // Either way its label comes back as P1 each frame.
-    if (!css_is_teams) recolour(jobj, 3, bk->frame);
+    if (!css_is_teams) recolor(jobj, 3, bk->frame);
     set_label(bk, css_child(jobj, 3));
 }
 
@@ -337,7 +333,7 @@ static void puck_think(HSD_GObj * gobj) {
         HSD_JObjSetFlagsAll(jobj, JOBJ_HIDDEN);
         return;
     }
-    // A mode change need not change the colour index for this port, so
+    // A mode change need not change the color index for this port, so
     // force the stock's refresh by running out its timer.
     if (bk->puck_teams != css_is_teams) {
         bk->puck_teams = css_is_teams;
@@ -348,17 +344,17 @@ static void puck_think(HSD_GObj * gobj) {
     css_puck_think(gobj);
     swap_out(bk);
 
-    // Stock colours the puck by port unless it is CPU grey or a team colour
-    // (index >= 4).  Joint 4 is the label (row * 4), joint 3 the colour
-    // (column * 0x28); in teams the colour is the team's, so only the label
-    // is ours.  Follow the stock's refresh (timer reset to 0) so the colour
+    // Stock colors the puck by port unless it is CPU gray or a team color
+    // (index >= 4).  Joint 4 is the label (row * 4), joint 3 the color
+    // (column * 0x28); in teams the color is the team's, so only the label
+    // is ours.  Follow the stock's refresh (timer reset to 0) so the color
     // anim plays out in between.
-    if (bk->puck.refresh != 0 || bk->puck.colour >= 4) return;
-    HSD_JObj * label = recolour(jobj, 4, bk->frame & ~3);
-    // The label holds its frame; the colour plays.
+    if (bk->puck.refresh != 0 || bk->puck.color >= 4) return;
+    HSD_JObj * label = recolor(jobj, 4, bk->frame & ~3);
+    // The label holds its frame; the color plays.
     HSD_ForeachAnim(label, HSD_TYPE_JOBJ, TOBJ_MASK, HSD_AObjStopAnim, HSD_TYPE_JOBJ, 0, 0);
     set_label(bk, label);
-    if (!css_is_teams) recolour(jobj, 3, (bk->frame & 3) * 0x28);
+    if (!css_is_teams) recolor(jobj, 3, (bk->frame & 3) * 0x28);
 }
 
 // Unplugging closes the door (the stock would make it a CPU), and the
@@ -395,8 +391,8 @@ static void card_think(HSD_GObj * gobj) {
 }
 
 static void create_port(int port, void * joint_tree, void * anim_tree, void * matanim_tree) {
-    PortBlock * bk = HSD_MemAlloc(sizeof *bk);
-    memset(bk, 0, sizeof *bk);
+    PortBlock * bk = HSD_MemAlloc(sizeof(*bk));
+    memset(bk, 0, sizeof(*bk));
     css_56_blocks[port - 4] = bk;
     bk->port = port;
     bk->frame = hand_frames[port - 4];
@@ -404,12 +400,12 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
     bk->cursor.y = -21.5f;
     bk->cursor.state = HAND_FREE;
     bk->hand_slot = &bk->cursor;
-    bk->puck.colour = 0xFF;
+    bk->puck.color = 0xFF;
     bk->puck_slot = &bk->puck;
 
     // Shadow doors start from the real ones for the joint ids, all closed
     // with nothing picked.  Door 0 keeps P1's team, which is 0.
-    memcpy(bk->doors, css_doors, sizeof bk->doors);
+    memcpy(bk->doors, css_doors, sizeof(bk->doors));
     for (int i = 0; i < 4; ++i) {
         CSSDoor * door = &bk->doors[i];
         door->p_kind = door->p_kind_prev = PKIND_CLOSED;

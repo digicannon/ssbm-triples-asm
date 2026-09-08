@@ -43,7 +43,7 @@ backup
   mr    REG_GObjData,r3
 #Zero
   li    r4, mgr_size * 6
-  branchl r12,ZeroAreaLength
+  branchl r12,memzero
 #Initialize
   mr    r6,REG_GObjData
   mr    r3,REG_GObj

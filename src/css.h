@@ -5,21 +5,17 @@
 
 #include "melee.h"
 
-enum {
-    ANIM_HAND = 1,
-    ANIM_PUCK = 2,
-    ANIM_SCENE = 3,
-    BG_JOINT = 0x29, // A door's background, door 0's here.
-    BOX_JOINT = 0x55, // The four stock name boxes, one mesh each.
-    BOX_JOINT_BASE = 0xEB, // Our name boxes, one joint per door.
-};
+#define ANIM_HAND 1
+#define ANIM_PUCK 2
+#define ANIM_SCENE 3
+#define BG_JOINT 0x29 // A door's background, door 0's here.
+#define BOX_JOINT 0x55 // The four stock name boxes, one mesh each.
+#define BOX_JOINT_BASE 0xEB // Our name boxes, one joint per door.
 
 // Desc trees come in three kinds: joint, anim joint, mat anim joint.
-enum {
-    KIND_JOINT,
-    KIND_ANIM,
-    KIND_MATANIM,
-};
+#define KIND_JOINT 0
+#define KIND_ANIM 1
+#define KIND_MATANIM 2
 typedef struct NodeKind {
     u32 size;
     u32 child;

@@ -4,13 +4,11 @@
 
 #include "css.h"
 
-enum {
-    MENU_MAIN_CSS = 2,
-    HUD_SIX = 8,
-    // Character, HMN/CPU, stocks, costume; slot, x5, spawn dir, sub colour;
-    // handicap, team, nametag.
-    CARD_BYTES = 12,
-};
+#define MENU_MAIN_CSS 2
+#define HUD_SIX 8
+// Character, HMN/CPU, stocks, costume; slot, x5, spawn dir, sub color;
+// handicap, team, nametag.
+#define CARD_BYTES 12
 
 // A closed door: no character, nametag 0x78 (none), handicap 9.
 static const u8 closed_card[CARD_BYTES] = {0x1A, PKIND_CLOSED, 0, 0, 0, 0xFF, 0, 0, 9, 0, 0x78, 0};

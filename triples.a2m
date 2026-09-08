@@ -1,6 +1,7 @@
 @title Triples Dat
 
 @symbols src/melee.ld
+@symbols src/triples.ld
 
 # Notice on title screen.
 @set 1A218C 60000000
@@ -262,6 +263,14 @@
 
 @file 2F9A3C asm/pal_stock_icons.asm
 @file 16CF38 asm/always_show_player_indicator.asm
+@texture indicator_5_us IA4 assets/indicator_5_us.png
+@texture indicator_6_us IA4 assets/indicator_6_us.png
+@texture indicator_5_jp IA4 assets/indicator_5_jp.png
+@texture indicator_6_jp IA4 assets/indicator_6_jp.png
+@c src/indicator_56.c
+@file 2FC9EC asm/indicator_56_frame.asm
+@file 2FD274 asm/indicator_56_label.asm
+@file 2FD3EC asm/indicator_56_recolor.asm
 
 # Taken from Slippi, this code hides nametags when invisible from a Zelda/Sheik/Mewtwo up-B.
 # It also overrides our "always show player indicator" code.

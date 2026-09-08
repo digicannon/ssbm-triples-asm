@@ -7,14 +7,13 @@
 
 .set lbDvd_GetPreloadCacheScene, 0x8001822C
 .set lbDvd_UpdatePreloadCache, 0x80018254
-.set player_data, 0x80480820
 .set player_size, 0x24
 .set CHKIND_NONE, 0x21
 
     branchl r12, lbDvd_GetPreloadCacheScene
     # game_cache.entries[4] is at scene + 0x30, 8 bytes each.
     addi r5, r3, 0x30
-    load r6, player_data + (player_size * 4)
+    load r6, players + (player_size * 4)
     li r7, 2
 loop:
     # slot_type: 0=HMN, 1=CPU, 3=NONE.

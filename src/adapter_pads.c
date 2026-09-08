@@ -1,14 +1,12 @@
 #include "melee.h"
 
-enum {
-    VID_NINTENDO = 0x57E,
-    PID_GC_ADAPTER = 0x337,
-    PORT_WIRED = 0x10,
-    PORT_WAVEBIRD = 0x22,
-    PAD_ERR_NONE = 0,
-    PAD_ERR_NO_CONTROLLER = -1,
-    RESET_BUTTONS = PAD_BUTTON_X | PAD_BUTTON_Y | PAD_BUTTON_START,
-};
+#define VID_NINTENDO 0x57E
+#define PID_GC_ADAPTER 0x337
+#define PORT_WIRED 0x10
+#define PORT_WAVEBIRD 0x22
+#define PAD_ERR_NONE 0
+#define PAD_ERR_NO_CONTROLLER -1
+#define RESET_BUTTONS (PAD_BUTTON_X | PAD_BUTTON_Y | PAD_BUTTON_START)
 
 static bool plugged(const AdapterPort * port) {
     return (port->status & PORT_WIRED) == PORT_WIRED || (port->status & PORT_WAVEBIRD) == PORT_WAVEBIRD;
@@ -29,9 +27,9 @@ static u8 trigger(u8 raw, u8 origin) {
 }
 
 void read_adapter_pads() {
-    DCInvalidateRange(&hid_status, sizeof hid_status);
-    DCInvalidateRange(&hid_ctrl, sizeof hid_ctrl);
-    DCInvalidateRange(&hid_report, sizeof hid_report);
+    DCInvalidateRange(&hid_status, sizeof(hid_status));
+    DCInvalidateRange(&hid_ctrl, sizeof(hid_ctrl));
+    DCInvalidateRange(&hid_report, sizeof(hid_report));
 
     bool adapter = hid_status != 0 && hid_ctrl.vid == VID_NINTENDO && hid_ctrl.pid == PID_GC_ADAPTER;
 
@@ -63,5 +61,5 @@ void read_adapter_pads() {
         pad->err = PAD_ERR_NONE;
     }
 
-    DCFlushRange(&adapter_pads_data, sizeof adapter_pads_data);
+    DCFlushRange(&adapter_pads_data, sizeof(adapter_pads_data));
 }

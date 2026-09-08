@@ -36,7 +36,7 @@ CreateTeamArray_Loop:
   CheckTeam_Loop:
   #Load slot type
     mr  r3,REG_Count
-    branchl r12,PlayerBlock_LoadSlotType
+    branchl r12,Player_GetPlayerSlotType
     cmpwi r3,0x3
     beq CheckTeam_IncLoop      #If =3, no player present
   #Get Team

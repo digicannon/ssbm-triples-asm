@@ -8,7 +8,6 @@
 
 .include "common.s"
 
-.set players, 0x80480820
 .set player_size, 0x24
 .set hide, 0x802631C0
 

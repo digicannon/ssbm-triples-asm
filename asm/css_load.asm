@@ -4,9 +4,7 @@
 
 .include "common.s"
 
-.set door_count, 0x804D6CF5
-
-    loadbz r12, door_count
+    loadbz r12, css_door_count
     cmpwi r12, 4
     bne return
     stwu r1, -0x10(r1)

@@ -1,8 +1,10 @@
-/* Stock symbols the C code uses, by GALE01 address.  Names follow the melee
+/* Stock symbols the code uses, by GALE01 address.  Names follow the melee
  * decomp where it has one; numbered ones get a descriptive name instead. */
 
 memset = 0x80003100;
 memcpy = 0x800031F4;
+memzero = 0x8000C160;
+OSReport = 0x803456A8;
 
 HSD_MemAlloc = 0x8037F1E4;
 HSD_Free = 0x8037F1B0;
@@ -33,6 +35,9 @@ lbLang_IsSavedLanguageUS = 0x8000AE90;
 Text_Create = 0x803A6754; /* HSD_SisLib_803A6754 */
 Text_InitSubtext = 0x803A6B98; /* HSD_SisLib_803A6B98 */
 gmMainLib_GetGameRules = 0x8015CC34;
+Player_GetPlayerSlotType = 0x8003241C;
+Player_GetEntity = 0x80034110;
+Player_GetEntityAtIndex = 0x8003418C;
 
 mnCharSel_CursorThink = 0x802602A0;
 css_puck_think = 0x80262648; /* fn_80262648 */
@@ -56,14 +61,3 @@ HSD_PadCopyStatus = 0x804C20BC;
 text_canvases = 0x804D797C; /* HSD_SisLib_804D797C */
 
 pause_data = 0x80479B10; /* lbl_80479B10 */
-
-/* Nintendont's HID data in Wii memory. */
-hid_status = 0x93003440;
-hid_ctrl = 0x93005000;
-hid_report = 0x930050F0;
-
-/* Triples globals; see asm/triples.s. */
-adapter_pads_data = 0x803FC500; /* triples_nintendont_data */
-triples_converted_output = 0x803FC600;
-pause_56_images = 0x803FC70C;
-css_56_blocks = 0x803FC710;

@@ -13,14 +13,12 @@ extern const u8 pause_digit_6_us[];
 extern const u8 pause_digit_5_jp[];
 extern const u8 pause_digit_6_jp[];
 
-enum {
-    LABEL_JOINT = 8,
-    TILE = 32,
-    TILE_COLUMNS = 6,
-    DIGIT_COLUMNS = 3,
-    DIGIT_ROWS = 3,
-    IMAGE_SIZE = TILE_COLUMNS * DIGIT_ROWS * TILE,
-};
+#define LABEL_JOINT 8
+#define TILE 32
+#define TILE_COLUMNS 6
+#define DIGIT_COLUMNS 3
+#define DIGIT_ROWS 3
+#define IMAGE_SIZE (TILE_COLUMNS * DIGIT_ROWS * TILE)
 
 typedef struct PauseImages {
     u8 image[2][IMAGE_SIZE];
@@ -35,7 +33,7 @@ static HSD_TObj * label_tobj(HSD_JObj * root) {
 
 // At the end of the banner load, when the label shows P1.
 void pause_56_banner_load(HSD_JObj * root) {
-    PauseImages * images = HSD_MemAlloc(sizeof *images);
+    PauseImages * images = HSD_MemAlloc(sizeof(*images));
     pause_56_images = images;
     const HSD_ImageDesc * p1 = label_tobj(root)->imagedesc;
 
@@ -57,7 +55,7 @@ void pause_56_banner_load(HSD_JObj * root) {
         images->desc[i].image_ptr = image;
     }
 
-    DCFlushRange(images, sizeof *images);
+    DCFlushRange(images, sizeof(*images));
 }
 
 // At the end of the banner proc, after its HSD_JObjAnimAll: for a P5/P6

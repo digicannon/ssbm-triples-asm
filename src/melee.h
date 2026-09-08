@@ -25,6 +25,9 @@ typedef struct HSD_GObj {
 } HSD_GObj;
 ASSERT_SIZE(HSD_GObj, 0x30);
 
+#define GX_TF_I4 0
+#define GX_TF_IA4 2
+
 typedef struct HSD_ImageDesc {
     void * image_ptr;
     u16 width;
@@ -39,11 +42,27 @@ ASSERT_SIZE(HSD_ImageDesc, 0x18);
 typedef struct HSD_TObj {
     u8 pad0[0x58];
     HSD_ImageDesc * imagedesc;
+    u8 pad1[0xC];
+    HSD_ImageDesc ** imagetbl;
 } HSD_TObj;
+ASSERT_OFFSET(HSD_TObj, imagetbl, 0x68);
+
+typedef struct GXColor {
+    u8 r, g, b, a;
+} GXColor;
+
+typedef struct HSD_Material {
+    GXColor ambient;
+    GXColor diffuse;
+    GXColor specular;
+    f32 alpha;
+    f32 shininess;
+} HSD_Material;
 
 typedef struct HSD_MObj {
     u8 pad0[8];
     HSD_TObj * tobj;
+    HSD_Material * mat;
 } HSD_MObj;
 
 typedef struct HSD_PObj {
@@ -59,7 +78,8 @@ typedef struct HSD_DObj {
 } HSD_DObj;
 
 typedef struct HSD_JObj {
-    u8 pad0[0x14];
+    u8 pad0[0x10];
+    struct HSD_JObj * child;
     u32 flags;
     HSD_DObj * dobj;
     u8 pad1[0x10];
@@ -87,10 +107,8 @@ typedef struct CSSAnim {
 
 // CSSCursorData.state: 1 while holding the puck, 3 for a hand the Start
 // check leaves out; 2 is a free hand.
-enum {
-    HAND_HOLDING = 1,
-    HAND_FREE = 2,
-};
+#define HAND_HOLDING 1
+#define HAND_FREE 2
 
 typedef struct CSSCursorData {
     HSD_GObj * gobj;
@@ -108,8 +126,8 @@ typedef struct CSSCharModel {
     HSD_GObj * gobj;
     u8 x4;
     u8 x5;
-    u8 colour;
-    u8 refresh; // Refreshes the colour anim when it runs past 0x27.
+    u8 color;
+    u8 refresh; // Refreshes the color anim when it runs past 0x27.
     f32 x;
     f32 y;
     f32 x10;
@@ -135,11 +153,10 @@ typedef struct CSSDoor {
 ASSERT_SIZE(CSSDoor, 0x24);
 ASSERT_OFFSET(CSSDoor, bounds, 0x14);
 
-enum {
-    PKIND_CLOSED = 3,
-    ICON_COUNT = 0x19,
-    ICON_NONE = 0x19,
-};
+#define PKIND_HUMAN 0
+#define PKIND_CLOSED 3
+#define ICON_COUNT 0x19
+#define ICON_NONE 0x19
 
 typedef struct Text {
     f32 pos_x;
@@ -214,20 +231,18 @@ typedef struct TextCanvas {
 
 typedef int8_t s8;
 
-enum {
-    PAD_BUTTON_LEFT = 0x0001,
-    PAD_BUTTON_RIGHT = 0x0002,
-    PAD_BUTTON_DOWN = 0x0004,
-    PAD_BUTTON_UP = 0x0008,
-    PAD_TRIGGER_Z = 0x0010,
-    PAD_TRIGGER_R = 0x0020,
-    PAD_TRIGGER_L = 0x0040,
-    PAD_BUTTON_A = 0x0100,
-    PAD_BUTTON_B = 0x0200,
-    PAD_BUTTON_X = 0x0400,
-    PAD_BUTTON_Y = 0x0800,
-    PAD_BUTTON_START = 0x1000,
-};
+#define PAD_BUTTON_LEFT 0x0001
+#define PAD_BUTTON_RIGHT 0x0002
+#define PAD_BUTTON_DOWN 0x0004
+#define PAD_BUTTON_UP 0x0008
+#define PAD_TRIGGER_Z 0x0010
+#define PAD_TRIGGER_R 0x0020
+#define PAD_TRIGGER_L 0x0040
+#define PAD_BUTTON_A 0x0100
+#define PAD_BUTTON_B 0x0200
+#define PAD_BUTTON_X 0x0400
+#define PAD_BUTTON_Y 0x0800
+#define PAD_BUTTON_START 0x1000
 
 // The pad library's raw status, as PADRead fills it.
 typedef struct PADStatus {
@@ -333,6 +348,7 @@ void DCInvalidateRange(void * start, u32 size);
 void JObj_GetChild(HSD_JObj * root, HSD_JObj ** out, int index, int stop);
 void JObj_WorldPos(HSD_JObj * jobj, void * unused, f32 out[3]);
 bool lbLang_IsSavedLanguageUS();
+u8 Player_GetPlayerSlotType(int slot);
 Text * Text_Create(int font, int canvas);
 void Text_InitSubtext(Text * text, f32 x, f32 y, const char * string);
 GameRules * gmMainLib_GetGameRules();
@@ -342,12 +358,10 @@ void css_puck_think(HSD_GObj * gobj);
 void css_scene_think(HSD_GObj * gobj);
 void css_door_refresh(int slot);
 
-enum {
-    JOBJ_HIDDEN = 0x10,
-    TOBJ_MASK = 0x400,
-    ALL_TYPE_MASK = 0xFFFF,
-    HSD_TYPE_JOBJ = 6,
-};
+#define JOBJ_HIDDEN 0x10
+#define TOBJ_MASK 0x400
+#define ALL_TYPE_MASK 0xFFFF
+#define HSD_TYPE_JOBJ 6
 
 extern CSSAnim * css_anim_table;
 extern HSD_JObj * css_scene_root;
@@ -366,7 +380,7 @@ extern PadStatus HSD_PadCopyStatus[4];
 extern TextCanvas * text_canvases;
 extern PauseData pause_data;
 extern PadStatus triples_converted_output[2];
-extern AdapterPads adapter_pads_data; // triples_nintendont_data in asm/triples.s.
+extern AdapterPads adapter_pads_data;
 extern u32 hid_status;
 extern HidControl hid_ctrl;
 extern AdapterReport hid_report;

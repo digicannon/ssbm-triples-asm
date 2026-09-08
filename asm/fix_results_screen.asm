@@ -224,7 +224,7 @@ return:
     # Player 5, zero.
     load r3, result_block_p5
     li r4, results_block_size
-    branchl r5, Zero_AreaLength
+    branchl r5, memzero
     # Player 5, store inactive player type.
     load r3, result_block_p5
     li r4, player_type_inactive
@@ -233,7 +233,7 @@ return:
     # Player 6, zero.
     load r3, result_block_p6
     li r4, results_block_size
-    branchl r5, Zero_AreaLength
+    branchl r5, memzero
     # Player 6, store inactive player type.
     load r3, result_block_p6
     li r4, player_type_inactive

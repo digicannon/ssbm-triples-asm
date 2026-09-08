@@ -4,8 +4,6 @@
 
 .include "common.s"
 
-.set OSReport, 0x803456A8
-
     # Skip data/funcs.
     b begin
 

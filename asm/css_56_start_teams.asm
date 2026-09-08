@@ -8,14 +8,12 @@
 
 .include "common.s"
 
-.set doors, 0x803F0DFC
 .set door_size, 0x24
-.set players, 0x80480820
 .set player_size, 0x24
 .set hide, 0x802631C0
 
     li r3, 0 # One bit per team in use.
-    load r4, doors
+    load r4, css_doors
     li r5, 4
 real:
     lbz r0, 0xB(r4) # p_kind; 3 is closed.

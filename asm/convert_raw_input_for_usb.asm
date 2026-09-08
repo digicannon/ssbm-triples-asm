@@ -29,7 +29,7 @@
 .if DEBUG
     # Dolphin would crash trying to read HID data.
     # Move P3/P4's raw pads to P5/P6 instead.
-    load r3, triples_nintendont_data
+    load r3, adapter_pads_data
     lwz r4, -12(reg_src_ptr)
     stw r4, 0(r3)
     lwz r4, -8(reg_src_ptr)
@@ -53,7 +53,7 @@
 
 set_pointers:
     # This function is about to increment this value by 12.
-    load reg_src_ptr, (triples_nintendont_data - 12)
+    load reg_src_ptr, (adapter_pads_data - 12)
     # This function is about to increment this value by 68.
     load reg_dest_ptr, (triples_converted_output - 68)
 
