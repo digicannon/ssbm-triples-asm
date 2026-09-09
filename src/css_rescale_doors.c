@@ -10,7 +10,7 @@
 
 // A door's top-level pieces as (door 0 joint, per-door stride) pairs:
 // background, emblem, costume, team, name plate and sliders, stock dots,
-// sliding panel and its two text anchors, door frame, indicator.
+// nametag window and its two text anchors, door frame, indicator.
 static const u8 pieces[][2] = {
     {0x29, 1}, {0x2E, 1}, {0x33, 1}, {0x38, 1}, {0x3D, 6}, {0x57, 6},
     {0x70, 5}, {0x73, 5}, {0x74, 5}, {0x85, 8}, {0xA5, 2},
@@ -31,6 +31,12 @@ void css_rescale_doors() {
             piece->translate[0] = piece->translate[0] * SQUEEZE + t;
             HSD_JObjSetMtxDirty(piece);
         }
+
+        // Rescale nametag window to fill the squeezed door.
+        HSD_JObj * window = css_child(css_scene_root, NAMETAG_WINDOW_JOINT + 5 * i);
+        window->scale[0] = SQUEEZE * NAMETAG_WINDOW_STRETCH;
+        window->translate[0] = css_child(css_scene_root, BG_JOINT + i)->translate[0];
+        HSD_JObjSetMtxDirty(window);
 
         // Bounds are rebuilt from the card's centre, not scaled in place: the
         // door array outlives the scene and would drift on every CSS load.

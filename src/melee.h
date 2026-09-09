@@ -180,7 +180,9 @@ ASSERT_OFFSET(Text, hidden, 0x4D);
 
 typedef struct CSSTagData {
     Text * text;
-    u8 pad0[0x16];
+    Text * name_ls; // The tag list.
+    u8 pad0[0x11];
+    u8 port;
     u8 state;
     u8 use_tag;
 } CSSTagData;
@@ -188,7 +190,7 @@ ASSERT_SIZE(CSSTagData, 0x1C);
 
 typedef struct CSSTag {
     CSSTagData * data;
-    // panel, list, name, x7, KO star text.
+    // nametag window, list, name, x7, KO star text.
     u8 joints[5];
     u8 pad0[3];
 } CSSTag;
@@ -215,7 +217,8 @@ typedef struct Player {
     u8 pad0[4];
     u8 handicap;
     u8 team;
-    u8 pad1[5];
+    u8 nametag; // 0x78 for none.
+    u8 pad1[4];
     u8 cpu_level;
     u8 pad2[0x14];
 } Player;
@@ -376,6 +379,8 @@ bool lbLang_IsSavedLanguageUS();
 u8 Player_GetPlayerSlotType(int slot);
 Text * Text_Create(int font, int canvas);
 void Text_InitSubtext(Text * text, f32 x, f32 y, const char * string);
+void Text_SetSubtext(Text * text, int subtext, const char * string);
+char * GetNameText(int tag);
 GameRules * gmMainLib_GetGameRules();
 
 void mnCharSel_CursorThink(HSD_GObj * gobj);

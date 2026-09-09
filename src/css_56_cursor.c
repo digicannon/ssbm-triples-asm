@@ -29,22 +29,24 @@ extern const u8 css_digit_6[];
 #define LABEL_TILE_ROWS 6
 #define LABEL_SIZE (LABEL_TILE_COLUMNS * LABEL_TILE_ROWS * TILE)
 
-// Where door 0's pieces land in the graft, in door_pieces order.
-#define G_BG 1
-#define G_EMBLEM 2
-#define G_COSTUME 3
-#define G_TEAM 4
-#define G_PLATE 5 // Six joints.
-#define G_CPUSLIDER2 8
-#define G_CPUSLIDER 9
-#define G_DOTS 11
-#define G_NAME 21
-#define G_DOOR 22
-#define G_INDICATOR 30
+// Joint indices of door 0's pieces in a P5/P6 card, the copy grafted onto
+// the scene, in door_pieces order.
+#define CARD_BG 1
+#define CARD_EMBLEM 2
+#define CARD_COSTUME 3
+#define CARD_TEAM 4
+#define CARD_PLATE 5 // Six joints.
+#define CARD_CPUSLIDER2 8
+#define CARD_CPUSLIDER 9
+#define CARD_DOTS 11
+#define CARD_NAMETAG_WINDOW 17
+#define CARD_NAME 21
+#define CARD_DOOR 22
+#define CARD_INDICATOR 30
 
 // Door 0's top-level joints in the VS scene with their group parents:
 // background, emblem, costume, team, name plate and sliders, stock dots,
-// sliding panel and its two text anchors, door frame, indicator.
+// nametag window and its two text anchors, door frame, indicator.
 static const u8 door_pieces[][2] = {
     {0x29, 0x28}, {0x2E, 0x2D}, {0x33, 0x32}, {0x38, 0x37}, {0x3D, 0x3C},
     {0x57, 0x56}, {0x70, 0x6F}, {0x73, 0x6F}, {0x74, 0x6F}, {0x85, 0x84},
@@ -52,8 +54,8 @@ static const u8 door_pieces[][2] = {
 };
 
 // CSSDoor joints, then CSSTag joints, in the graft.
-static const u8 door_graft_ids[9] = {G_EMBLEM, G_COSTUME, G_TEAM, G_DOOR, G_BG, G_INDICATOR, 5, G_CPUSLIDER, G_CPUSLIDER2};
-static const u8 tag_graft_ids[5] = {17, 20, G_NAME, 19, 18};
+static const u8 door_graft_ids[9] = {CARD_EMBLEM, CARD_COSTUME, CARD_TEAM, CARD_DOOR, CARD_BG, CARD_INDICATOR, 5, CARD_CPUSLIDER, CARD_CPUSLIDER2};
+static const u8 tag_graft_ids[5] = {CARD_NAMETAG_WINDOW, 20, CARD_NAME, 19, 18};
 
 // Hand and puck frames: row = the stock P1..P4 label (set_label replaces
 // it), column = red/blue/yellow/green.
@@ -181,6 +183,15 @@ static void setup_model(HSD_GObj * gobj, HSD_JObj * jobj, const CSSAnim * anim, 
     HSD_ForeachAnim(jobj, HSD_TYPE_JOBJ, ALL_TYPE_MASK, HSD_AObjStopAnim, HSD_TYPE_JOBJ, 0, 0);
 }
 
+// Melee places the list text from its joint before css_rescale_doors runs.
+static void move_list(HSD_JObj * anchor, Text * list) {
+    f32 squeeze = css_child(css_scene_root, BG_JOINT)->scale[0];
+    f32 pos[3];
+    JObj_WorldPos(anchor, NULL, pos);
+    list->pos_x = pos[0] - 0.6f * squeeze;
+    list->box_size_x = 154.0f * squeeze * NAMETAG_WINDOW_STRETCH;
+}
+
 // A door's character name text as the stock makes it, but squeezed like the
 // door.  css_door_refresh fills in the name and shows or hides it.
 static void make_text(HSD_JObj * anchor, CSSTagData * tag) {
@@ -207,6 +218,11 @@ static void make_text(HSD_JObj * anchor, CSSTagData * tag) {
     text->pos_z = pos[2];
 
     Text_InitSubtext(text, 81.0f * squeeze, 0.0f, placeholder);
+    // A tag in use is written once at CSS build; css_door_refresh leaves it.
+    if (tag->use_tag) {
+        Text_SetSubtext(text, 0, GetNameText(players[tag->port].nametag));
+        text->default_kerning = 0;
+    }
     tag->text = text;
 }
 
@@ -481,7 +497,7 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
     // The plate is skinned to joints found by desc through the ID table,
     // which still names the real door 0's.  Point those descs at the copy,
     // resolve again, and point them back.
-    bind_plate(card, G_PLATE);
+    bind_plate(card, CARD_PLATE);
     HSD_JObjResolveRefsAll(card, joint_tree);
     bind_plate(css_scene_root, PLATE_JOINT);
     HSD_JObjAddAnimAll(card, anim_tree, matanim_tree, NULL);
@@ -493,11 +509,15 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
     const HSD_JObj * bg0 = css_child(css_scene_root, BG_JOINT);
     f32 squeeze = bg0->scale[0];
     card->scale[0] = squeeze;
-    card->translate[0] = bg0->translate[0] - css_child(card, G_BG)->translate[0] * squeeze + CSS_DOOR_PITCH * port;
+    card->translate[0] = bg0->translate[0] - css_child(card, CARD_BG)->translate[0] * squeeze + CSS_DOOR_PITCH * port;
     HSD_JObjSetMtxDirty(card);
+    HSD_JObj * window = css_child(card, CARD_NAMETAG_WINDOW);
+    window->scale[0] = NAMETAG_WINDOW_STRETCH;
+    window->translate[0] = css_child(card, CARD_BG)->translate[0];
+    HSD_JObjSetMtxDirty(window);
 
     // The KO stars are the stock dots subtree; triples shows none.
-    HSD_JObjSetFlagsAll(css_child(card, G_DOTS), JOBJ_HIDDEN);
+    HSD_JObjSetFlagsAll(css_child(card, CARD_DOTS), JOBJ_HIDDEN);
     HSD_JObjAddChild(css_scene_root, card);
 
     // The card proc only needs a GObj to run from.
@@ -506,7 +526,7 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
     GObj_AddUserData(card_gobj, 4, noop, bk);
 
     set_boxes(bk);
-    make_text(css_child(card, G_NAME), &bk->tag);
+    make_text(css_child(card, CARD_NAME), &bk->tag);
 
     // Draw the door in its restored state, name included.
     swap_in(bk);
@@ -516,7 +536,7 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
     // CPU level knob at the saved level, as the stock leaves its doors.
     // With handicap on the level moves to cpuslider2 and css_door_refresh
     // places the handicap knob.
-    HSD_JObj * knob = css_child(card, gmMainLib_GetGameRules()->handicap ? G_CPUSLIDER2 : G_CPUSLIDER);
+    HSD_JObj * knob = css_child(card, gmMainLib_GetGameRules()->handicap ? CARD_CPUSLIDER2 : CARD_CPUSLIDER);
     knob->translate[0] = (player->cpu_level - 1) * 1.25f;
     HSD_JObjSetMtxDirty(knob);
 }
@@ -527,11 +547,12 @@ void css_56_create() {
     void * anim_tree = build_tree(KIND_ANIM);
     void * matanim_tree = build_tree(KIND_MATANIM);
 
-    // The stock doors' name texts were laid out before css_rescale_doors.c
-    // ran and are text, not joints; replace them like P5/P6's.
+    // The stock doors' texts were laid out before css_rescale_doors.c ran
+    // and are text, not joints.
     for (int i = 0; i < 4; ++i) {
         css_tags[i].data->text->hidden = 1;
         make_text(css_child(css_scene_root, 0x74 + 5 * i), css_tags[i].data);
+        move_list(css_child(css_scene_root, 0x73 + 5 * i), css_tags[i].data->name_ls);
         css_door_refresh(i);
     }
 

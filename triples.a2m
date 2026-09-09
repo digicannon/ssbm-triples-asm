@@ -206,9 +206,6 @@
 # Remove the KO Stars rendering
 @set 25D22C 3BA00000
 
-# Disable Nametag Menu from CSS
-@set 261EA0 C042CA10
-
 # ==========
 # Stage select / match load.
 # ==========
