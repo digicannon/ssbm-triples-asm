@@ -31,6 +31,7 @@ void css_player_data_update() {
         player->color = kept.color;
         player->handicap = kept.handicap;
         player->team = kept.team;
+        player->nametag = kept.nametag;
         if (player->slot_type != PKIND_CLOSED) match_init_flags |= HUD_SIX;
     }
 }

@@ -146,7 +146,10 @@ typedef struct CSSDoor {
     u8 costume;
     u8 sel_icon;
     u8 sel_icon_prev;
-    u8 timers[4];
+    u8 dooranim_timer;
+    u8 slideranim_timer;
+    u8 is_hold_cpu_slider;
+    u8 is_hold_handicap_slider;
     // HMN button left, right; team button left, right.
     f32 bounds[4];
 } CSSDoor;

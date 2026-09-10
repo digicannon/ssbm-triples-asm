@@ -426,13 +426,13 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
     bk->puck.color = 0xFF;
     bk->puck_slot = &bk->puck;
 
-    // Shadow doors start from the real ones for the joint ids, all closed
-    // with nothing picked.  Door 0 keeps P1's team, which is 0.
+    // Shadow doors start from the real ones for the joint ids.
     memcpy(bk->doors, css_doors, sizeof(bk->doors));
     for (int i = 0; i < 4; ++i) {
         CSSDoor * door = &bk->doors[i];
         door->p_kind = door->p_kind_prev = PKIND_CLOSED;
         door->sel_icon = door->sel_icon_prev = ICON_NONE;
+        door->dooranim_timer = door->slideranim_timer = 0;
         // No button can be hit: their pieces are the real doors'.  Door 0's
         // bounds are set by set_boxes.
         door->bounds[0] = door->bounds[2] = FLT_MAX;
