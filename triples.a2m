@@ -193,6 +193,7 @@
 @c src/css_name_boxes.c
 @c src/css_player_data_update.c
 @c src/css_56_scene_anim.c
+@set 1A3F9C 38603600 # Increase CSS text arena size.
 @file 266830 asm/css_load.asm
 
 @file 263334 asm/css_player_data_update.asm

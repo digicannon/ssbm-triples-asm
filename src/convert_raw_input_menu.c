@@ -1,4 +1,5 @@
 #include "melee.h"
+#include "triples.h"
 
 #define SCENE_VS 2
 
@@ -25,6 +26,16 @@ void convert_raw_input_menu() {
                 // This is just to let P5/6 advance from CSS to SSS.
                 start_only = true;
             } else if (menu_cur_menu == MENU_NAME_ENTRY) {
+                // Name entry for P5/6?
+                if (css_name_entry_slot == CSS_NAME_ENTRY_SLOT_56) {
+                    // Replace P1 with whoever opened nametag entry.
+                    HSD_PadMasterStatus[0] = triples_converted_output[css_name_entry_port - 4];
+                    // Disable everyone else since we're in "any input" mode.
+                    for (int i = 1; i < 4; ++i) {
+                        memset(&HSD_PadMasterStatus[i], 0, offsetof(PadStatus, cross_dir));
+                    }
+                }
+
                 return;
             }
         }

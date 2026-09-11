@@ -12,6 +12,7 @@
 #include <float.h>
 
 #include "css.h"
+#include "triples.h"
 
 // assets/css_digit_*.png, 16x24 IA4.
 extern const u8 css_digit_5[];
@@ -40,6 +41,8 @@ extern const u8 css_digit_6[];
 #define CARD_CPUSLIDER 9
 #define CARD_DOTS 11
 #define CARD_NAMETAG_WINDOW 17
+#define CARD_LIST 20
+#define PENDING_NAME_ENTRY 4 // css_pending_scene_change.
 #define CARD_NAME 21
 #define CARD_DOOR 22
 #define CARD_INDICATOR 30
@@ -55,7 +58,7 @@ static const u8 door_pieces[][2] = {
 
 // CSSDoor joints, then CSSTag joints, in the graft.
 static const u8 door_graft_ids[9] = {CARD_EMBLEM, CARD_COSTUME, CARD_TEAM, CARD_DOOR, CARD_BG, CARD_INDICATOR, 5, CARD_CPUSLIDER, CARD_CPUSLIDER2};
-static const u8 tag_graft_ids[5] = {CARD_NAMETAG_WINDOW, 20, CARD_NAME, 19, 18};
+static const u8 tag_graft_ids[5] = {CARD_NAMETAG_WINDOW, CARD_LIST, CARD_NAME, 19, 18};
 
 // Hand and puck frames: row = the stock P1..P4 label (set_label replaces
 // it), column = red/blue/yellow/green.
@@ -63,6 +66,9 @@ static const u8 hand_frames[2] = {2, 7};
 
 // Four SJIS dots: what the texts are sized for at init.
 static const char placeholder[] = "\x81\x45\x81\x45\x81\x45\x81\x45";
+static const char list_header[] = "\x81\x45\x81\x45\x81\x45\x81\x45\x81\x45\x81\x45\x81\x45\x81\x45\x81\x45\x81\x45\x81\x45";
+static const char name_entry[] = "\x82\x6d\x82\x60\x82\x6c\x82\x64\x20\x82\x64\x82\x6d\x82\x73\x82\x71\x82\x78"; // NAME ENTRY
+static const GXColor yellow = {0xFF, 0xFF, 0, 0xFF};
 
 // Per port, HSD_MemAlloc'd and owned by the hand GObj.  The stock structs
 // sit first so the hand's user data is its CSSCursorData and the puck's is
@@ -78,7 +84,7 @@ typedef struct PortBlock {
     CSSTagData tag;
     CSSTag tag_slot;
     HSD_JObj * root; // The port's grafted subtree.
-    HSD_GObj stub; // Stands in for a GObj when running the scene proc.
+    HSD_GObj stub; // Stands in for a GObj when running the scene and tag procs.
     // What the stock's slot 0 holds while this port is swapped out: this
     // port's hand and puck, and the other way round while swapped in.
     CSSCursorData * hand_slot;
@@ -192,15 +198,19 @@ static void move_list(HSD_JObj * anchor, Text * list) {
     list->box_size_x = 154.0f * squeeze * NAMETAG_WINDOW_STRETCH;
 }
 
-// A door's character name text as the stock makes it, but squeezed like the
-// door.  css_door_refresh fills in the name and shows or hides it.
-static void make_text(HSD_JObj * anchor, CSSTagData * tag) {
-    // The CSS's own canvas is the latest font 0 one.
+// The CSS's own canvas is the latest font 0 one.
+static int css_canvas() {
     int canvas = -1;
     for (const TextCanvas * c = text_canvases; c; c = c->next) {
         if (c->font == 0) ++canvas;
     }
-    Text * text = Text_Create(0, canvas);
+    return canvas;
+}
+
+// A door's character name text as the stock makes it, but squeezed like the
+// door.  css_door_refresh fills in the name and shows or hides it.
+static void make_text(HSD_JObj * anchor, CSSTagData * tag, const Player * player) {
+    Text * text = Text_Create(0, css_canvas());
     text->x4c = text->default_fitting = text->default_alignment = 1;
     text->font_size_x = 0.058f;
     text->font_size_y = 0.055f;
@@ -220,10 +230,33 @@ static void make_text(HSD_JObj * anchor, CSSTagData * tag) {
     Text_InitSubtext(text, 81.0f * squeeze, 0.0f, placeholder);
     // A tag in use is written once at CSS build; css_door_refresh leaves it.
     if (tag->use_tag) {
-        Text_SetSubtext(text, 0, GetNameText(players[tag->port].nametag));
+        Text_SetSubtext(text, 0, GetNameText(player->nametag));
         text->default_kerning = 0;
     }
     tag->text = text;
+}
+
+// The port's tag list text as the stock makes each door's, on the card's list joint.
+static void make_list(PortBlock * bk) {
+    Text * list = Text_Create(0, css_canvas());
+    list->default_fitting = 1;
+    f32 squeeze = css_child(css_scene_root, BG_JOINT)->scale[0];
+    list->box_size_x = 154.0f * squeeze * NAMETAG_WINDOW_STRETCH;
+    list->box_size_y = 256.0f;
+    f32 pos[3];
+    JObj_WorldPos(css_child(bk->root, CARD_LIST), NULL, pos);
+    list->pos_x = pos[0] - 0.6f * squeeze;
+    list->pos_y = 0.8f - pos[1] - 1.0f;
+    list->pos_z = pos[2];
+    list->font_size_x = list->font_size_y = 0.065f;
+    list->x4e = 1;
+    list->hidden = 1;
+    Text_InitSubtext(list, 0.0f, 0.0f, list_header);
+    Text_SetSubtextColor(list, 0, &yellow);
+    Text_InitSubtext(list, 0.0f, 0.0f, name_entry);
+    Text_SetSubtextColor(list, 1, &yellow);
+    for (int i = 0; i < 9; ++i) Text_InitSubtext(list, 10.0f, 0.0f, placeholder);
+    bk->tag.name_ls = list;
 }
 
 // Our label: the loaded P1 image with the digit half replaced from the
@@ -388,6 +421,9 @@ static void card_unplugged(PortBlock * bk) {
     bk->doors[0].sel_icon = ICON_NONE;
     bk->cursor.state = 0;
     bk->puck.x5 = 0;
+    if (bk->tag.state != 0 && bk->tag.state < 4) {
+        bk->tag.state = 4;
+    }
 
     swap_in(bk);
     css_door_refresh(0);
@@ -411,6 +447,26 @@ static void card_think(HSD_GObj * gobj) {
     css_scene_think(&bk->stub);
     swap_out(bk);
     for (int i = 0; i < ICON_COUNT; ++i) css_icons[i].anim_timer = timers[i];
+}
+
+static void tag_think(HSD_GObj * gobj) {
+    PortBlock * bk = gobj->user_data;
+
+    // An unplugged pad only finishes closing the list.
+    if (!pad_plugged(bk) && bk->tag.state == 0) {
+        return;
+    }
+
+    u8 pending = css_pending_scene_change;
+    swap_in(bk);
+    css_tag_think(&bk->stub);
+    swap_out(bk);
+
+    // Did P5/6 ask for name entry?
+    if (pending != PENDING_NAME_ENTRY && css_pending_scene_change == PENDING_NAME_ENTRY) {
+        css_name_entry_slot = CSS_NAME_ENTRY_SLOT_56;
+        css_name_entry_port = bk->port;
+    }
 }
 
 static void create_port(int port, void * joint_tree, void * anim_tree, void * matanim_tree) {
@@ -464,11 +520,16 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
     for (int i = 0; i < 5; ++i) bk->tag_slot.joints[i] = tag_graft_ids[i] + graft;
     bk->tag_slot.data = &bk->tag;
 
-    // Shadow tag data starts from P1's (valid text pointers) with no tag in
-    // use.
+    // Shadow tag data starts from P1's (valid text pointers).
     bk->tag = *css_tags[0].data;
     bk->tag.state = 0;
-    bk->tag.use_tag = 0;
+    // Back from this port's name entry: the new tag is the first one the
+    // stock did not know at the last build.
+    if (css_name_entry_slot == CSS_NAME_ENTRY_SLOT_56 && css_name_entry_port == port && css_tag_mark < bk->tag.next_tag) {
+        player->nametag = css_tag_mark - 1;
+        css_tag_mark = bk->tag.next_tag;
+    }
+    bk->tag.use_tag = player->nametag != NAMETAG_NONE;
 
     HSD_GObj * hand = GObj_Create(4, 5, 0x80);
     bk->cursor.gobj = hand;
@@ -505,6 +566,7 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
     HSD_JObjAnimAll(card);
     HSD_ForeachAnim(card, HSD_TYPE_JOBJ, ALL_TYPE_MASK, HSD_AObjStopAnim, HSD_TYPE_JOBJ, 0, 0);
     bk->stub.hsd_obj = css_scene_root;
+    bk->stub.user_data = &bk->tag;
 
     const HSD_JObj * bg0 = css_child(css_scene_root, BG_JOINT);
     f32 squeeze = bg0->scale[0];
@@ -520,13 +582,17 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
     HSD_JObjSetFlagsAll(css_child(card, CARD_DOTS), JOBJ_HIDDEN);
     HSD_JObjAddChild(css_scene_root, card);
 
-    // The card proc only needs a GObj to run from.
+    // The card and tag procs only need a GObj to run from.
     HSD_GObj * card_gobj = GObj_Create(4, 5, 0x80);
     GObj_AddProc(card_gobj, card_think, 4);
     GObj_AddUserData(card_gobj, 4, noop, bk);
+    HSD_GObj * tag_gobj = GObj_Create(4, 5, 0x80);
+    GObj_AddProc(tag_gobj, tag_think, 4);
+    GObj_AddUserData(tag_gobj, 4, noop, bk);
 
     set_boxes(bk);
-    make_text(css_child(card, CARD_NAME), &bk->tag);
+    make_text(css_child(card, CARD_NAME), &bk->tag, player);
+    make_list(bk);
 
     // Draw the door in its restored state, name included.
     swap_in(bk);
@@ -551,7 +617,7 @@ void css_56_create() {
     // and are text, not joints.
     for (int i = 0; i < 4; ++i) {
         css_tags[i].data->text->hidden = 1;
-        make_text(css_child(css_scene_root, 0x74 + 5 * i), css_tags[i].data);
+        make_text(css_child(css_scene_root, 0x74 + 5 * i), css_tags[i].data, &players[i]);
         move_list(css_child(css_scene_root, 0x73 + 5 * i), css_tags[i].data->name_ls);
         css_door_refresh(i);
     }

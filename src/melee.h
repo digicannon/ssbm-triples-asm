@@ -177,6 +177,7 @@ typedef struct Text {
     u8 x4b;
     u8 x4c;
     u8 hidden;
+    u8 x4e;
 } Text;
 ASSERT_OFFSET(Text, font_size_x, 0x24);
 ASSERT_OFFSET(Text, hidden, 0x4D);
@@ -184,9 +185,13 @@ ASSERT_OFFSET(Text, hidden, 0x4D);
 typedef struct CSSTagData {
     Text * text;
     Text * name_ls; // The tag list.
-    u8 pad0[0x11];
+    f32 x8; // List scroll, in text units.
+    f32 scroll_amt;
+    f32 scroll_force;
+    int timer;
+    u8 next_tag; // The list's NAME ENTRY row.
     u8 port;
-    u8 state;
+    u8 state; // 0 closed, 1-2 opening, 3 open, 4-5 closing.
     u8 use_tag;
 } CSSTagData;
 ASSERT_SIZE(CSSTagData, 0x1C);
@@ -383,10 +388,12 @@ u8 Player_GetPlayerSlotType(int slot);
 Text * Text_Create(int font, int canvas);
 void Text_InitSubtext(Text * text, f32 x, f32 y, const char * string);
 void Text_SetSubtext(Text * text, int subtext, const char * string);
+void Text_SetSubtextColor(Text * text, int subtext, const GXColor * color);
 char * GetNameText(int tag);
 GameRules * gmMainLib_GetGameRules();
 
 void mnCharSel_CursorThink(HSD_GObj * gobj);
+void css_tag_think(HSD_GObj * gobj);
 void css_puck_think(HSD_GObj * gobj);
 void css_scene_think(HSD_GObj * gobj);
 void css_door_refresh(int slot);
@@ -415,6 +422,10 @@ extern u8 scene_major;
 extern u8 scene_minor;
 extern u8 sss_stage_picked;
 extern u8 css_pending_scene_change;
+extern s8 css_name_entry_slot;
+extern u8 css_tag_mark;
+extern u32 css_name_entry_port;
+#define NAMETAG_NONE 0x78
 extern u8 menu_cur_menu;
 extern TextCanvas * text_canvases;
 extern PauseData pause_data;
