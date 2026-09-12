@@ -18,7 +18,8 @@ extern const u8 indicator_6_jp[];
 #define TEAM_GREEN 2
 
 static const GXColor colors[2] = {
-    {0xFF, 0x98, 0x26, 0xFF}, {0x98, 0x4C, 0xE5, 0xFF}
+    {0xFF, 0x98, 0x26, 0xFF},
+    {0x98, 0x4C, 0xE5, 0xFF}
 };
 
 static const HSD_ImageDesc labels[2][2] = {
@@ -35,22 +36,46 @@ f32 indicator_56_frame(int team, bool teams) {
     return FRAME_RED;
 }
 
+static bool showing_nametag(const HSD_DObj * label) {
+    const HSD_TObj * tobj = label->mobj->tobj;
+    return tobj->imagedesc != tobj->imagetbl[IMAGE_P1];
+}
+
 void indicator_56_recolor(HSD_JObj * root, int slot) {
-    if (css_is_teams || Player_GetPlayerSlotType(slot) != PKIND_HUMAN) return;
-    for (HSD_DObj * dobj = root->child->dobj; dobj; dobj = dobj->next) dobj->mobj->mat->diffuse = colors[slot - 4];
+    if (css_is_teams || Player_GetPlayerSlotType(slot) != PKIND_HUMAN) {
+        return;
+    }
+
+    GXColor color = colors[slot - 4];
+    HSD_DObj * label = root->child->dobj;
+    HSD_DObj * arrow = label->next;
+    HSD_DObj * backdrop = arrow->next;
+
+    arrow->mobj->mat->diffuse = color;
+
+    if (!showing_nametag(label)) {
+        label->mobj->mat->diffuse = color;
+    }
+
+    backdrop->mobj->mat->diffuse.r = (color.r * 48) / 255;
+    backdrop->mobj->mat->diffuse.g = (color.g * 48) / 255;
+    backdrop->mobj->mat->diffuse.b = (color.b * 48) / 255;
 }
 
 void indicator_56_label(HSD_JObj * root, int slot) {
     if (Player_GetPlayerSlotType(slot) != PKIND_HUMAN) return;
 
-    HSD_ImageDesc * label = (HSD_ImageDesc *)&labels[lbLang_IsSavedLanguageUS()][slot - 4];
-    HSD_ImageDesc ** images = HSD_MemAlloc(IMAGE_COUNT * sizeof(*images));
+    indicator_56_recolor(root, slot);
+
+    if (showing_nametag(root->child->dobj)) {
+        return;
+    }
 
     HSD_TObj * tobj = root->child->dobj->mobj->tobj;
+    HSD_ImageDesc * label = (HSD_ImageDesc *)&labels[lbLang_IsSavedLanguageUS()][slot - 4];
+    HSD_ImageDesc ** images = HSD_MemAlloc(IMAGE_COUNT * sizeof(*images));
     memcpy(images, tobj->imagetbl, IMAGE_COUNT * sizeof(*images));
     images[IMAGE_P1] = label;
-
     tobj->imagetbl = images;
     tobj->imagedesc = label;
-    indicator_56_recolor(root, slot);
 }
