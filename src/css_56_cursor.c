@@ -303,6 +303,11 @@ static HSD_JObj * recolor(HSD_JObj * root, int child, int frame) {
     return joint;
 }
 
+static GXColor port_color(const PortBlock * bk) {
+    static const GXColor colors[2] = {P5_COLOR, P6_COLOR};
+    return colors[bk->port - 4];
+}
+
 static bool pad_plugged(const PortBlock * bk) {
     return triples_converted_output[bk->port - 4].err == 0;
 }
@@ -376,9 +381,15 @@ static void hand_think(HSD_GObj * gobj) {
     mnCharSel_CursorThink(gobj);
     swap_out(bk);
 
-    // Stock colors the hand by port; in teams it uses the team color.
-    // Either way its label comes back as P1 each frame.
-    if (!css_is_teams) recolor(jobj, 3, bk->frame);
+    // Set text color.
+    if (!css_is_teams) {
+        HSD_TObjTev * tev = label_tobj(recolor(jobj, 3, bk->frame))->tev;
+        GXColor color = port_color(bk);
+        tev->konst.r = color.r;
+        tev->konst.g = color.g;
+        tev->konst.b = color.b;
+    }
+
     set_label(bk, css_child(jobj, 3));
 }
 
@@ -401,16 +412,25 @@ static void puck_think(HSD_GObj * gobj) {
     swap_out(bk);
 
     // Stock colors the puck by port unless it is CPU gray or a team color
-    // (index >= 4).  Joint 4 is the label (row * 4), joint 3 the color
-    // (column * 0x28); in teams the color is the team's, so only the label
-    // is ours.  Follow the stock's refresh (timer reset to 0) so the color
-    // anim plays out in between.
+    // (index >= 4); in teams the color is the team's, so only the label is
+    // ours.  The body carries the port color in all three of its material
+    // colors, and re-hueing them every frame leaves the anim's pulse toward
+    // white intact.
+    if (!css_is_teams && bk->puck.color < 4) {
+        HSD_Material * mat = css_child(jobj, 3)->dobj->next->mobj->mat;
+        GXColor hue = color_hue(port_color(bk));
+        mat->ambient = color_retint(hue, mat->ambient);
+        mat->diffuse = color_retint(hue, mat->diffuse);
+        mat->specular = color_retint(hue, mat->specular);
+    }
+
+    // Joint 4 is the label (row * 4).  Follow the stock's refresh (timer
+    // reset to 0) so the color anim plays out in between.
     if (bk->puck.refresh != 0 || bk->puck.color >= 4) return;
     HSD_JObj * label = recolor(jobj, 4, bk->frame & ~3);
     // The label holds its frame; the color plays.
     HSD_ForeachAnim(label, HSD_TYPE_JOBJ, TOBJ_MASK, HSD_AObjStopAnim, HSD_TYPE_JOBJ, 0, 0);
     set_label(bk, label);
-    if (!css_is_teams) recolor(jobj, 3, (bk->frame & 3) * 0x28);
 }
 
 // Unplugging closes the door (the stock would make it a CPU), and the
