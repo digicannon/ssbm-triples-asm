@@ -2,6 +2,7 @@
 
 @symbols src/melee.ld
 @symbols src/triples.ld
+@c src/triples.c
 
 # Notice on title screen.
 @set 1A218C 60000000
@@ -167,10 +168,6 @@
 # Disable Great Fox's Gun (no shots or collision) [Zauron]
 #@set 1E1390 40800430
 
-# ====================================
-
-@c src/triples.c
-
 # ==========
 # Input.
 # ==========
@@ -195,6 +192,8 @@
 @c src/css_name_boxes.c
 @c src/css_player_data_update.c
 @c src/css_56_scene_anim.c
+@file 263968 asm/css_56_tag_taken_list.asm
+@file 263CC4 asm/css_56_tag_taken_pick.asm
 @set 1A3F9C 38603600 # Increase CSS text arena size.
 @file 266830 asm/css_load.asm
 
