@@ -39,6 +39,8 @@ Text_SetSubtextColor = 0x803A74F0; /* HSD_SisLib_803A74F0 */
 GetNameText = 0x8023754C;
 gmMainLib_GetGameRules = 0x8015CC34;
 Player_GetPlayerSlotType = 0x8003241C;
+ft_shield_colors = 0x804D650C; /* Fighter_804D650C; 5 RGBx entries by color index, also the KO burst's first color */
+ft_blastzone_colors = 0x804D6508; /* Fighter_804D6508; the KO burst's second color */
 Player_GetEntity = 0x80034110;
 Player_GetEntityAtIndex = 0x8003418C;
 

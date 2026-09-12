@@ -13,3 +13,5 @@ match_frames_since_indicator_switch = match_player_count + 4;
 pause_56_images = match_frames_since_indicator_switch + 4; /* Heap block, per match. */
 css_56_blocks = pause_56_images + 4; /* P5 and P6's CSS blocks, per CSS load. */
 css_name_entry_port = css_56_blocks + 8; /* Which of P5/P6 asked for name entry. */
+shield_colors_56 = css_name_entry_port + 4; /* 7 RGBx entries. */
+blastzone_colors_56 = shield_colors_56 + 28;

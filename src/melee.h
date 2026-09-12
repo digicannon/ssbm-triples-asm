@@ -436,6 +436,10 @@ extern u8 css_pending_scene_change;
 extern s8 css_name_entry_slot;
 extern u8 css_tag_mark;
 extern u32 css_name_entry_port;
+extern u8 shield_colors_56[7][4];
+extern u8 blastzone_colors_56[7][4];
+extern u8 * ft_shield_colors;
+extern u8 * ft_blastzone_colors;
 #define NAMETAG_NONE 0x78
 extern u8 menu_cur_menu;
 extern TextCanvas * text_canvases;
