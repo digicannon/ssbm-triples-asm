@@ -1,4 +1,5 @@
 #include "melee.h"
+#include "triples.h"
 
 extern const u8 indicator_5_us[];
 extern const u8 indicator_6_us[];
@@ -17,10 +18,7 @@ extern const u8 indicator_6_jp[];
 #define TEAM_BLUE 1
 #define TEAM_GREEN 2
 
-static const GXColor colors[2] = {
-    {0xFF, 0x98, 0x26, 0xFF},
-    {0x98, 0x4C, 0xE5, 0xFF}
-};
+static const GXColor colors[2] = {P5_COLOR, P6_COLOR};
 
 static const HSD_ImageDesc labels[2][2] = {
     {{(u8 *)indicator_5_jp, 32, 44, GX_TF_IA4}, {(u8 *)indicator_6_jp, 32, 44, GX_TF_IA4}},

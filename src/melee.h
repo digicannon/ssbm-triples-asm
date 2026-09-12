@@ -39,17 +39,28 @@ typedef struct HSD_ImageDesc {
 } HSD_ImageDesc;
 ASSERT_SIZE(HSD_ImageDesc, 0x18);
 
+typedef struct GXColor {
+    u8 r, g, b, a;
+} GXColor;
+
+typedef struct HSD_TObjTev {
+    u8 pad0[0x10];
+    GXColor konst;
+    GXColor tev0;
+    GXColor tev1;
+    u32 active;
+} HSD_TObjTev;
+
 typedef struct HSD_TObj {
     u8 pad0[0x58];
     HSD_ImageDesc * imagedesc;
     u8 pad1[0xC];
     HSD_ImageDesc ** imagetbl;
+    u8 pad2[0x3C];
+    HSD_TObjTev * tev;
 } HSD_TObj;
 ASSERT_OFFSET(HSD_TObj, imagetbl, 0x68);
-
-typedef struct GXColor {
-    u8 r, g, b, a;
-} GXColor;
+ASSERT_OFFSET(HSD_TObj, tev, 0xA8);
 
 typedef struct HSD_Material {
     GXColor ambient;

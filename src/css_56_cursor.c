@@ -433,6 +433,24 @@ static void card_unplugged(PortBlock * bk) {
     HSD_JObjSetFlagsAll(css_child(css_scene_root, BOX_JOINT_BASE + bk->port), JOBJ_HIDDEN);
 }
 
+static void color_card(PortBlock * bk) {
+    if (css_is_teams || bk->doors[0].p_kind != PKIND_HUMAN) {
+        return;
+    }
+
+    static const GXColor colors[2] = {P5_COLOR, P6_COLOR};
+    static const GXColor inner_line = {0x2C, 0x2C, 0x2C, 0xFF};
+
+    HSD_TObjTev * tev = css_child(bk->root, CARD_BG)->dobj->mobj->tobj->tev;
+    GXColor color = colors[bk->port - 4];
+    tev->konst.r = color.r;
+    tev->konst.g = color.g;
+    tev->konst.b = color.b;
+    tev->tev0.r = inner_line.r;
+    tev->tev0.g = inner_line.g;
+    tev->tev0.b = inner_line.b;
+}
+
 static void card_think(HSD_GObj * gobj) {
     PortBlock * bk = gobj->user_data;
     if (!pad_plugged(bk)) {
@@ -447,6 +465,7 @@ static void card_think(HSD_GObj * gobj) {
     css_scene_think(&bk->stub);
     swap_out(bk);
     for (int i = 0; i < ICON_COUNT; ++i) css_icons[i].anim_timer = timers[i];
+    color_card(bk);
 }
 
 static void tag_think(HSD_GObj * gobj) {
@@ -605,6 +624,7 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
     HSD_JObj * knob = css_child(card, gmMainLib_GetGameRules()->handicap ? CARD_CPUSLIDER2 : CARD_CPUSLIDER);
     knob->translate[0] = (player->cpu_level - 1) * 1.25f;
     HSD_JObjSetMtxDirty(knob);
+    color_card(bk);
 }
 
 void css_56_create() {

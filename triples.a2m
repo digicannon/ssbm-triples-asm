@@ -260,6 +260,8 @@
 @file 2FC9EC asm/indicator_56_frame.asm
 @file 2FD274 asm/indicator_56_label.asm
 @file 2FD3EC asm/indicator_56_recolor.asm
+@c src/hud_56_franchise_symbol.c
+@file 2F64F0 asm/hud_56_franchise_symbol_color.asm
 
 # Taken from Slippi, this code hides nametags when invisible from a Zelda/Sheik/Mewtwo up-B.
 # It also overrides our "always show player indicator" code.
