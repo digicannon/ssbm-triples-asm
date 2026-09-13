@@ -12,6 +12,7 @@
     branchl r12, css_rescale_doors
     branchl r12, css_56_create
     branchl r12, css_name_boxes
+    branchl r12, css_door_buttons_create
     lwz r3, 8(r1)
     addi r1, r1, 0x10
 return:

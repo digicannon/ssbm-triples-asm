@@ -647,6 +647,34 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
     color_card(bk);
 }
 
+CSSCursorData * css_port_cursor(int port) {
+    return (port < 4) ? css_hands[port] : &css_56_blocks[port - 4]->cursor;
+}
+
+CSSDoor * css_port_door(int port) {
+    return (port < 4) ? &css_doors[port] : &css_56_blocks[port - 4]->doors[0];
+}
+
+CSSTagData * css_port_tag(int port) {
+    return (port < 4) ? css_tags[port].data : &css_56_blocks[port - 4]->tag;
+}
+
+CSSCharModel * css_port_puck(int port) {
+    return (port < 4) ? css_pucks[port] : &css_56_blocks[port - 4]->puck;
+}
+
+void css_port_refresh(int port, bool pick_rand_char) {
+    PortBlock * bk = (port < 4) ? NULL : css_56_blocks[port - 4];
+    int slot = bk ? 0 : port;
+
+    if (bk) swap_in(bk);
+
+    if (pick_rand_char) css_pick_random_character(slot, 1);
+    css_door_refresh(slot);
+
+    if (bk) swap_out(bk);
+}
+
 void css_56_create() {
     // One compact copy of the descs (joint, anim, mat anim) serves both ports.
     void * joint_tree = build_tree(KIND_JOINT);

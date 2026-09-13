@@ -48,6 +48,8 @@ mnCharSel_CursorThink = 0x802602A0;
 css_puck_think = 0x80262648; /* fn_80262648 */
 css_scene_think = 0x8025F0E0; /* fn_8025F0E0 */
 css_door_refresh = 0x8025DB34; /* mnCharSel_8025DB34 */
+css_pick_random_character = 0x8025FB50; /* mnCharSel_8025FB50 */
+menu_sfx = 0x80024030; /* lbAudioAx_80024030 */
 css_tag_think = 0x802633B0; /* fn_802633B0 */
 
 css_anim_table = 0x804D6CD8; /* mnCharSel_804D6CD8 */

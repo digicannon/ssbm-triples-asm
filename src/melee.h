@@ -168,7 +168,11 @@ ASSERT_SIZE(CSSDoor, 0x24);
 ASSERT_OFFSET(CSSDoor, bounds, 0x14);
 
 #define PKIND_HUMAN 0
+#define PKIND_CPU 1
 #define PKIND_CLOSED 3
+
+#define SFX_MOVE 2
+
 #define ICON_COUNT 0x19
 #define ICON_NONE 0x19
 
@@ -408,6 +412,8 @@ void css_tag_think(HSD_GObj * gobj);
 void css_puck_think(HSD_GObj * gobj);
 void css_scene_think(HSD_GObj * gobj);
 void css_door_refresh(int slot);
+void css_pick_random_character(int slot, int arg1);
+void menu_sfx(int sound);
 
 #define JOBJ_HIDDEN 0x10
 #define TOBJ_MASK 0x400
