@@ -176,6 +176,7 @@
 @file 377988 asm/convert_raw_input_for_usb.asm
 @c src/convert_raw_input_menu.c
 @file 377998 asm/convert_raw_input_menu.asm
+@file 06AF10 asm/inputs_to_player_analog.asm
 @file 06B028 asm/inputs_to_player.asm
 
 # ==========

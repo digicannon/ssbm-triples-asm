@@ -1,5 +1,5 @@
 # ====================
-#  Insert at 8006B028
+#  Insert at 8006AF10
 # ====================
 
 .include "triples.s"
@@ -30,7 +30,25 @@
     ori r4, r4, triples_converted_output @l
     sync
 
-    lwz r0, 0(r4)
+    # Stick X and Y.
+    lwz r3, 0x20(r4)
+    stw r3, 0x620(player_data)
+    lwz r3, 0x24(r4)
+    stw r3, 0x624(player_data)
+    # C-Stick X and Y.
+    lwz r3, 0x28(r4)
+    stw r3, 0x638(player_data)
+    lwz r3, 0x2C(r4)
+    stw r3, 0x63C(player_data)
+
+    # Trigger.  The greater side is used.
+    lwz r3, 0x30(r4)
+    lwz r0, 0x34(r4)
+    cmplw 0, r0, r3
+    ble store_trigger
+    mr r3, r0
+store_trigger:
+    stw r3, 0x650(player_data)
 
 return:
-    stw r0, 0x065C(player_data) # Original code.
+    lfs f1, 0x620(player_data) # Original code.
