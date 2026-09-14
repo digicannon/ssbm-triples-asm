@@ -514,8 +514,7 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
     css_56_blocks[port - 4] = bk;
     bk->port = port;
     bk->frame = hand_frames[port - 4];
-    bk->cursor.x = port == 4 ? 20.0f : 26.0f;
-    bk->cursor.y = -21.5f;
+    css_hand_warp_to_spawn(&bk->cursor, port);
     bk->cursor.state = HAND_FREE;
     bk->hand_slot = &bk->cursor;
     bk->puck.color = 0xFF;
@@ -684,6 +683,7 @@ void css_56_create() {
     // The stock doors' texts were laid out before css_rescale_doors.c ran
     // and are text, not joints.
     for (int i = 0; i < 4; ++i) {
+        css_hand_warp_to_spawn(css_hands[i], i);
         css_tags[i].data->text->hidden = 1;
         make_text(css_child(css_scene_root, 0x74 + 5 * i), css_tags[i].data, &players[i]);
         move_list(css_child(css_scene_root, 0x73 + 5 * i), css_tags[i].data->name_ls);

@@ -27,6 +27,8 @@ extern const NodeKind css_node_kinds[3];
 #define CHILD(node, kind) (*(void **)((u8 *)(node) + css_node_kinds[kind].child))
 #define NEXT(node, kind) (*(void **)((u8 *)(node) + css_node_kinds[kind].next))
 
+void css_hand_warp_to_spawn(CSSCursorData * cursor, int port);
+
 HSD_JObj * css_child(HSD_JObj * root, int index);
 // The node at DFS index *index, counting *index down along the way.
 void * css_find_node(void * node, int kind, int * index);

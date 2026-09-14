@@ -14,3 +14,8 @@ void * css_find_node(void * node, int kind, int * index) {
     void * found = css_find_node(CHILD(node, kind), kind, index);
     return found ? found : css_find_node(NEXT(node, kind), kind, index);
 }
+
+void css_hand_warp_to_spawn(CSSCursorData * cursor, int port) {
+    cursor->x = -31.0f + (CSS_DOOR_PITCH * port);
+    cursor->y = -21.5f;
+}
