@@ -174,8 +174,11 @@
 
 @c src/adapter_pads.c
 @file 377988 asm/convert_raw_input_for_usb.asm
-@c src/convert_raw_input_menu.c
-@file 377998 asm/convert_raw_input_menu.asm
+@c src/menu_inputs_56.c
+@file 1A3E74 asm/menu_inputs_56.asm
+@c src/sss_56_input.c
+@file 25BA60 asm/sss_56_input.asm
+@file 22BB14 asm/menu_camera_56.asm
 @file 06AF10 asm/inputs_to_player_analog.asm
 @file 06B028 asm/inputs_to_player.asm
 
@@ -204,6 +207,7 @@
 @file 263064 asm/css_56_start_count.asm
 @file 2630E8 asm/css_56_start_teams.asm
 @file 26312C asm/css_56_start_cursor_holding.asm
+@file 263250 asm/css_56_start_trigger.asm
 @file 266BB4 asm/css_preload_p5_p6.asm
 @file 017BFC asm/preload_overflow_fallback.asm
 @file 25FA9C asm/css_56_scene_anim.asm

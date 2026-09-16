@@ -12,6 +12,7 @@
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
+typedef uint64_t u64;
 typedef float f32;
 
 #define ASSERT_OFFSET(type, field, offset) \
@@ -269,6 +270,19 @@ typedef int8_t s8;
 #define PAD_BUTTON_X 0x0400
 #define PAD_BUTTON_Y 0x0800
 #define PAD_BUTTON_START 0x1000
+#define PAD_STICK_UP 0x10000
+#define PAD_STICK_DOWN 0x20000
+#define PAD_STICK_LEFT 0x40000
+#define PAD_STICK_RIGHT 0x80000
+// gm_EvaluateAllControllerInputs' derived bits.
+#define PAD_CONFIRM (1ULL << 32)
+#define PAD_CANCEL (1ULL << 33)
+#define PAD_LR_START (1ULL << 34)
+#define PAD_LRA_START (1ULL << 35)
+#define PAD_ANY_UP (1ULL << 36)
+#define PAD_ANY_DOWN (1ULL << 37)
+#define PAD_ANY_LEFT (1ULL << 38)
+#define PAD_ANY_RIGHT (1ULL << 39)
 
 // The pad library's raw status, as PADRead fills it.
 typedef struct PADStatus {
@@ -318,6 +332,30 @@ ASSERT_SIZE(PadStatus, 0x44);
 ASSERT_OFFSET(PadStatus, stick_x, 0x18);
 ASSERT_OFFSET(PadStatus, nml_substick_x, 0x28);
 ASSERT_OFFSET(PadStatus, err, 0x41);
+
+// One port's menu inputs.  Ports 0-3, then ANY_PORT as their OR.
+typedef struct ControllerMapEntry {
+    u64 button;
+    u64 trigger;
+    u64 repeat;
+    u64 release;
+    u64 repeat2;
+    int repeat_timer;
+    int held; // Frames without a change, saturating at fastest_after.
+} ControllerMapEntry;
+ASSERT_SIZE(ControllerMapEntry, 0x30);
+
+typedef struct ControllerMap {
+    ControllerMapEntry ports[5];
+    void (* repeat_proc)(int port);
+    u16 delay;
+    u8 interval;
+    u16 fast_after;
+    u8 fast_interval;
+    u16 fastest_after;
+    u8 fastest_interval;
+} ControllerMap;
+ASSERT_SIZE(ControllerMap, 0x100);
 
 // One port of the GameCube adapter's USB report.
 typedef struct AdapterPort {
@@ -435,6 +473,11 @@ extern u8 match_init_flags;
 extern Player players[6];
 extern PadStatus HSD_PadMasterStatus[4];
 extern PadStatus HSD_PadCopyStatus[4];
+extern ControllerMap controller_map;
+extern u32 sss_input_trigger;
+extern s8 sss_input_stick_x;
+extern s8 sss_input_stick_y;
+extern s8 sss_input_port; // -1 reads every pad.
 extern u8 scene_major;
 extern u8 scene_minor;
 extern u8 sss_stage_picked;
@@ -451,6 +494,7 @@ extern u8 menu_cur_menu;
 extern TextCanvas * text_canvases;
 extern PauseData pause_data;
 extern PadStatus triples_converted_output[2];
+extern ControllerMapEntry menu_inputs_56_ports[2];
 extern AdapterPads adapter_pads_data;
 extern u32 hid_status;
 extern HidControl hid_ctrl;

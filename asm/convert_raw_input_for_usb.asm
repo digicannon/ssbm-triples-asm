@@ -43,10 +43,10 @@
     lwz r4, 8(reg_src_ptr)
     stw r4, 20(r3)
     # P3 and P4 themselves read as unplugged.
-    #li r4, 0xFF
-    #load r3, master_status + 2 * port_size + port_ofst_err
-    #stb r4, 0(r3)
-    #stb r4, port_size(r3)
+    li r4, 0xFF
+    load r3, master_status + 2 * port_size + port_ofst_err
+    stb r4, 0(r3)
+    stb r4, port_size(r3)
 .else
     branchl r12, read_adapter_pads
 .endif

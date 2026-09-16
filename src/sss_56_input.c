@@ -1,0 +1,23 @@
+#include "melee.h"
+
+#define ANY_PORT -1
+#define DEADZONE 30
+
+static bool deflected(s8 x, s8 y) {
+    return x < -DEADZONE || x > DEADZONE || y < -DEADZONE || y > DEADZONE;
+}
+
+void sss_56_input() {
+    if (sss_input_port != ANY_PORT) {
+        return;
+    }
+
+    for (int i = 0; i < 2; ++i) {
+        const PadStatus * pad = &triples_converted_output[i];
+        sss_input_trigger |= pad->trigger;
+        if (!deflected(sss_input_stick_x, sss_input_stick_y) && deflected(pad->stick_x, pad->stick_y)) {
+            sss_input_stick_x = pad->stick_x;
+            sss_input_stick_y = pad->stick_y;
+        }
+    }
+}
