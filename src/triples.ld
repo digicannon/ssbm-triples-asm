@@ -16,3 +16,4 @@ css_name_entry_port = css_56_blocks + 8; /* Which of P5/P6 asked for name entry.
 shield_colors_56 = css_name_entry_port + 4; /* 7 RGBx entries. */
 blastzone_colors_56 = shield_colors_56 + 28;
 menu_inputs_56_ports = blastzone_colors_56 + 28; /* P5 and P6's menu inputs. */
+css_hands_held = menu_inputs_56_ports + 0x60; /* Bit per port, as of the last frame. */

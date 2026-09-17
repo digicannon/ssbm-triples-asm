@@ -13,6 +13,7 @@
     branchl r12, css_56_create
     branchl r12, css_name_boxes
     branchl r12, css_door_buttons_create
+    branchl r12, css_cursor_grab_create
     lwz r3, 8(r1)
     addi r1, r1, 0x10
 return:

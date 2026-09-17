@@ -197,6 +197,7 @@
 @c src/css_player_data_update.c
 @c src/css_56_scene_anim.c
 @c src/css_door_buttons.c
+@c src/css_cursor_grab.c
 @file 260548 asm/css_hand_respawn.asm
 @file 263968 asm/css_56_tag_taken_list.asm
 @file 263CC4 asm/css_56_tag_taken_pick.asm

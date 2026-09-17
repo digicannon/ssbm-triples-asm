@@ -50,6 +50,17 @@ css_puck_think = 0x80262648; /* fn_80262648 */
 css_scene_think = 0x8025F0E0; /* fn_8025F0E0 */
 css_door_refresh = 0x8025DB34; /* mnCharSel_8025DB34 */
 css_pick_random_character = 0x8025FB50; /* mnCharSel_8025FB50 */
+css_return_puck = 0x8025FDEC; /* mnCharSel_8025FDEC */
+css_door_portrait = 0x8025D5AC; /* mnCharSel_8025D5AC */
+css_costume_change = 0x80260094; /* mnCharSel_CostumeChange */
+css_duplicate_costume = 0x8025DAA0; /* mnCharSel_8025DAA0 */
+costume_count = 0x80169238; /* gm_80169238 */
+announce_character = 0x80168C5C; /* gm_80168C5C */
+sfx_play = 0x800237A8; /* lbAudioAx_800237A8 */
+sfx_play_id = 0x80023870; /* lbAudioAx_80023870 */
+GObj_GXLinkLike = 0x803909D8; /* HSD_GObjGXLink_803909D8 */
+HSD_AObjReqAnim = 0x8036410C;
+HSD_Randi = 0x80380580;
 menu_sfx = 0x80024030; /* lbAudioAx_80024030 */
 css_tag_think = 0x802633B0; /* fn_802633B0 */
 

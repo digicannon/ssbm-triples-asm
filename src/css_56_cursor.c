@@ -365,18 +365,11 @@ static void swap_out(PortBlock * bk) {
     }
 }
 
-// GObj procs.  All three skip the stock proc while the pad is unplugged:
-// hand and puck hide, the card closes the door.
+// GObj procs.
 
 static void hand_think(HSD_GObj * gobj) {
     PortBlock * bk = gobj->user_data;
     HSD_JObj * jobj = gobj->hsd_obj;
-    if (!pad_plugged(bk)) {
-        HSD_JObjSetFlagsAll(jobj, JOBJ_HIDDEN);
-        return;
-    }
-    HSD_JObjClearFlagsAll(jobj, JOBJ_HIDDEN);
-
     swap_in(bk);
     mnCharSel_CursorThink(gobj);
     swap_out(bk);
@@ -396,10 +389,6 @@ static void hand_think(HSD_GObj * gobj) {
 static void puck_think(HSD_GObj * gobj) {
     PortBlock * bk = (PortBlock *)((u8 *)gobj->user_data - offsetof(PortBlock, puck));
     HSD_JObj * jobj = gobj->hsd_obj;
-    if (!pad_plugged(bk)) {
-        HSD_JObjSetFlagsAll(jobj, JOBJ_HIDDEN);
-        return;
-    }
     // A mode change need not change the color index for this port, so
     // force the stock's refresh by running out its timer.
     if (bk->puck_teams != css_is_teams) {
@@ -433,26 +422,6 @@ static void puck_think(HSD_GObj * gobj) {
     set_label(bk, label);
 }
 
-// Unplugging closes the door (the stock would make it a CPU), and the
-// player table follows in css_player_data_update.
-static void card_unplugged(PortBlock * bk) {
-    if (bk->doors[0].p_kind == PKIND_CLOSED) return;
-    bk->doors[0].p_kind = PKIND_CLOSED;
-    bk->doors[0].sel_icon = ICON_NONE;
-    bk->cursor.state = 0;
-    bk->puck.x5 = 0;
-    if (bk->tag.state != 0 && bk->tag.state < 4) {
-        bk->tag.state = 4;
-    }
-
-    swap_in(bk);
-    css_door_refresh(0);
-    swap_out(bk);
-
-    // The name box follows the door only while the shadow scene proc runs.
-    HSD_JObjSetFlagsAll(css_child(css_scene_root, BOX_JOINT_BASE + bk->port), JOBJ_HIDDEN);
-}
-
 static void color_card(PortBlock * bk) {
     if (css_is_teams || bk->doors[0].p_kind != PKIND_HUMAN) {
         return;
@@ -473,10 +442,6 @@ static void color_card(PortBlock * bk) {
 
 static void card_think(HSD_GObj * gobj) {
     PortBlock * bk = gobj->user_data;
-    if (!pad_plugged(bk)) {
-        card_unplugged(bk);
-        return;
-    }
     // The scene proc also counts down the icon flash timers and resets the
     // icon on the tree it was given; leave that to the real scene proc.
     u8 timers[ICON_COUNT];
@@ -662,16 +627,29 @@ CSSCharModel * css_port_puck(int port) {
     return (port < 4) ? css_pucks[port] : &css_56_blocks[port - 4]->puck;
 }
 
+const PadStatus * css_port_pad(int port) {
+    return (port < 4) ? &HSD_PadCopyStatus[port] : &triples_converted_output[port - 4];
+}
+
+bool css_port_sees(int port, int door) {
+    return (port < 4) ? (door < 4) : (door == port);
+}
+
+int css_port_swap_in(int port) {
+    if (port < 4) return port;
+    swap_in(css_56_blocks[port - 4]);
+    return 0;
+}
+
+void css_port_swap_out(int port) {
+    if (port >= 4) swap_out(css_56_blocks[port - 4]);
+}
+
 void css_port_refresh(int port, bool pick_rand_char) {
-    PortBlock * bk = (port < 4) ? NULL : css_56_blocks[port - 4];
-    int slot = bk ? 0 : port;
-
-    if (bk) swap_in(bk);
-
+    int slot = css_port_swap_in(port);
     if (pick_rand_char) css_pick_random_character(slot, 1);
     css_door_refresh(slot);
-
-    if (bk) swap_out(bk);
+    css_port_swap_out(port);
 }
 
 void css_56_create() {

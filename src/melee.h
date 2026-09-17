@@ -225,7 +225,10 @@ typedef struct CSSIcon {
     u8 char_kind;
     u8 state;
     u8 anim_timer;
-    u8 pad0[8];
+    u8 joint_id_vs;
+    u8 joint_id_1p;
+    u8 pad0[2];
+    int sfx;
     f32 bound_l;
     f32 bound_r;
     f32 bound_u;
@@ -451,7 +454,21 @@ void css_puck_think(HSD_GObj * gobj);
 void css_scene_think(HSD_GObj * gobj);
 void css_door_refresh(int slot);
 void css_pick_random_character(int slot, int arg1);
+// Sends the slot's puck back to its door's character; 1 if it has none.
+int css_return_puck(int slot);
+void css_door_portrait(int slot, int frame, bool hidden);
+void css_costume_change(int slot, u32 input);
+bool css_duplicate_costume(int slot);
+int costume_count(u32 char_kind);
+void announce_character(u32 char_kind);
 void menu_sfx(int sound);
+int sfx_play(int sfx, int volume, int pan);
+int sfx_play_id(int sfx, int volume, int pan, int id);
+// Puts gobj on other's GX layer and priority.
+void GObj_GXLinkLike(HSD_GObj * gobj, HSD_GObj * other);
+void HSD_AObjReqAnim();
+int HSD_Randi(int max);
+#define AOBJ_ARG_AF 1
 
 #define JOBJ_HIDDEN 0x10
 #define TOBJ_MASK 0x400
@@ -495,6 +512,7 @@ extern TextCanvas * text_canvases;
 extern PauseData pause_data;
 extern PadStatus triples_converted_output[2];
 extern ControllerMapEntry menu_inputs_56_ports[2];
+extern u8 css_hands_held;
 extern AdapterPads adapter_pads_data;
 extern u32 hid_status;
 extern HidControl hid_ctrl;

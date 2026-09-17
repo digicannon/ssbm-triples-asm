@@ -10,10 +10,6 @@
 #define TEAM_REST -3.4f
 #define TEAM_COUNT 3
 
-static const PadStatus * port_pad(int port) {
-    return (port < 4) ? &HSD_PadCopyStatus[port] : &triples_converted_output[port - 4];
-}
-
 static bool door_busy(int port) {
     const CSSDoor * door = css_port_door(port);
     return door->is_hold_cpu_slider || door->is_hold_handicap_slider ||
@@ -36,7 +32,7 @@ static void cycle_kind(int port, int door_idx) {
     if (kind == 2) {
         kind = PKIND_CLOSED;
     } else if (kind == 4) {
-        if (port_pad(door_idx)->err != 0) {
+        if (css_port_pad(door_idx)->err != 0) {
             kind = PKIND_CPU;
         } else {
             kind = PKIND_HUMAN;
@@ -69,15 +65,14 @@ static void cycle_team(int port) {
 
 static void door_buttons_think(HSD_GObj * gobj) {
     for (int port = 0; port < PORT_COUNT; ++port) {
-        const PadStatus * pad = port_pad(port);
+        const PadStatus * pad = css_port_pad(port);
         if (pad->err != 0 || !(pad->trigger & PAD_BUTTON_A)) {
             continue;
         }
 
         CSSCursorData * cursor = css_port_cursor(port);
         for (int door_idx = 0; door_idx < PORT_COUNT; ++door_idx) {
-            // Check if melee already handled this.
-            if ((port < 4) ? (door_idx < 4) : (door_idx == port)) {
+            if (css_port_sees(port, door_idx)) {
                 continue;
             }
 
