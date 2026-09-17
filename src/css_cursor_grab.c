@@ -2,7 +2,15 @@
 #include "css_56_cursor.h"
 
 #define PORT_COUNT 6
-#define HELD_BASE 12
+#define HELD_BASE 12 // Then kind * PORT_COUNT + door.
+#define HOLD_PUCK 0
+#define HOLD_CPU 1
+#define HOLD_HANDICAP 2
+#define SLIDER_REACH 5.0f // Squared.
+#define SLIDER_MAX 10.0f
+#define HANDICAP_RULE 2
+#define JOINT_CPUSLIDER 7
+#define JOINT_CPUSLIDER2 8
 #define ICON_HELD 0xD // What Melee leaves in sel_icon while a puck is out.
 #define REACH 9.0f // Squared.
 #define ROW_BOTTOM 0.2f
@@ -12,9 +20,10 @@
 #define SFX_DENY 3
 #define ANNOUNCE_ID 0x8A
 
-// Where Melee keeps a held puck relative to the hand.
 #define HAND_TO_PUCK_DX 2.7f
 #define HAND_TO_PUCK_DY -2.0f
+#define HAND_TO_KNOB_DX 2.9f
+#define HAND_TO_KNOB_DY -1.7f
 
 // The puck think has already placed the joint from its own follow of the
 // wrong hand this frame, so the joint is moved too.
@@ -72,6 +81,74 @@ static void release(int door) {
     css_port_swap_out(door);
 }
 
+// The CPU level knob moves to the second slider while the handicap rule is
+// on; the handicap knob is then on the first.
+static HSD_JObj * knob(const CSSDoor * d, int kind) {
+    bool second = kind == HOLD_CPU && gmMainLib_GetGameRules()->handicap != 0;
+    return css_child(css_scene_root, d->joints[second ? JOINT_CPUSLIDER2 : JOINT_CPUSLIDER]);
+}
+
+static u8 * hold_flag(CSSDoor * d, int kind) {
+    return kind == HOLD_CPU ? &d->is_hold_cpu_slider : &d->is_hold_handicap_slider;
+}
+
+static bool grab_slider(int port, int door, int kind) {
+    CSSDoor * d = css_port_door(door);
+    if (*hold_flag(d, kind) || d->p_kind != PKIND_CPU) return false;
+    if (kind == HOLD_HANDICAP && gmMainLib_GetGameRules()->handicap != HANDICAP_RULE) return false;
+    f32 pos[3];
+    JObj_WorldPos(knob(d, kind), NULL, pos);
+    CSSCursorData * hand = css_port_cursor(port);
+    f32 dx = hand->x - (pos[0] - HAND_TO_KNOB_DX);
+    f32 dy = hand->y - (pos[1] - HAND_TO_KNOB_DY);
+    if (dx * dx + dy * dy >= SLIDER_REACH) return false;
+    hand->state = HAND_HOLDING;
+    hand->x6 = HELD_BASE + kind * PORT_COUNT + door;
+    hand->x = pos[0] - HAND_TO_KNOB_DX;
+    hand->y = pos[1] - HAND_TO_KNOB_DY;
+    *hold_flag(d, kind) = 1;
+    sfx_play(SFX_GRAB, 0x7F, 0x40);
+    return true;
+}
+
+static void slide(int port, int door, int kind) {
+    CSSCursorData * hand = css_port_cursor(port);
+    CSSDoor * d = css_port_door(door);
+    HSD_JObj * jobj = knob(d, kind);
+    f32 pos[3];
+    JObj_WorldPos(jobj, NULL, pos);
+    f32 base_x = jobj->translate[0] - pos[0];
+    f32 x = hand->x + HAND_TO_KNOB_DX + base_x;
+    if (x < 0.0f) x = 0.0f;
+    if (x > SLIDER_MAX) x = SLIDER_MAX;
+
+    u8 level = (int)(0.8f * x + 0.5f) + 1;
+    if (kind == HOLD_CPU) {
+        players[door].cpu_level = level;
+    } else {
+        players[door].handicap = level;
+    }
+    HSD_ForeachAnim(jobj, HSD_TYPE_JOBJ, TOBJ_MASK, HSD_AObjReqAnim, AOBJ_ARG_AF, (double)level);
+    HSD_JObjAnimAll(jobj);
+    HSD_ForeachAnim(jobj, HSD_TYPE_JOBJ, TOBJ_MASK, HSD_AObjStopAnim, AOBJ_ARG_AOV, 0, 0);
+    jobj->translate[0] = x;
+    HSD_JObjSetMtxDirty(jobj);
+    // Melee's think has already placed the hand's joint where the stick
+    // moved it, so it is put back on the knob too.
+    hand->x = x - base_x - HAND_TO_KNOB_DX;
+    hand->y = pos[1] - HAND_TO_KNOB_DY;
+    HSD_JObj * hand_jobj = hand->gobj->hsd_obj;
+    hand_jobj->translate[0] = hand->x;
+    hand_jobj->translate[1] = hand->y;
+    HSD_JObjSetMtxDirty(hand_jobj);
+
+    if (css_port_pad(port)->trigger & PAD_BUTTON_A) {
+        free_hand(hand);
+        *hold_flag(d, kind) = 0;
+        sfx_play(SFX_GRAB, 0x7F, 0x40);
+    }
+}
+
 static int icon_under(const CSSCharModel * puck) {
     for (int i = 0; i < ICON_COUNT; ++i) {
         if (over_icon(puck, &css_icons[i])) return i;
@@ -100,9 +177,8 @@ static void pick_random(int slot) {
     css_door_refresh(slot);
 }
 
-static void hold_think(int port) {
+static void hold_puck(int port, int door) {
     CSSCursorData * hand = css_port_cursor(port);
-    int door = hand->x6 - HELD_BASE;
     u32 trigger = css_port_pad(port)->trigger;
     puck_follow(css_port_puck(door), hand);
 
@@ -151,6 +227,11 @@ static void hold_think(int port) {
 }
 
 static void grab_think(int port) {
+    for (int door = 0; door < PORT_COUNT; ++door) {
+        if (css_port_sees(port, door)) continue;
+        if (grab_slider(port, door, HOLD_CPU) || grab_slider(port, door, HOLD_HANDICAP)) return;
+    }
+
     CSSCursorData * hand = css_port_cursor(port);
     if (hand->y < ROW_BOTTOM || hand->y > ROW_TOP) return;
 
@@ -182,13 +263,20 @@ static void cursor_grab_think(HSD_GObj * gobj) {
         CSSCursorData * hand = css_port_cursor(port);
         if (hand->state == HAND_HOLDING) css_hands_held |= 1 << port;
         if (hand->x6 >= HELD_BASE) {
-            int door = hand->x6 - HELD_BASE;
+            int kind = (hand->x6 - HELD_BASE) / PORT_COUNT;
+            int door = (hand->x6 - HELD_BASE) % PORT_COUNT;
             if (hand->state != HAND_HOLDING) {
                 // The holder unplugged or closed; Melee did not know it held.
-                release(door);
+                if (kind == HOLD_PUCK) {
+                    release(door);
+                } else {
+                    *hold_flag(css_port_door(door), kind) = 0;
+                }
                 hand->x6 = 0;
+            } else if (kind == HOLD_PUCK) {
+                hold_puck(port, door);
             } else {
-                hold_think(port);
+                slide(port, door, kind);
             }
             continue;
         }

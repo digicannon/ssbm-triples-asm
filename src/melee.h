@@ -469,6 +469,7 @@ void GObj_GXLinkLike(HSD_GObj * gobj, HSD_GObj * other);
 void HSD_AObjReqAnim();
 int HSD_Randi(int max);
 #define AOBJ_ARG_AF 1
+#define AOBJ_ARG_AOV 6
 
 #define JOBJ_HIDDEN 0x10
 #define TOBJ_MASK 0x400
