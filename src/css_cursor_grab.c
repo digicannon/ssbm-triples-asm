@@ -58,6 +58,12 @@ static void free_hand(CSSCursorData * hand) {
     hand->x6 = 0;
 }
 
+// As Melee's unplug path: a door left without a character rolls one.
+static void return_puck(int slot) {
+    if (css_return_puck(slot)) css_pick_random_character(slot, 1);
+    css_door_refresh(slot);
+}
+
 static void grab(int port, int door) {
     CSSCursorData * hand = css_port_cursor(port);
     CSSCharModel * puck = css_port_puck(door);
@@ -190,8 +196,7 @@ static void hold_puck(int port, int door) {
 
     bool picked = false;
     if (hand->y < ROW_BOTTOM || (trigger & PAD_BUTTON_B)) {
-        css_return_puck(slot);
-        css_door_refresh(slot);
+        return_puck(slot);
         free_hand(hand);
         if (hand->y < ROW_BOTTOM) sfx_play(SFX_DROP, 0x7F, 0x40);
     } else if (!(trigger & PAD_BUTTON_A)) {
@@ -254,9 +259,7 @@ static void cursor_grab_think(HSD_GObj * gobj) {
             if (hand->state != HAND_HOLDING) {
                 // The holder unplugged or closed; Melee did not know it held.
                 if (kind == HOLD_PUCK) {
-                    int slot = css_port_swap_in(door);
-                    css_return_puck(slot);
-                    css_door_refresh(slot);
+                    return_puck(css_port_swap_in(door));
                     css_port_swap_out(door);
                 } else {
                     *hold_flag(css_port_door(door), kind) = 0;

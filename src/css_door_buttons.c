@@ -45,7 +45,9 @@ static void cycle_kind(int port, int door_idx) {
     if (kind == PKIND_CPU) {
         players[door_idx].nametag = NAMETAG_NONE;
         css_port_tag(door_idx)->use_tag = 0;
-        if (!door->selected_since_load && port != door_idx) {
+        // Melee only checks the flag; a door that lost its pick would stay empty.
+        bool unpicked = !door->selected_since_load || door->sel_icon >= ICON_NONE;
+        if (unpicked && port != door_idx) {
             pick_rand_char = true;
         }
     }
