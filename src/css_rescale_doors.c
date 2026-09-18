@@ -18,6 +18,9 @@ static const u8 pieces[][2] = {
 
 // Door 0's vanilla HMN and team button bounds relative to its background.
 static const f32 bounds[4] = {-5.4f, 1.6f, 3.4f, 9.2f};
+// The hand's tip is this far right of the position the bounds test (the
+// vanilla's puck reach offset); the squeeze applies to what the tip sees.
+#define HAND_TIP_X 3.8f
 
 void css_rescale_doors() {
     f32 x0 = css_child(css_scene_root, BG_JOINT)->translate[0];
@@ -40,7 +43,9 @@ void css_rescale_doors() {
 
         // Bounds are rebuilt from the card's centre, not scaled in place: the
         // door array outlives the scene and would drift on every CSS load.
-        for (int b = 0; b < 4; ++b) css_doors[i].bounds[b] = bounds[b] * SQUEEZE + centre;
+        for (int b = 0; b < 4; ++b) {
+            css_doors[i].bounds[b] = (bounds[b] + HAND_TIP_X) * SQUEEZE + centre - HAND_TIP_X;
+        }
         css_hand_warp_to_spawn(css_hands[i], i);
     }
 

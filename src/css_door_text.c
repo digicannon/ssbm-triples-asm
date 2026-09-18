@@ -33,7 +33,7 @@ void css_door_text_create(HSD_JObj * anchor, CSSTagData * tag, const Player * pl
     JObj_WorldPos(anchor, NULL, pos);
     text->pos_x = pos[0] + 0.5f * squeeze;
     text->pos_y = -0.4f - pos[1];
-    text->pos_z = pos[2];
+    text->pos_z = 0.0f; // The plate's plane; the anchor's 0.4 drifts under perspective.
 
     Text_InitSubtext(text, 81.0f * squeeze, 0.0f, placeholder);
     // A tag in use is written once at CSS build; css_door_refresh leaves it.
@@ -44,24 +44,28 @@ void css_door_text_create(HSD_JObj * anchor, CSSTagData * tag, const Player * pl
     tag->text = text;
 }
 
-void css_door_list_place(HSD_JObj * anchor, Text * list) {
-    f32 squeeze = css_child(css_scene_root, BG_JOINT)->scale[0];
+void css_door_list_place(HSD_JObj * window, HSD_JObj * anchor, Text * list) {
+    f32 stretch = css_child(css_scene_root, BG_JOINT)->scale[0] * NAMETAG_WINDOW_STRETCH;
     f32 pos[3];
+    JObj_WorldPos(window, NULL, pos);
+    // The vanilla's 0.6 inside the window's left edge.
+    list->pos_x = pos[0] + 0.6f * stretch;
     JObj_WorldPos(anchor, NULL, pos);
-    list->pos_x = pos[0] - 0.6f * squeeze;
     list->pos_y = 0.8f - pos[1] - 1.0f;
     list->pos_z = pos[2];
-    list->box_size_x = 154.0f * squeeze * NAMETAG_WINDOW_STRETCH;
+    // Glyphs squeeze with the window; the box clips at its width times this.
+    list->font_size_x = 0.065f * stretch;
 }
 
-void css_door_list_create(HSD_JObj * anchor, CSSTagData * tag) {
+void css_door_list_create(HSD_JObj * window, HSD_JObj * anchor, CSSTagData * tag) {
     Text * list = Text_Create(0, css_canvas());
     list->default_fitting = 1;
+    list->box_size_x = 154.0f;
     list->box_size_y = 256.0f;
-    list->font_size_x = list->font_size_y = 0.065f;
+    list->font_size_y = 0.065f;
     list->x4e = 1;
     list->hidden = 1;
-    css_door_list_place(anchor, list);
+    css_door_list_place(window, anchor, list);
     Text_InitSubtext(list, 0.0f, 0.0f, list_header);
     Text_SetSubtextColor(list, 0, &yellow);
     Text_InitSubtext(list, 0.0f, 0.0f, name_entry);
@@ -74,7 +78,7 @@ void css_door_texts_remake() {
     for (int i = 0; i < 4; ++i) {
         css_tags[i].data->text->hidden = 1;
         css_door_text_create(css_child(css_scene_root, 0x74 + 5 * i), css_tags[i].data, &players[i]);
-        css_door_list_place(css_child(css_scene_root, 0x73 + 5 * i), css_tags[i].data->name_ls);
+        css_door_list_place(css_child(css_scene_root, NAMETAG_WINDOW_JOINT + 5 * i), css_child(css_scene_root, 0x73 + 5 * i), css_tags[i].data->name_ls);
         css_door_refresh(i);
     }
 }

@@ -133,7 +133,7 @@ HSD_JObj * css_56_card_create(int port, CSSTagData * tag) {
 
     const Player * player = &players[port];
     css_door_text_create(css_child(card, CARD_NAME), tag, player);
-    css_door_list_create(css_child(card, CARD_LIST), tag);
+    css_door_list_create(css_child(card, CARD_NAMETAG_WINDOW), css_child(card, CARD_LIST), tag);
 
     // CPU level knob at the saved level, as the vanilla leaves its doors.
     // With handicap on the level moves to cpuslider2 and css_door_refresh
