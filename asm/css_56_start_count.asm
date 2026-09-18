@@ -17,8 +17,8 @@ loop:
     lbz r0, 1(r5) # slot_type; 3 is closed.
     cmplwi r0, 1
     bgt next
-    lbz r0, 0(r5) # ckind; playable ids end at 0x19.
-    cmplwi r0, 0x19
+    lbz r0, 0(r5) # ckind; playable ids end at 0x1A.
+    cmplwi r0, 0x1A
     bge no_pick
     addi r4, r4, 1
 next:
