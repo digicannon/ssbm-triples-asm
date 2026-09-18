@@ -1,27 +1,15 @@
-// P5 and P6 on the CSS: a hand, puck and door card each, run by the stock
-// procs.  Those index 4-entry per-port arrays, so each P5/P6 proc call runs
-// with slot 0 swapped for the port's own copy (pad, hand, puck, doors, tag,
-// player data) and swapped back after.
-//
-// The card is a copy of door 0's pieces grafted onto the end of the scene
-// tree, so the stock door code reaches it through the scene root with joint
-// ids past the stock ones.
-
 #include "css_56_cursor.h"
 
 #include <float.h>
 
 #include "css.h"
+#include "css_56_card.h"
 #include "triples.h"
 
 // assets/css_digit_*.png, 16x24 IA4.
 extern const u8 css_digit_5[];
 extern const u8 css_digit_6[];
 
-#define PLATE_JOINT 0x3D // Door 0's name plate: skinned, six joints.
-#define PLATE_JOINTS 6
-#define SCENE_JOINTS 0xAD // Joints in the VS scene; grafts index from here.
-#define GRAFT_JOINTS 31 // Root plus door 0's pieces.
 // The label: 32x24 IA4 in 8x4 tiles.
 #define TILE_W 8
 #define TILE_H 4
@@ -29,48 +17,13 @@ extern const u8 css_digit_6[];
 #define LABEL_TILE_COLUMNS 4
 #define LABEL_TILE_ROWS 6
 #define LABEL_SIZE (LABEL_TILE_COLUMNS * LABEL_TILE_ROWS * TILE)
-
-// Joint indices of door 0's pieces in a P5/P6 card, the copy grafted onto
-// the scene, in door_pieces order.
-#define CARD_BG 1
-#define CARD_EMBLEM 2
-#define CARD_COSTUME 3
-#define CARD_TEAM 4
-#define CARD_PLATE 5 // Six joints.
-#define CARD_CPUSLIDER2 8
-#define CARD_CPUSLIDER 9
-#define CARD_DOTS 11
-#define CARD_NAMETAG_WINDOW 17
-#define CARD_LIST 20
 #define PENDING_NAME_ENTRY 4 // css_pending_scene_change.
-#define CARD_NAME 21
-#define CARD_DOOR 22
-#define CARD_INDICATOR 30
 
-// Door 0's top-level joints in the VS scene with their group parents:
-// background, emblem, costume, team, name plate and sliders, stock dots,
-// nametag window and its two text anchors, door frame, indicator.
-static const u8 door_pieces[][2] = {
-    {0x29, 0x28}, {0x2E, 0x2D}, {0x33, 0x32}, {0x38, 0x37}, {0x3D, 0x3C},
-    {0x57, 0x56}, {0x70, 0x6F}, {0x73, 0x6F}, {0x74, 0x6F}, {0x85, 0x84},
-    {0xA5, 0xA4},
-};
-
-// CSSDoor joints, then CSSTag joints, in the graft.
-static const u8 door_graft_ids[9] = {CARD_EMBLEM, CARD_COSTUME, CARD_TEAM, CARD_DOOR, CARD_BG, CARD_INDICATOR, 5, CARD_CPUSLIDER, CARD_CPUSLIDER2};
-static const u8 tag_graft_ids[5] = {CARD_NAMETAG_WINDOW, CARD_LIST, CARD_NAME, 19, 18};
-
-// Hand and puck frames: row = the stock P1..P4 label (set_label replaces
+// Hand and puck frames: row = the vanilla P1..P4 label (set_label replaces
 // it), column = red/blue/yellow/green.
 static const u8 hand_frames[2] = {2, 7};
 
-// Four SJIS dots: what the texts are sized for at init.
-static const char placeholder[] = "\x81\x45\x81\x45\x81\x45\x81\x45";
-static const char list_header[] = "\x81\x45\x81\x45\x81\x45\x81\x45\x81\x45\x81\x45\x81\x45\x81\x45\x81\x45\x81\x45\x81\x45";
-static const char name_entry[] = "\x82\x6d\x82\x60\x82\x6c\x82\x64\x20\x82\x64\x82\x6d\x82\x73\x82\x71\x82\x78"; // NAME ENTRY
-static const GXColor yellow = {0xFF, 0xFF, 0, 0xFF};
-
-// Per port, HSD_MemAlloc'd and owned by the hand GObj.  The stock structs
+// Per port, HSD_MemAlloc'd and owned by the hand GObj.  The vanilla structs
 // sit first so the hand's user data is its CSSCursorData and the puck's is
 // its CSSCharModel.
 typedef struct PortBlock {
@@ -83,9 +36,9 @@ typedef struct PortBlock {
     CSSDoor doors[4]; // Door 0 is this port's; the rest never open.
     CSSTagData tag;
     CSSTag tag_slot;
-    HSD_JObj * root; // The port's grafted subtree.
+    HSD_JObj * root; // The port's card.
     HSD_GObj stub; // Stands in for a GObj when running the scene and tag procs.
-    // What the stock's slot 0 holds while this port is swapped out: this
+    // What the vanilla's slot 0 holds while this port is swapped out: this
     // port's hand and puck, and the other way round while swapped in.
     CSSCursorData * hand_slot;
     CSSCharModel * puck_slot;
@@ -121,65 +74,6 @@ static void noop(void * data) {
     (void)data;
 }
 
-static void * copy_chain(const void * node, int kind);
-
-// A copy of the node, without its siblings.
-static void * copy_node(const void * node, int kind, bool with_children) {
-    if (!node) return NULL;
-    void * copy = HSD_MemAlloc(css_node_kinds[kind].size);
-    memcpy(copy, node, css_node_kinds[kind].size);
-    NEXT(copy, kind) = NULL;
-    CHILD(copy, kind) = with_children ? copy_chain(CHILD(node, kind), kind) : NULL;
-    return copy;
-}
-
-static void * copy_chain(const void * node, int kind) {
-    if (!node) return NULL;
-    void * copy = copy_node(node, kind, true);
-    NEXT(copy, kind) = copy_chain(NEXT(node, kind), kind);
-    return copy;
-}
-
-static void free_tree(void * node, int kind) {
-    if (!node) return;
-    free_tree(CHILD(node, kind), kind);
-    free_tree(NEXT(node, kind), kind);
-    HSD_Free(node);
-}
-
-// A copy of the scene's root of that kind whose only children are door 0's
-// pieces, in door_pieces order.  Only needed while loading; free_tree after.
-static void * build_tree(int kind) {
-    void * scene = css_anim_table[ANIM_SCENE].desc[kind];
-    void * root = copy_node(scene, kind, false);
-    void * prev = NULL;
-    for (unsigned i = 0; i < sizeof(door_pieces) / sizeof(door_pieces[0]); ++i) {
-        int index = door_pieces[i][0];
-        void * copy = copy_node(css_find_node(scene, kind, &index), kind, true);
-        if (kind == KIND_JOINT) {
-            // Joints lose their group parent, so its translation moves into
-            // the copy (the groups have no scale or rotation).
-            index = door_pieces[i][1];
-            HSD_JObjDesc * group = css_find_node(scene, kind, &index);
-            HSD_JObjDesc * joint = copy;
-            for (int axis = 0; axis < 3; ++axis) joint->position[axis] += group->position[axis];
-        }
-        if (prev) NEXT(prev, kind) = copy;
-        else CHILD(root, kind) = copy;
-        prev = copy;
-    }
-    return root;
-}
-
-// Maps the plate's six original descs to that tree's plate joints.
-static void bind_plate(HSD_JObj * tree, int plate) {
-    for (int i = 0; i < PLATE_JOINTS; ++i) {
-        int index = PLATE_JOINT + i;
-        void * desc = css_find_node(css_anim_table[ANIM_SCENE].desc[KIND_JOINT], KIND_JOINT, &index);
-        HSD_IDInsertToTable(NULL, desc, css_child(tree, plate + i));
-    }
-}
-
 static void setup_model(HSD_GObj * gobj, HSD_JObj * jobj, const CSSAnim * anim, int gx_link) {
     GObj_AddToObj(gobj, 4, jobj);
     GObj_SetupGXLink(gobj, HSD_GObj_JObjCallback, gx_link, 0x80);
@@ -187,76 +81,6 @@ static void setup_model(HSD_GObj * gobj, HSD_JObj * jobj, const CSSAnim * anim, 
     HSD_JObjReqAnimAll(jobj, 0.0f);
     HSD_JObjAnimAll(jobj);
     HSD_ForeachAnim(jobj, HSD_TYPE_JOBJ, ALL_TYPE_MASK, HSD_AObjStopAnim, HSD_TYPE_JOBJ, 0, 0);
-}
-
-// Melee places the list text from its joint before css_rescale_doors runs.
-static void move_list(HSD_JObj * anchor, Text * list) {
-    f32 squeeze = css_child(css_scene_root, BG_JOINT)->scale[0];
-    f32 pos[3];
-    JObj_WorldPos(anchor, NULL, pos);
-    list->pos_x = pos[0] - 0.6f * squeeze;
-    list->box_size_x = 154.0f * squeeze * NAMETAG_WINDOW_STRETCH;
-}
-
-// The CSS's own canvas is the latest font 0 one.
-static int css_canvas() {
-    int canvas = -1;
-    for (const TextCanvas * c = text_canvases; c; c = c->next) {
-        if (c->font == 0) ++canvas;
-    }
-    return canvas;
-}
-
-// A door's character name text as the stock makes it, but squeezed like the
-// door.  css_door_refresh fills in the name and shows or hides it.
-static void make_text(HSD_JObj * anchor, CSSTagData * tag, const Player * player) {
-    Text * text = Text_Create(0, css_canvas());
-    text->x4c = text->default_fitting = text->default_alignment = 1;
-    text->font_size_x = 0.058f;
-    text->font_size_y = 0.055f;
-
-    // The text fits itself to its box, so only the box is squeezed.  A
-    // little wider than the stock 160 so long names fit the squeezed plate.
-    f32 squeeze = css_child(css_scene_root, BG_JOINT)->scale[0];
-    text->box_size_x = 162.0f * squeeze;
-    text->box_size_y = 32.0f;
-
-    f32 pos[3];
-    JObj_WorldPos(anchor, NULL, pos);
-    text->pos_x = pos[0] + 0.5f * squeeze;
-    text->pos_y = -0.4f - pos[1];
-    text->pos_z = pos[2];
-
-    Text_InitSubtext(text, 81.0f * squeeze, 0.0f, placeholder);
-    // A tag in use is written once at CSS build; css_door_refresh leaves it.
-    if (tag->use_tag) {
-        Text_SetSubtext(text, 0, GetNameText(player->nametag));
-        text->default_kerning = 0;
-    }
-    tag->text = text;
-}
-
-// The port's tag list text as the stock makes each door's, on the card's list joint.
-static void make_list(PortBlock * bk) {
-    Text * list = Text_Create(0, css_canvas());
-    list->default_fitting = 1;
-    f32 squeeze = css_child(css_scene_root, BG_JOINT)->scale[0];
-    list->box_size_x = 154.0f * squeeze * NAMETAG_WINDOW_STRETCH;
-    list->box_size_y = 256.0f;
-    f32 pos[3];
-    JObj_WorldPos(css_child(bk->root, CARD_LIST), NULL, pos);
-    list->pos_x = pos[0] - 0.6f * squeeze;
-    list->pos_y = 0.8f - pos[1] - 1.0f;
-    list->pos_z = pos[2];
-    list->font_size_x = list->font_size_y = 0.065f;
-    list->x4e = 1;
-    list->hidden = 1;
-    Text_InitSubtext(list, 0.0f, 0.0f, list_header);
-    Text_SetSubtextColor(list, 0, &yellow);
-    Text_InitSubtext(list, 0.0f, 0.0f, name_entry);
-    Text_SetSubtextColor(list, 1, &yellow);
-    for (int i = 0; i < 9; ++i) Text_InitSubtext(list, 10.0f, 0.0f, placeholder);
-    bk->tag.name_ls = list;
 }
 
 // Our label: the loaded P1 image with the digit half replaced from the
@@ -288,14 +112,14 @@ static void make_label(PortBlock * bk, const HSD_ImageDesc * p1) {
     DCFlushRange(bk->label, LABEL_SIZE);
 }
 
-// Points a label joint's texture at ours; the stock's anim puts P1 back
+// Points a label joint's texture at ours; the vanilla's anim puts P1 back
 // whenever it re-requests the frame.
 static void set_label(PortBlock * bk, HSD_JObj * joint) {
     label_tobj(joint)->imagedesc = &bk->label_desc;
 }
 
 // Requests the frame on the child and re-animates that subtree only, so
-// the rest of the model keeps the stock's frame count.
+// the rest of the model keeps the vanilla's frame count.
 static HSD_JObj * recolor(HSD_JObj * root, int child, int frame) {
     HSD_JObj * joint = css_child(root, child);
     HSD_JObjReqAnim(joint, frame);
@@ -308,17 +132,6 @@ static GXColor port_color(const PortBlock * bk) {
     return colors[bk->port - 4];
 }
 
-static bool pad_plugged(const PortBlock * bk) {
-    return triples_converted_output[bk->port - 4].err == 0;
-}
-
-// The shadow door's button bounds are door 0's shifted by the card's
-// offset.  Reasserted on every swap (real door 0 is P1's then) so nothing
-// that writes the door array between frames can stick.
-static void set_boxes(PortBlock * bk) {
-    for (int i = 0; i < 4; ++i) bk->doors[0].bounds[i] = css_doors[0].bounds[i] + CSS_DOOR_PITCH * bk->port;
-}
-
 static void swap(void * a, void * b, size_t size) {
     u8 * p = a;
     u8 * q = b;
@@ -329,7 +142,7 @@ static void swap(void * a, void * b, size_t size) {
     }
 }
 
-// Exchanges the stock's slot 0 with this port's copies; doing it twice
+// Exchanges the vanilla's slot 0 with this port's copies; doing it twice
 // puts everything back, with the port's copies updated.
 static void swap_slot(PortBlock * bk) {
     swap(&HSD_PadCopyStatus[0], &triples_converted_output[bk->port - 4], sizeof(PadStatus));
@@ -342,7 +155,6 @@ static void swap_slot(PortBlock * bk) {
 
 // Slot 0 becomes this port until swap_out.
 static void swap_in(PortBlock * bk) {
-    set_boxes(bk);
     swap_slot(bk);
     css_exit_bits[0] = 1 << bk->port;
 
@@ -374,7 +186,6 @@ static void hand_think(HSD_GObj * gobj) {
     mnCharSel_CursorThink(gobj);
     swap_out(bk);
 
-    // Set text color.
     if (!css_is_teams) {
         HSD_TObjTev * tev = label_tobj(recolor(jobj, 3, bk->frame))->tev;
         GXColor color = port_color(bk);
@@ -390,7 +201,7 @@ static void puck_think(HSD_GObj * gobj) {
     PortBlock * bk = (PortBlock *)((u8 *)gobj->user_data - offsetof(PortBlock, puck));
     HSD_JObj * jobj = gobj->hsd_obj;
     // A mode change need not change the color index for this port, so
-    // force the stock's refresh by running out its timer.
+    // force the vanilla's refresh by running out its timer.
     if (bk->puck_teams != css_is_teams) {
         bk->puck_teams = css_is_teams;
         bk->puck.refresh = 0x28;
@@ -400,7 +211,7 @@ static void puck_think(HSD_GObj * gobj) {
     css_puck_think(gobj);
     swap_out(bk);
 
-    // Stock colors the puck by port unless it is CPU gray or a team color
+    // Vanilla colors the puck by port unless it is CPU gray or a team color
     // (index >= 4); in teams the color is the team's, so only the label is
     // ours.  The body carries the port color in all three of its material
     // colors, and re-hueing them every frame leaves the anim's pulse toward
@@ -413,31 +224,13 @@ static void puck_think(HSD_GObj * gobj) {
         mat->specular = color_retint(hue, mat->specular);
     }
 
-    // Joint 4 is the label (row * 4).  Follow the stock's refresh (timer
+    // Joint 4 is the label (row * 4).  Follow the vanilla's refresh (timer
     // reset to 0) so the color anim plays out in between.
     if (bk->puck.refresh != 0 || bk->puck.color >= 4) return;
     HSD_JObj * label = recolor(jobj, 4, bk->frame & ~3);
     // The label holds its frame; the color plays.
     HSD_ForeachAnim(label, HSD_TYPE_JOBJ, TOBJ_MASK, HSD_AObjStopAnim, HSD_TYPE_JOBJ, 0, 0);
     set_label(bk, label);
-}
-
-static void color_card(PortBlock * bk) {
-    if (css_is_teams || bk->doors[0].p_kind != PKIND_HUMAN) {
-        return;
-    }
-
-    static const GXColor colors[2] = {P5_COLOR, P6_COLOR};
-    static const GXColor inner_line = {0x2C, 0x2C, 0x2C, 0xFF};
-
-    HSD_TObjTev * tev = css_child(bk->root, CARD_BG)->dobj->mobj->tobj->tev;
-    GXColor color = colors[bk->port - 4];
-    tev->konst.r = color.r;
-    tev->konst.g = color.g;
-    tev->konst.b = color.b;
-    tev->tev0.r = inner_line.r;
-    tev->tev0.g = inner_line.g;
-    tev->tev0.b = inner_line.b;
 }
 
 static void card_think(HSD_GObj * gobj) {
@@ -450,14 +243,14 @@ static void card_think(HSD_GObj * gobj) {
     css_scene_think(&bk->stub);
     swap_out(bk);
     for (int i = 0; i < ICON_COUNT; ++i) css_icons[i].anim_timer = timers[i];
-    color_card(bk);
+    if (!css_is_teams && bk->doors[0].p_kind == PKIND_HUMAN) css_56_card_color(bk->root, port_color(bk));
 }
 
 static void tag_think(HSD_GObj * gobj) {
     PortBlock * bk = gobj->user_data;
 
     // An unplugged pad only finishes closing the list.
-    if (!pad_plugged(bk) && bk->tag.state == 0) {
+    if (triples_converted_output[bk->port - 4].err != 0 && bk->tag.state == 0) {
         return;
     }
 
@@ -473,7 +266,7 @@ static void tag_think(HSD_GObj * gobj) {
     }
 }
 
-static void create_port(int port, void * joint_tree, void * anim_tree, void * matanim_tree) {
+static void create_port(int port) {
     PortBlock * bk = HSD_MemAlloc(sizeof(*bk));
     memset(bk, 0, sizeof(*bk));
     css_56_blocks[port - 4] = bk;
@@ -492,19 +285,19 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
         door->p_kind = door->p_kind_prev = PKIND_CLOSED;
         door->sel_icon = door->sel_icon_prev = ICON_NONE;
         door->dooranim_timer = door->slideranim_timer = 0;
-        // No button can be hit: their pieces are the real doors'.  Door 0's
-        // bounds are set by set_boxes.
+        // No button can be hit: their pieces are the real doors'.
         door->bounds[0] = door->bounds[2] = FLT_MAX;
         door->bounds[1] = door->bounds[3] = -FLT_MAX;
     }
+    for (int i = 0; i < 4; ++i) bk->doors[0].bounds[i] = css_doors[0].bounds[i] + CSS_DOOR_PITCH * port;
 
-    // Door 0 comes back from players[port] like the stock doors do, so a
+    // Door 0 comes back from players[port] like the vanilla doors do, so a
     // pick survives a match.
     Player * player = &players[port];
     bk->doors[0].p_kind = player->slot_type;
     bk->doors[0].costume = player->color;
     bk->doors[0].team = player->team;
-    // The stock floors every door's CPU level to 1 at CSS entry, but only
+    // The vanilla floors every door's CPU level to 1 at CSS entry, but only
     // for its four slots.
     if (player->cpu_level == 0) player->cpu_level = 1;
 
@@ -516,18 +309,15 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
         break;
     }
 
-    // Door 0's and tag 0's joint ids move to the graft.
-    int graft = SCENE_JOINTS + GRAFT_JOINTS * (port - 4);
-    for (int i = 0; i < 9; ++i) bk->doors[0].joints[i] = door_graft_ids[i] + graft;
     bk->tag_slot = css_tags[0];
-    for (int i = 0; i < 5; ++i) bk->tag_slot.joints[i] = tag_graft_ids[i] + graft;
     bk->tag_slot.data = &bk->tag;
+    css_56_card_set_joint_ids(port, &bk->doors[0], &bk->tag_slot);
 
     // Shadow tag data starts from P1's (valid text pointers).
     bk->tag = *css_tags[0].data;
     bk->tag.state = 0;
     // Back from this port's name entry: the new tag is the first one the
-    // stock did not know at the last build.
+    // vanilla did not know at the last build.
     if (css_name_entry_slot == CSS_NAME_ENTRY_SLOT_56 && css_name_entry_port == port && css_tag_mark < bk->tag.next_tag) {
         player->nametag = css_tag_mark - 1;
         css_tag_mark = bk->tag.next_tag;
@@ -553,37 +343,9 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
     GObj_AddProc(puck, puck_think, 2);
     GObj_AddUserData(puck, 4, noop, &bk->puck);
 
-    // Card: door 0's pieces, squeezed like the stock doors, placed
-    // CSS_DOOR_PITCH * port right of where door 0 ended up, and grafted
-    // onto the scene.
-    HSD_JObj * card = HSD_JObjLoadJoint(joint_tree);
-    bk->root = card;
-    // The plate is skinned to joints found by desc through the ID table,
-    // which still names the real door 0's.  Point those descs at the copy,
-    // resolve again, and point them back.
-    bind_plate(card, CARD_PLATE);
-    HSD_JObjResolveRefsAll(card, joint_tree);
-    bind_plate(css_scene_root, PLATE_JOINT);
-    HSD_JObjAddAnimAll(card, anim_tree, matanim_tree, NULL);
-    HSD_JObjReqAnimAll(card, 0.0f);
-    HSD_JObjAnimAll(card);
-    HSD_ForeachAnim(card, HSD_TYPE_JOBJ, ALL_TYPE_MASK, HSD_AObjStopAnim, HSD_TYPE_JOBJ, 0, 0);
+    bk->root = css_56_card_create(port, &bk->tag);
     bk->stub.hsd_obj = css_scene_root;
     bk->stub.user_data = &bk->tag;
-
-    const HSD_JObj * bg0 = css_child(css_scene_root, BG_JOINT);
-    f32 squeeze = bg0->scale[0];
-    card->scale[0] = squeeze;
-    card->translate[0] = bg0->translate[0] - css_child(card, CARD_BG)->translate[0] * squeeze + CSS_DOOR_PITCH * port;
-    HSD_JObjSetMtxDirty(card);
-    HSD_JObj * window = css_child(card, CARD_NAMETAG_WINDOW);
-    window->scale[0] = NAMETAG_WINDOW_STRETCH;
-    window->translate[0] = css_child(card, CARD_BG)->translate[0];
-    HSD_JObjSetMtxDirty(window);
-
-    // The KO stars are the stock dots subtree; triples shows none.
-    HSD_JObjSetFlagsAll(css_child(card, CARD_DOTS), JOBJ_HIDDEN);
-    HSD_JObjAddChild(css_scene_root, card);
 
     // The card and tag procs only need a GObj to run from.
     HSD_GObj * card_gobj = GObj_Create(4, 5, 0x80);
@@ -593,22 +355,10 @@ static void create_port(int port, void * joint_tree, void * anim_tree, void * ma
     GObj_AddProc(tag_gobj, tag_think, 4);
     GObj_AddUserData(tag_gobj, 4, noop, bk);
 
-    set_boxes(bk);
-    make_text(css_child(card, CARD_NAME), &bk->tag, player);
-    make_list(bk);
-
     // Draw the door in its restored state, name included.
     swap_in(bk);
     css_door_refresh(0);
     swap_out(bk);
-
-    // CPU level knob at the saved level, as the stock leaves its doors.
-    // With handicap on the level moves to cpuslider2 and css_door_refresh
-    // places the handicap knob.
-    HSD_JObj * knob = css_child(card, gmMainLib_GetGameRules()->handicap ? CARD_CPUSLIDER2 : CARD_CPUSLIDER);
-    knob->translate[0] = (player->cpu_level - 1) * 1.25f;
-    HSD_JObjSetMtxDirty(knob);
-    color_card(bk);
 }
 
 CSSCursorData * css_port_cursor(int port) {
@@ -653,23 +403,5 @@ void css_port_refresh(int port, bool pick_rand_char) {
 }
 
 void css_56_create() {
-    // One compact copy of the descs (joint, anim, mat anim) serves both ports.
-    void * joint_tree = build_tree(KIND_JOINT);
-    void * anim_tree = build_tree(KIND_ANIM);
-    void * matanim_tree = build_tree(KIND_MATANIM);
-
-    // The stock doors' texts were laid out before css_rescale_doors.c ran
-    // and are text, not joints.
-    for (int i = 0; i < 4; ++i) {
-        css_hand_warp_to_spawn(css_hands[i], i);
-        css_tags[i].data->text->hidden = 1;
-        make_text(css_child(css_scene_root, 0x74 + 5 * i), css_tags[i].data, &players[i]);
-        move_list(css_child(css_scene_root, 0x73 + 5 * i), css_tags[i].data->name_ls);
-        css_door_refresh(i);
-    }
-
-    for (int port = 4; port < 6; ++port) create_port(port, joint_tree, anim_tree, matanim_tree);
-    free_tree(joint_tree, KIND_JOINT);
-    free_tree(anim_tree, KIND_ANIM);
-    free_tree(matanim_tree, KIND_MATANIM);
+    for (int port = 4; port < 6; ++port) create_port(port);
 }

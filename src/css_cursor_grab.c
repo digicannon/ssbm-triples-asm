@@ -1,7 +1,6 @@
 #include "css.h"
 #include "css_56_cursor.h"
 
-#define PORT_COUNT 6
 #define HELD_BASE 12 // Then kind * PORT_COUNT + door.
 #define HOLD_PUCK 0
 #define HOLD_CPU 1
@@ -72,13 +71,6 @@ static void grab(int port, int door) {
     sfx_play(SFX_GRAB, 0x7F, 0x40);
     hand->x = puck->x - HAND_TO_PUCK_DX;
     hand->y = puck->y - HAND_TO_PUCK_DY;
-}
-
-static void release(int door) {
-    int slot = css_port_swap_in(door);
-    css_return_puck(slot);
-    css_door_refresh(slot);
-    css_port_swap_out(door);
 }
 
 // The CPU level knob moves to the second slider while the handicap rule is
@@ -182,13 +174,6 @@ static void hold_puck(int port, int door) {
     u32 trigger = css_port_pad(port)->trigger;
     puck_follow(css_port_puck(door), hand);
 
-    if (hand->y < ROW_BOTTOM) {
-        release(door);
-        free_hand(hand);
-        sfx_play(SFX_DROP, 0x7F, 0x40);
-        return;
-    }
-
     // Swapped in, the door's slot indexes every table.
     int slot = css_port_swap_in(door);
     CSSDoor * d = &css_doors[slot];
@@ -204,10 +189,11 @@ static void hold_puck(int port, int door) {
     }
 
     bool picked = false;
-    if (trigger & PAD_BUTTON_B) {
+    if (hand->y < ROW_BOTTOM || (trigger & PAD_BUTTON_B)) {
         css_return_puck(slot);
         css_door_refresh(slot);
         free_hand(hand);
+        if (hand->y < ROW_BOTTOM) sfx_play(SFX_DROP, 0x7F, 0x40);
     } else if (!(trigger & PAD_BUTTON_A)) {
         css_costume_change(slot, trigger);
     } else if (over_random_button(puck) && all_icons_shown()) {
@@ -268,7 +254,10 @@ static void cursor_grab_think(HSD_GObj * gobj) {
             if (hand->state != HAND_HOLDING) {
                 // The holder unplugged or closed; Melee did not know it held.
                 if (kind == HOLD_PUCK) {
-                    release(door);
+                    int slot = css_port_swap_in(door);
+                    css_return_puck(slot);
+                    css_door_refresh(slot);
+                    css_port_swap_out(door);
                 } else {
                     *hold_flag(css_port_door(door), kind) = 0;
                 }
