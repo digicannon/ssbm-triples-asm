@@ -149,11 +149,17 @@
 @set 390f38 2C000000
 @set 390f3C 40800024
 
-# UCF 0.80
-# https://github.com/project-slippi/slippi-ssbm-asm/tree/0ca890f4a0a6dfe2ce42570892218428327a3168/External/UCF%200.8/Logic
-@file 0C9A44 asm/ucf/dashback.asm
-@file 0998A4 asm/ucf/shield_drop.asm
-@file 0908F4 asm/ucf/tumble.asm
+# UCF 0.84
+# https://github.com/project-slippi/slippi-ssbm-asm/tree/master/External/UCF%200.84/UCF
+# Pad Buffer is modified for six ports.
+@file 06B460 asm/UCF/UCF Pad Buffer + 1.0 Cardinals.asm
+@file 0C9A44 asm/UCF/UCF Dashback.asm
+@file 0D65EC asm/UCF/UCF DBOOC SquatRv Fix.asm
+@file 08E54C asm/UCF/UCF SDI.asm
+@file 0998A4 asm/UCF/UCF Shield Drop.asm
+@file 09A0B8 asm/UCF/UCF Shield Drop Extended.asm
+@file 093294 asm/UCF/UCF Shield SDI.asm
+@file 0908F4 asm/UCF/UCF Tumble.asm
 
 # ==========
 # Stage Changes
