@@ -394,6 +394,16 @@ typedef struct AdapterPads {
 } AdapterPads;
 ASSERT_OFFSET(AdapterPads, pad, 0);
 
+// HSD's per-port rumble state.  Status 2 is motor on; 0 and 1 are stops.
+typedef struct HSD_RumbleData {
+    u8 last_status;
+    u8 status;
+    u8 direct_status;
+    u16 nb_list;
+    void * listdatap;
+} HSD_RumbleData;
+ASSERT_SIZE(HSD_RumbleData, 0xC);
+
 typedef struct GameRules {
     u8 pad0[5];
     u8 handicap;
@@ -441,6 +451,9 @@ void JObj_GetChild(HSD_JObj * root, HSD_JObj ** out, int index, int stop);
 void JObj_WorldPos(HSD_JObj * jobj, void * unused, f32 out[3]);
 bool lbLang_IsSavedLanguageUS();
 u8 Player_GetPlayerSlotType(int slot);
+bool gm_RumbleEnabledForPlayer(int port, int nametag);
+// lb_80014574.  Plays effect from LbRb.dat; 0 frames loops until removed by id.
+void rumble_start(u8 port, int id, int effect, int frames);
 Text * Text_Create(int font, int canvas);
 void Text_InitSubtext(Text * text, f32 x, f32 y, const char * string);
 void Text_SetSubtext(Text * text, int subtext, const char * string);
@@ -518,6 +531,8 @@ extern AdapterPads adapter_pads_data;
 extern u32 hid_status;
 extern HidControl hid_ctrl;
 extern AdapterReport hid_report;
+extern u32 hid_motor_56;
+extern HSD_RumbleData rumble_data[6];
 extern PauseImages * pause_56_images; // Heap block, per match.
 
 #define CSS_DOOR_PITCH 10.3f // x spacing of the six squeezed doors.
