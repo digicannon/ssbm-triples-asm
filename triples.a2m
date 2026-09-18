@@ -97,6 +97,8 @@
 # Unplugging closes CSS door [UnclePunch]
 @set 2605FC 38C00003
 
+@file 2608B0 asm/css_hand_right_limit.asm
+
 # "RANDOM" is Default Highlighted on Stage Select Screen (1.02) [Jorgasms]
 @set 25AA10 38E0001D
 
