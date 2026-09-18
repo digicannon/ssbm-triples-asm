@@ -1,7 +1,6 @@
 #include "css.h"
 #include "css_56_cursor.h"
 
-#define PORT_COUNT 6
 #define TOGGLE_TOP 0.2f
 #define TOGGLE_BOTTOM -4.6f
 #define TOGGLE_REST -2.2f

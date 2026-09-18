@@ -3,6 +3,8 @@
 
 #include "melee.h"
 
+#define PORT_COUNT 6
+
 // The port whose block is swapped into slot 0, or -1.
 int css_56_swapped_port();
 
@@ -16,10 +18,10 @@ CSSCharModel * css_port_puck(int port);
 
 const PadStatus * css_port_pad(int port);
 
-/// Whether Melee's own hand think covers this port acting on this door.
+// Whether Melee's own hand think covers this port acting on this door.
 bool css_port_sees(int port, int door);
 
-/// @returns The slot now being used for the given port.
+// The slot the port is in until css_port_swap_out.
 int css_port_swap_in(int port);
 void css_port_swap_out(int port);
 

@@ -9,7 +9,7 @@
 #define ANIM_PUCK 2
 #define ANIM_SCENE 3
 #define BG_JOINT 0x29 // A door's background, door 0's here.
-#define BOX_JOINT 0x55 // The four stock name boxes, one mesh each.
+#define BOX_JOINT 0x55 // The four vanilla name boxes, one mesh each.
 #define BOX_JOINT_BASE 0xEB // Our name boxes, one joint per door.
 #define NAMETAG_WINDOW_JOINT 0x70 // Door 0's here.
 #define NAMETAG_WINDOW_STRETCH (14.2f / 11.6f) // Door background width over window width.
