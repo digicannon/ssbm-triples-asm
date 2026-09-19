@@ -454,6 +454,10 @@ u8 Player_GetPlayerSlotType(int slot);
 bool gm_RumbleEnabledForPlayer(int port, int nametag);
 // lb_80014574.  Plays effect from LbRb.dat; 0 frames loops until removed by id.
 void rumble_start(u8 port, int id, int effect, int frames);
+bool GetRumbleSettingOfPort(int port);
+void gmMainLib_SetRumbleEnabled(int port, bool enabled);
+int HSD_PadRumbleAdd(u8 port, int id, int frames, int priority, const u16 * effect);
+void HSD_PadRumbleRemoveId(u8 port, int id);
 Text * Text_Create(int font, int canvas);
 void Text_InitSubtext(Text * text, f32 x, f32 y, const char * string);
 void Text_SetSubtext(Text * text, int subtext, const char * string);
@@ -533,6 +537,9 @@ extern HidControl hid_ctrl;
 extern AdapterReport hid_report;
 extern u32 hid_motor_56;
 extern HSD_RumbleData rumble_data[6];
+extern u8 rumble_56_enabled[2];
+extern f32 css_rumble_shake[6];
+extern const u16 mn_rumble_test_effect[2]; // The Options menu's one-shot buzz.
 extern PauseImages * pause_56_images; // Heap block, per match.
 
 #define CSS_DOOR_PITCH 10.3f // x spacing of the six squeezed doors.

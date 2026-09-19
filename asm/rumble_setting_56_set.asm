@@ -1,14 +1,14 @@
 # ====================
-#  Insert at 8015ED3C
+#  Insert at 8015ED4C
 # ====================
-
-# GetRumbleSettingOfPort.  The save data has four entries; P5/P6 are always on.
 
 .include "common.s"
 
     cmpwi r3, 4
     blt return
-    li r3, 1
+    subi r3, r3, 4
+    load r5, rumble_56_enabled
+    stbx r4, r5, r3
     blr
 return:
     lwz r0, -0x77C0(r13) # Original code.

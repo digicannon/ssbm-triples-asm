@@ -7,6 +7,7 @@ hid_motor_56 = 0x93003028; /* Rumble mask for the adapter, bit per port.  Ninten
 adapter_pads_data = 0x803FC500; /* Reserved size 0x100, more than required. */
 triples_converted_output = 0x803FC600; /* Size 0x88. */
 rumble_data = 0x803FC6B0; /* Six HSD_RumbleData, 0x48. */
+rumble_56_enabled = rumble_data + 0x48; /* Byte per port for P5/P6, zeroed with rumble_data. */
 
 begin_triples_globals = 0x803FC700;
 widescreen_enabled = begin_triples_globals; /* Nintendont depends on this address. */
@@ -19,3 +20,4 @@ shield_colors_56 = css_name_entry_port + 4; /* 7 RGBx entries. */
 blastzone_colors_56 = shield_colors_56 + 28;
 menu_inputs_56_ports = blastzone_colors_56 + 28; /* P5 and P6's menu inputs. */
 css_hands_held = menu_inputs_56_ports + 0x60; /* Bit per port, as of the last frame. */
+css_rumble_shake = css_hands_held + 4; /* Six f32: hand x velocity while a rumble toggle shakes it. */

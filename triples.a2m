@@ -118,7 +118,8 @@
 @file 378A24 asm/rumble_data_init.asm
 @asm 01461C cmpwi r31, 6 # lb_800145F4
 @asm 16F0B0 cmpwi r30, 6 # gm_LoadRumbleEnabled
-@file 15ED3C asm/rumble_setting_56.asm
+@file 15ED3C asm/rumble_setting_56_get.asm
+@file 15ED4C asm/rumble_setting_56_set.asm
 @c src/rumble_56_motor.c
 @file 3787FC asm/rumble_56_motor.asm
 
@@ -269,6 +270,8 @@
 @c src/css_56_scene_anim.c
 @c src/css_door_buttons.c
 @c src/css_cursor_grab.c
+@c src/css_rumble_toggle.c
+@file 2608D8 asm/css_rumble_toggle.asm
 @file 260548 asm/css_hand_respawn.asm
 @file 263968 asm/css_56_tag_taken_list.asm
 @file 263CC4 asm/css_56_tag_taken_pick.asm
