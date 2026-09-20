@@ -1,4 +1,4 @@
-#include "melee.h"
+#include "triples.h"
 
 #define RUMBLE_STATUS_ON 2
 

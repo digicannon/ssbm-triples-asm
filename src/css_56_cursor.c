@@ -47,10 +47,9 @@ typedef struct PortBlock {
 } PortBlock;
 ASSERT_OFFSET(PortBlock, cursor, 0);
 
-// P5 and P6's blocks, at a fixed address so code outside the procs can find
-// them.  Set on every four-door CSS load; on any other screen they point at
-// freed memory.
-extern PortBlock * css_56_blocks[2];
+// P5 and P6's blocks.  Set on every four-door CSS load; on any other screen
+// they point at freed memory.
+static PortBlock * css_56_blocks[2];
 
 bool css_56_cursor_holding() {
     if (css_door_count != 4) return false;

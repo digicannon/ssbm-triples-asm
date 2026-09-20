@@ -20,10 +20,12 @@ extern const u8 pause_digit_6_jp[];
 #define DIGIT_ROWS 3
 #define IMAGE_SIZE (TILE_COLUMNS * DIGIT_ROWS * TILE)
 
-typedef struct PauseImages {
+typedef struct {
     u8 image[2][IMAGE_SIZE];
     HSD_ImageDesc desc[2];
 } PauseImages;
+
+static PauseImages * pause_56_images; // Heap block, per match.
 
 static HSD_TObj * label_tobj(HSD_JObj * root) {
     HSD_JObj * label = NULL;

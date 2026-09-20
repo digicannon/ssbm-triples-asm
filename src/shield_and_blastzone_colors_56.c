@@ -4,6 +4,9 @@
 #define EXISTING_ENTRIES 5
 #define ENTRY_SIZE 4
 
+static u8 shield_colors_56[EXISTING_ENTRIES + 2][ENTRY_SIZE];
+static u8 blastzone_colors_56[EXISTING_ENTRIES + 2][ENTRY_SIZE];
+
 static void fill(u8 table[][ENTRY_SIZE], const u8 * original) {
     static const GXColor colors[2] = {P5_COLOR, P6_COLOR};
 

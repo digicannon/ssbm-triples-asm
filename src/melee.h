@@ -360,40 +360,6 @@ typedef struct ControllerMap {
 } ControllerMap;
 ASSERT_SIZE(ControllerMap, 0x100);
 
-// One port of the GameCube adapter's USB report.
-typedef struct AdapterPort {
-    u8 status;
-    u8 buttons;
-    u8 buttons2;
-    u8 stick_x;
-    u8 stick_y;
-    u8 cstick_x;
-    u8 cstick_y;
-    u8 trigger_left;
-    u8 trigger_right;
-} AdapterPort;
-ASSERT_SIZE(AdapterPort, 9);
-
-typedef struct AdapterReport {
-    u8 id;
-    AdapterPort port[4];
-} AdapterReport;
-
-// Nintendont's HID device, as it publishes it to the game.
-typedef struct HidControl {
-    u32 vid;
-    u32 pid;
-} HidControl;
-
-// Our adapter ports as raw pads for the pad loop, and what it takes to
-// make them.
-typedef struct AdapterPads {
-    PADStatus pad[2];
-    AdapterPort origin[2];
-    bool plugged[2];
-} AdapterPads;
-ASSERT_OFFSET(AdapterPads, pad, 0);
-
 // HSD's per-port rumble state.  Status 2 is motor on; 0 and 1 are stops.
 typedef struct HSD_RumbleData {
     u8 last_status;
@@ -418,8 +384,6 @@ typedef struct PauseData {
     int slot; // The pauser.
 } PauseData;
 ASSERT_OFFSET(PauseData, slot, 0x14);
-
-typedef struct PauseImages PauseImages;
 
 void * memset(void * dst, int value, size_t size);
 void * memcpy(void * dst, const void * src, size_t size);
@@ -519,29 +483,12 @@ extern u8 sss_stage_picked;
 extern u8 css_pending_scene_change;
 extern s8 css_name_entry_slot;
 extern u8 css_tag_mark;
-extern u32 css_name_entry_port;
-extern u8 shield_colors_56[7][4];
-extern u8 blastzone_colors_56[7][4];
 extern u8 * ft_shield_colors;
 extern u8 * ft_blastzone_colors;
 #define NAMETAG_NONE 0x78
 extern u8 menu_cur_menu;
 extern TextCanvas * text_canvases;
 extern PauseData pause_data;
-extern PadStatus triples_converted_output[2];
-extern ControllerMapEntry menu_inputs_56_ports[2];
-extern u8 css_hands_held;
-extern AdapterPads adapter_pads_data;
-extern u32 hid_status;
-extern HidControl hid_ctrl;
-extern AdapterReport hid_report;
-extern u32 hid_motor_56;
-extern HSD_RumbleData rumble_data[6];
-extern u8 rumble_56_enabled[2];
-extern f32 css_rumble_shake[6];
 extern const u16 mn_rumble_test_effect[2]; // The Options menu's one-shot buzz.
-extern PauseImages * pause_56_images; // Heap block, per match.
-
-#define CSS_DOOR_PITCH 10.3f // x spacing of the six squeezed doors.
 
 #endif

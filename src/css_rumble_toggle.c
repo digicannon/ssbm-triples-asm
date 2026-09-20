@@ -6,6 +6,8 @@
 #define SHAKE_DAMPING 0.8f
 #define SHAKE_STOP 0.015625f
 
+static f32 shake[PORT_COUNT];
+
 static void start_shake(CSSCursorData * cursor, f32 * velocity) {
     if (*velocity > 0) {
         cursor->x += *velocity;
@@ -18,7 +20,7 @@ void css_rumble_toggle(CSSCursorData * cursor, u32 triggered) {
     int port = css_56_swapped_port();
     if (port < 0) port = cursor->x4;
 
-    f32 * velocity = &css_rumble_shake[port];
+    f32 * velocity = &shake[port];
 
     if ((triggered & PAD_BUTTON_UP)) {
         gmMainLib_SetRumbleEnabled(port, true);

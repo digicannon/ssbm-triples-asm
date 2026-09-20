@@ -5,6 +5,8 @@
 
 #include "melee.h"
 
+#define CSS_DOOR_PITCH 10.3f // x spacing of the six squeezed doors.
+
 #define ANIM_HAND 1
 #define ANIM_PUCK 2
 #define ANIM_SCENE 3

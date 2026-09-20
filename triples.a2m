@@ -90,7 +90,10 @@
 
 @file 028494 asm/sfx_bank_six_players.asm
 
-# Rumble.  Point HSD's per-port rumble functions at our rumble_data.
+# ===============
+# Rumble support.
+# ===============
+
 @asm 3780B0 lis r4, rumble_data@ha # HSD_PadRumbleOn
 @asm 3780B4 addi r0, r4, rumble_data@l
 @asm 3780FC lis r4, rumble_data@ha # HSD_PadRumbleOffN
@@ -118,8 +121,11 @@
 @file 378A24 asm/rumble_data_init.asm
 @asm 01461C cmpwi r31, 6 # lb_800145F4
 @asm 16F0B0 cmpwi r30, 6 # gm_LoadRumbleEnabled
+
+@buffer rumble_56_enabled 2 # Byte per port for P5/P6.
 @file 15ED3C asm/rumble_setting_56_get.asm
 @file 15ED4C asm/rumble_setting_56_set.asm
+
 @c src/rumble_56_motor.c
 @file 3787FC asm/rumble_56_motor.asm
 
@@ -305,6 +311,8 @@
 # In game.
 # ==========
 
+@buffer match_player_count 4
+@buffer match_frames_since_indicator_switch 4
 @file 16E9A8 asm/match_store_player_count.asm
 
 # Pausing by P5/P6: the stock searches four pads for Start, then reads the

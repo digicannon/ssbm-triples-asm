@@ -2,8 +2,7 @@
 #  Insert at 80378A24
 # ====================
 
-# HSD_PadRumbleInit zeroes four entries; zero our fifth and sixth and
-# rumble_56_enabled after them.
+# HSD_PadRumbleInit zeroes P1-4.  Do 5 and 6.
 
 .include "common.s"
 
@@ -14,5 +13,4 @@
     stw r0, 0x3C(r3)
     stw r0, 0x40(r3)
     stw r0, 0x44(r3)
-    stw r0, 0x48(r3)
     lwz r31, 0x2C(r1) # Original code.

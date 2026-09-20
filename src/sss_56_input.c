@@ -1,4 +1,4 @@
-#include "melee.h"
+#include "triples.h"
 
 #define ANY_PORT -1
 #define DEADZONE 30

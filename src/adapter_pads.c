@@ -1,4 +1,4 @@
-#include "melee.h"
+#include "triples.h"
 
 #define VID_NINTENDO 0x57E
 #define PID_GC_ADAPTER 0x337

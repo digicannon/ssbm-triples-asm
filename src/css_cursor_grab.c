@@ -10,6 +10,7 @@
 #define HANDICAP_RULE 2
 #define JOINT_CPUSLIDER 7
 #define JOINT_CPUSLIDER2 8
+
 #define ICON_HELD 0xD // What Melee leaves in sel_icon while a puck is out.
 #define REACH 9.0f // Squared.
 #define ROW_BOTTOM 0.2f
@@ -23,6 +24,8 @@
 #define HAND_TO_PUCK_DY -2.0f
 #define HAND_TO_KNOB_DX 2.9f
 #define HAND_TO_KNOB_DY -1.7f
+
+static u8 css_hands_held; // Bit per port, as of the last frame.
 
 // The puck think has already placed the joint from its own follow of the
 // wrong hand this frame, so the joint is moved too.

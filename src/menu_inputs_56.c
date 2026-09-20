@@ -8,6 +8,9 @@
 #define CSS_IN_SUBMENU 5
 #define MENU_NAME_ENTRY 0x12
 
+static ControllerMapEntry menu_inputs_56_ports[2];
+u32 css_name_entry_port; // Which of P5/P6 asked for name entry; the CSS sets it.
+
 // Sets `to` in each word holding any of `from`.
 static void map_any(ControllerMapEntry * e, u64 from, u64 to) {
     if (e->button & from) e->button |= to;
