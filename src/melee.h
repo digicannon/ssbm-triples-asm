@@ -90,7 +90,8 @@ typedef struct HSD_DObj {
 } HSD_DObj;
 
 typedef struct HSD_JObj {
-    u8 pad0[0x10];
+    u8 pad0[0xC];
+    struct HSD_JObj * parent;
     struct HSD_JObj * child;
     u32 flags;
     HSD_DObj * dobj;
@@ -434,6 +435,8 @@ void css_tag_think(HSD_GObj * gobj);
 void css_puck_think(HSD_GObj * gobj);
 void css_scene_think(HSD_GObj * gobj);
 void css_door_refresh(int slot);
+// Sets the mode banner for the match type and the teams rule, and refreshes the doors.
+void css_set_mode(int match_type);
 void css_pick_random_character(int slot, int arg1);
 // Sends the slot's puck back to its door's character; 1 if it has none.
 int css_return_puck(int slot);
@@ -445,6 +448,8 @@ void announce_character(u32 char_kind);
 void menu_sfx(int sound);
 int sfx_play(int sfx, int volume, int pan);
 int sfx_play_id(int sfx, int volume, int pan, int id);
+// Cuts playing sounds and swaps the scene's bank for the id's if it is not loaded.
+int sfx_play_with_bank(int sfx);
 // Puts gobj on other's GX layer and priority.
 void GObj_GXLinkLike(HSD_GObj * gobj, HSD_GObj * other);
 void HSD_AObjReqAnim();

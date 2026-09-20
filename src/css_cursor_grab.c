@@ -249,6 +249,8 @@ static void grab_think(int port) {
 }
 
 static void cursor_grab_think(HSD_GObj * gobj) {
+    if (css_pending_scene_change != 0) return;
+
     // Melee's hand think has already run, so a hand that dropped on this
     // A press looks free; it was holding last frame.
     u8 was_held = css_hands_held;

@@ -65,6 +65,8 @@ static void cycle_team(int port) {
 }
 
 static void door_buttons_think(HSD_GObj * gobj) {
+    if (css_pending_scene_change != 0) return;
+
     for (int port = 0; port < PORT_COUNT; ++port) {
         const PadStatus * pad = css_port_pad(port);
         if (pad->err != 0 || !(pad->trigger & PAD_BUTTON_A)) {
