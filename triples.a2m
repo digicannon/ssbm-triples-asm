@@ -295,6 +295,16 @@
 @file 017BFC asm/preload_overflow_fallback.asm
 @file 25FA9C asm/css_56_scene_anim.asm
 
+# --- Costumes ---
+# Allow duplicates.
+@asm 25DAA0 li r3, 0
+@asm 25DAA4 blr
+# mnCharSel_CostumeChange: don't skip duplicates.
+@asm 26019C nop
+@asm 26026C nop
+@c src/css_costume_suggest.c
+@file 25DCD4 asm/css_costume_suggest.asm
+
 # Remove the KO Stars rendering
 @set 25D22C 3BA00000
 

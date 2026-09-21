@@ -170,11 +170,7 @@ static void pick(int slot, int icon) {
 }
 
 static void pick_random(int slot) {
-    CSSDoor * d = &css_doors[slot];
     css_pick_random_character(slot, 0);
-    do {
-        d->costume = HSD_Randi(costume_count(css_icons[d->sel_icon].char_kind));
-    } while (css_duplicate_costume(slot));
     css_door_refresh(slot);
 }
 

@@ -368,6 +368,13 @@ CSSDoor * css_port_door(int port) {
     return (port < 4) ? &css_doors[port] : &css_56_blocks[port - 4]->doors[0];
 }
 
+const CSSDoor * css_get_door_for_port_swap_aware(int port) {
+    int swapped = css_56_swapped_port();
+    if (swapped < 0 || (port >= 4 && port != swapped)) return css_port_door(port);
+    if (port == swapped) return &css_doors[0];
+    return &css_56_blocks[swapped - 4]->doors[port];
+}
+
 CSSTagData * css_port_tag(int port) {
     return (port < 4) ? css_tags[port].data : &css_56_blocks[port - 4]->tag;
 }

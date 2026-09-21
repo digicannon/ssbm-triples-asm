@@ -13,6 +13,9 @@ bool css_56_cursor_holding();
 
 CSSCursorData * css_port_cursor(int port);
 CSSDoor * css_port_door(int port);
+// css_port_door that also works inside a swapped region, where slot 0 is
+// the swapped port's door and the real doors sit in its block.
+const CSSDoor * css_get_door_for_port_swap_aware(int port);
 CSSTagData * css_port_tag(int port);
 CSSCharModel * css_port_puck(int port);
 
