@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+typedef int8_t s8;
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -242,7 +243,10 @@ typedef struct Player {
     u8 slot_type;
     u8 stocks;
     u8 color;
-    u8 pad0[4];
+    u8 slot;
+    s8 spawn_pos;
+    s8 spawn_dir;
+    u8 sub_color; // The tint that tells duplicate fighters apart.
     u8 handicap;
     u8 team;
     u8 nametag; // 0x78 for none.
@@ -254,13 +258,21 @@ ASSERT_SIZE(Player, 0x24);
 ASSERT_OFFSET(Player, handicap, 8);
 ASSERT_OFFSET(Player, cpu_level, 0xF);
 
+#define GM_MAX_PLAYERS 6
+
+typedef struct StartMeleeData {
+    u8 pad0[8];
+    u8 is_teams;
+    u8 pad1[0x57];
+    Player players[GM_MAX_PLAYERS];
+} StartMeleeData;
+ASSERT_OFFSET(StartMeleeData, players, 0x60);
+
 typedef struct TextCanvas {
     struct TextCanvas * next;
     u8 pad0[6];
     u16 font;
 } TextCanvas;
-
-typedef int8_t s8;
 
 #define PAD_BUTTON_LEFT 0x0001
 #define PAD_BUTTON_RIGHT 0x0002

@@ -9,6 +9,9 @@
             "windows": {
                 "command": "$env:PATH += \\\";C:\\devkitPro\\devkitPPC\\bin\\\"; ..\\asm2memcard\\a2m --dolphin --clean --no-loader triples.a2m",
             },
+            "linux": {
+                "command": "./build_dolphin.sh",
+            },
             "problemMatcher": [],
             "group": {
                 "kind": "build",

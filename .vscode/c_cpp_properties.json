@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "name": "Triples",
+            "includePath": ["${workspaceFolder}/src"],
+            "forcedInclude": ["${workspaceFolder}/../asm2memcard/hook.h"],
+            "cStandard": "gnu23"
+        }
+    ],
+    "version": 4
+}

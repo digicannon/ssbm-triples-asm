@@ -317,6 +317,11 @@
 @file 16D978 asm/input_override_hold_a_for_sheik.asm
 @file 16BA0C asm/input_override_stock_steal.asm
 
+# Disable assertion on subcolor maximum.
+@asm 068A18 b .+0x28
+# Replace subcolor system.
+@c src/match_sub_colors.c
+
 # ==========
 # In game.
 # ==========
