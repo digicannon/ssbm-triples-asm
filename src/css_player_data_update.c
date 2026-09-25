@@ -13,3 +13,7 @@ void css_player_data_update() {
         if (players[i].slot_type != PKIND_CLOSED) match_init_flags |= HUD_SIX;
     }
 }
+
+HOOK(0x80263334,
+    "bl css_player_data_update\n"
+    "lwz r0, 0x34(r1)"); // Original code.

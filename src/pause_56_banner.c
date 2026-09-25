@@ -68,3 +68,12 @@ void pause_56_banner_label() {
     if (port < 4 || !pause_56_images) return;
     label_tobj(pause_data.background)->imagedesc = &pause_56_images->desc[port - 4];
 }
+
+HOOK(0x801A129C,
+    "mr r3, r28\n"
+    "bl pause_56_banner_load\n"
+    "li r0, 99"); // Original code.
+
+HOOK(0x801A10E8,
+    "bl pause_56_banner_label\n"
+    "lmw r26, 0x18(r1)"); // Original code.

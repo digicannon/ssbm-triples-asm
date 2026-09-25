@@ -21,3 +21,8 @@ void sss_56_input() {
         }
     }
 }
+
+// After mnStageSel_Scene_OnFrame's existing pad loop.
+HOOK(0x8025BA60,
+    "bl sss_56_input\n"
+    "lbz r3, -0x49F4(r13)"); // Original code.

@@ -251,9 +251,7 @@
 @c src/adapter_pads.c
 @file 377988 asm/convert_raw_input_for_usb.asm
 @c src/menu_inputs_56.c
-@file 1A3E74 asm/menu_inputs_56.asm
 @c src/sss_56_input.c
-@file 25BA60 asm/sss_56_input.asm
 @file 22BB14 asm/menu_camera_56.asm
 @file 06AF10 asm/inputs_to_player_analog.asm
 @file 06B028 asm/inputs_to_player.asm
@@ -277,23 +275,19 @@
 @c src/css_door_buttons.c
 @c src/css_cursor_grab.c
 @c src/css_rumble_toggle.c
-@file 2608D8 asm/css_rumble_toggle.asm
 @file 260548 asm/css_hand_respawn.asm
 @file 263968 asm/css_56_tag_taken_list.asm
 @file 263CC4 asm/css_56_tag_taken_pick.asm
 @set 1A3F9C 38603600 # Increase CSS text arena size.
 @file 266830 asm/css_load.asm
 
-@file 263334 asm/css_player_data_update.asm
 @file 263064 asm/css_56_start_count.asm
 @file 2630E8 asm/css_56_start_teams.asm
 @file 26312C asm/css_56_start_cursor_holding.asm
 @file 263250 asm/css_56_start_trigger.asm
 @c src/css_56_start_rumble.c
-@file 263328 asm/css_56_start_rumble.asm
 @file 266BB4 asm/css_preload_p5_p6.asm
 @file 017BFC asm/preload_overflow_fallback.asm
-@file 25FA9C asm/css_56_scene_anim.asm
 
 # --- Costumes ---
 # Allow duplicates.
@@ -303,7 +297,6 @@
 @asm 26019C nop
 @asm 26026C nop
 @c src/css_costume_suggest.c
-@file 25DCD4 asm/css_costume_suggest.asm
 
 # Remove the KO Stars rendering
 @set 25D22C 3BA00000
@@ -350,8 +343,6 @@
 @texture pause_digit_5_jp I4 assets/pause_digit_5_jp.png
 @texture pause_digit_6_jp I4 assets/pause_digit_6_jp.png
 @c src/pause_56_banner.c
-@file 1A129C asm/pause_56_banner_load.asm
-@file 1A10E8 asm/pause_56_banner_label.asm
 @file 1A0E7C asm/pause_56_stick.asm
 
 @file 2F6690 asm/transparent_hud.asm
@@ -367,12 +358,8 @@
 @texture indicator_6_jp IA4 assets/indicator_6_jp.png
 @c src/indicator_56.c
 @file 2FC9EC asm/indicator_56_frame.asm
-@file 2FD274 asm/indicator_56_label.asm
-@file 2FD3EC asm/indicator_56_recolor.asm
 @c src/hud_56_franchise_symbol.c
-@file 2F64F0 asm/hud_56_franchise_symbol_color.asm
 @c src/shield_and_blastzone_colors_56.c
-@file 0364BC asm/shield_and_blastzone_colors_56_index.asm
 
 # Taken from Slippi, this code hides nametags when invisible from a Zelda/Sheik/Mewtwo up-B.
 # It also overrides our "always show player indicator" code.

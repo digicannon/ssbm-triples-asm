@@ -33,3 +33,8 @@ void css_costume_suggest(int slot) {
         }
     }
 }
+
+HOOK(0x8025DCD4,
+    "mr r3, r31\n"
+    "bl css_costume_suggest\n"
+    "lbz r0, -0x49AA(r13)"); // Original code.

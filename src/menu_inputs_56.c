@@ -101,3 +101,8 @@ void menu_inputs_56() {
         merge(any, &menu_inputs_56_ports[i]);
     }
 }
+
+// End of gm_EvaluateAllControllerInputs.
+HOOK(0x801A3E74,
+    "bl menu_inputs_56\n"
+    "lwz r0, 0x4C(r1)"); // Original code.

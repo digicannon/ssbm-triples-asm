@@ -11,3 +11,6 @@ void css_56_start_rumble() {
         }
     }
 }
+
+HOOK_TO(0x80263328, 0x80263334,
+    "bl css_56_start_rumble");

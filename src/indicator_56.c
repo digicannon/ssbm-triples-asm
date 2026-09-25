@@ -77,3 +77,21 @@ void indicator_56_label(HSD_JObj * root, int slot) {
     tobj->imagetbl = images;
     tobj->imagedesc = label;
 }
+
+HOOK(0x802FD274,
+    "cmpwi r27, 4\n"
+    "blt label_done\n"
+    "mr r3, r28\n"
+    "mr r4, r27\n"
+    "bl indicator_56_label\n"
+"label_done:\n"
+    "lmw r25, 0x2C(r1)"); // Original code.
+
+HOOK(0x802FD3EC,
+    "cmpwi r29, 4\n"
+    "blt recolor_done\n"
+    "mr r3, r30\n"
+    "mr r4, r29\n"
+    "bl indicator_56_recolor\n"
+"recolor_done:\n"
+    "lmw r27, 0x34(r1)"); // Original code.

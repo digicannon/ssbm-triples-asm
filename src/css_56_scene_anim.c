@@ -13,13 +13,21 @@ static void show_box(HSD_JObj * root, int box, int slot) {
 
 void css_56_scene_anim(HSD_JObj * root) {
     int port = css_56_swapped_port();
-    if (port >= 0) {
-        show_box(root, port, 0);
-        return;
-    }
 
-    for (int i = 0; i < 4; ++i) {
-        show_box(root, i, i);
+    if (port < 0) {
+        // No swap, vanilla path.
+
+        for (int i = 0; i < 4; ++i) {
+            show_box(root, i, i);
+        }
+
+        // This should only be called once per frame,
+        // we're taking advantage of this "no swap" path
+        // only happening once to do so.
+        HSD_JObjAnimAll(root);
+    } else {
+        show_box(root, port, 0);
     }
-    HSD_JObjAnimAll(root);
 }
+
+HOOK(0x8025FA9C, "bl css_56_scene_anim");

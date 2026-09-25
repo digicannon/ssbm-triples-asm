@@ -39,3 +39,16 @@ int shield_and_blastzone_colors_56_index(int slot, int index) {
         return EXISTING_ENTRIES + slot - 4;
     }
 }
+
+// The entry of Player_SetUnk45, which stores a slot's color index.
+HOOK(0x800364BC,
+    "mflr r0\n" // Original code.
+    "stw r0, 4(r1)\n"
+    "stwu r1, -0x10(r1)\n"
+    "stw r3, 8(r1)\n" // The slot.
+    "bl shield_and_blastzone_colors_56_index\n"
+    "mr r4, r3\n" // Replace the caller's second argument with our return value.
+    "lwz r3, 8(r1)\n" // Reload caller's first argument.
+    "addi r1, r1, 0x10\n"
+    "lwz r0, 4(r1)\n"
+    "mtlr r0");

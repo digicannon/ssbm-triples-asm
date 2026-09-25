@@ -46,3 +46,11 @@ void css_rumble_toggle(CSSCursorData * cursor, u32 triggered) {
         }
     }
 }
+
+// mnCharSel_CursorThink, once the hand is clamped on screen.  r28 holds the
+// port's triggered buttons.
+HOOK(0x802608D8,
+    "mr r3, r31\n"
+    "mr r4, r28\n"
+    "bl css_rumble_toggle\n"
+    "lbz r4, 4(r31)"); // Original code.
