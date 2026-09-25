@@ -41,7 +41,7 @@
 @set 3D4A60 FF000000 # No Items [Magus]
 
 @set 3D4A70 00000000 # Disable rumble for all. [Project Slippi]
-@set 45C384 00000100 # Deflicker off! Stop making your TV blurry AF.
+#@set 45C384 00000100 # Deflicker off! Stop making your TV blurry AF.
 
 # Unlock everything. [Datel]
 @set 15EE98 38600001
@@ -264,6 +264,10 @@
 
 @texture css_label_5 IA4 assets/css_label_5.png
 @texture css_label_6 IA4 assets/css_label_6.png
+@texture css_door_label_5_us I4 assets/css_door_label_5_us.png
+@texture css_door_label_6_us I4 assets/css_door_label_6_us.png
+@texture css_door_label_5_jp I4 assets/css_door_label_5_jp.png
+@texture css_door_label_6_jp I4 assets/css_door_label_6_jp.png
 @c src/css.c
 @c src/css_rescale_doors.c
 @c src/css_door_text.c

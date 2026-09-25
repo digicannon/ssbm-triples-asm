@@ -21,7 +21,11 @@
 #define CARD_LIST 20
 #define CARD_NAME 21
 #define CARD_DOOR 22
-#define CARD_INDICATOR 30
+#define CARD_INDICATOR 30 // Its third DObj is the door's player label.
+
+// The label's texture anim images: player, CP, blank.
+#define LABEL_IMAGES 3
+#define LABEL_PLAYER 0
 
 // Door 0's top-level joints in the VS scene with their group parents:
 // background, emblem, costume, team, name plate and sliders, KO star dots,
@@ -35,6 +39,16 @@ static const u8 door_pieces[][2] = {
 // CSSDoor joints, then CSSTag joints, in the graft.
 static const u8 door_graft_ids[9] = {CARD_EMBLEM, CARD_COSTUME, CARD_TEAM, CARD_DOOR, CARD_BG, CARD_INDICATOR, 5, CARD_CPUSLIDER, CARD_CPUSLIDER2};
 static const u8 tag_graft_ids[5] = {CARD_NAMETAG_WINDOW, CARD_LIST, CARD_NAME, 19, 18};
+
+extern const u8 css_door_label_5_us[];
+extern const u8 css_door_label_6_us[];
+extern const u8 css_door_label_5_jp[];
+extern const u8 css_door_label_6_jp[];
+
+static const HSD_ImageDesc labels[2][2] = {
+    {{(u8 *)css_door_label_5_jp, 56, 16, GX_TF_I4}, {(u8 *)css_door_label_6_jp, 56, 16, GX_TF_I4}},
+    {{(u8 *)css_door_label_5_us, 56, 16, GX_TF_I4}, {(u8 *)css_door_label_6_us, 56, 16, GX_TF_I4}},
+};
 
 static void * copy_chain(const void * node, int kind);
 
@@ -114,6 +128,14 @@ HSD_JObj * css_56_card_create(int port, CSSTagData * tag) {
     free_tree(joint_tree, KIND_JOINT);
     free_tree(anim_tree, KIND_ANIM);
     free_tree(matanim_tree, KIND_MATANIM);
+
+    // The image table is door 0's, so the port's label goes in a copy.
+    HSD_TObj * label = css_child(card, CARD_INDICATOR)->dobj->next->next->mobj->tobj;
+    HSD_ImageDesc ** images = HSD_MemAlloc(LABEL_IMAGES * sizeof(*images));
+    memcpy(images, label->imagetbl, LABEL_IMAGES * sizeof(*images));
+    images[LABEL_PLAYER] = (HSD_ImageDesc *)&labels[lbLang_IsSavedLanguageUS()][port - 4];
+    if (label->imagedesc == label->imagetbl[LABEL_PLAYER]) label->imagedesc = images[LABEL_PLAYER];
+    label->imagetbl = images;
 
     // Squeezed like the vanilla doors and placed CSS_DOOR_PITCH * port
     // right of where door 0 ended up.
