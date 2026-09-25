@@ -1,5 +1,5 @@
 # ====================
-#  Insert at 8006AF10
+#  Insert at 8006AF0C
 # ====================
 
 .include "triples.s"
@@ -42,13 +42,11 @@
     stw r3, 0x63C(player_data)
 
     # Trigger.  The greater side is used.
-    lwz r3, 0x30(r4)
-    lwz r0, 0x34(r4)
-    cmplw 0, r0, r3
-    ble store_trigger
-    mr r3, r0
-store_trigger:
-    stw r3, 0x650(player_data)
+    lfs f0, 0x30(r4)
+    lfs f1, 0x34(r4)
+    fcmpo cr0, f1, f0
+    ble return
+    fmr f0, f1
 
 return:
-    lfs f1, 0x620(player_data) # Original code.
+    stfs f0, 0x650(player_data) # Original code.

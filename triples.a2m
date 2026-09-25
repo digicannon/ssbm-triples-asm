@@ -253,7 +253,7 @@
 @c src/menu_inputs_56.c
 @c src/sss_56_input.c
 @file 22BB14 asm/menu_camera_56.asm
-@file 06AF10 asm/inputs_to_player_analog.asm
+@file 06AF0C asm/inputs_to_player_analog.asm
 @file 06B028 asm/inputs_to_player.asm
 
 # ==========
