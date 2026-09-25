@@ -262,8 +262,8 @@
 
 @file 2662D0 asm/css_version_text.asm
 
-@texture css_digit_5 IA4 assets/css_digit_5.png
-@texture css_digit_6 IA4 assets/css_digit_6.png
+@texture css_label_5 IA4 assets/css_label_5.png
+@texture css_label_6 IA4 assets/css_label_6.png
 @c src/css.c
 @c src/css_rescale_doors.c
 @c src/css_door_text.c

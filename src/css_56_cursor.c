@@ -6,22 +6,18 @@
 #include "css_56_card.h"
 #include "triples.h"
 
-// assets/css_digit_*.png, 16x24 IA4.
-extern const u8 css_digit_5[];
-extern const u8 css_digit_6[];
-
-// The label: 32x24 IA4 in 8x4 tiles.
-#define TILE_W 8
-#define TILE_H 4
-#define TILE (TILE_W * TILE_H)
-#define LABEL_TILE_COLUMNS 4
-#define LABEL_TILE_ROWS 6
-#define LABEL_SIZE (LABEL_TILE_COLUMNS * LABEL_TILE_ROWS * TILE)
+extern const u8 css_label_5[];
+extern const u8 css_label_6[];
 #define PENDING_NAME_ENTRY 4 // css_pending_scene_change.
 
 // Hand and puck frames: row = the vanilla P1..P4 label (set_label replaces
 // it), column = red/blue/yellow/green.
 static const u8 hand_frames[2] = {2, 7};
+
+static const HSD_ImageDesc labels[2] = {
+    {(u8 *)css_label_5, 32, 24, GX_TF_IA4},
+    {(u8 *)css_label_6, 32, 24, GX_TF_IA4},
+};
 
 // Per port, HSD_MemAlloc'd and owned by the hand GObj.  The vanilla structs
 // sit first so the hand's user data is its CSSCursorData and the puck's is
@@ -42,8 +38,6 @@ typedef struct PortBlock {
     // port's hand and puck, and the other way round while swapped in.
     CSSCursorData * hand_slot;
     CSSCharModel * puck_slot;
-    HSD_ImageDesc label_desc;
-    u8 label[LABEL_SIZE] __attribute__((aligned(32)));
 } PortBlock;
 ASSERT_OFFSET(PortBlock, cursor, 0);
 
@@ -82,39 +76,10 @@ static void setup_model(HSD_GObj * gobj, HSD_JObj * jobj, const CSSAnim * anim, 
     HSD_ForeachAnim(jobj, HSD_TYPE_JOBJ, ALL_TYPE_MASK, HSD_AObjStopAnim, HSD_TYPE_JOBJ, 0, 0);
 }
 
-// Our label: the loaded P1 image with the digit half replaced from the
-// asset: tile columns 2-3 in English, 0-1 in Japanese.  The "P" reaches one
-// pixel into that half, so the boundary column (the half's first in
-// English, last in Japanese) keeps P1's pixels.
-static void make_label(PortBlock * bk, const HSD_ImageDesc * p1) {
-    memcpy(bk->label, p1->image_ptr, LABEL_SIZE);
-
-    bool us = lbLang_IsSavedLanguageUS();
-    const u8 * digit = bk->port == 4 ? css_digit_5 : css_digit_6;
-    int column = us ? 2 : 0;
-    for (int r = 0; r < LABEL_TILE_ROWS; ++r) {
-        for (int y = 0; y < TILE_H; ++y) {
-            u8 * dst = bk->label + (r * LABEL_TILE_COLUMNS + column) * TILE + y * TILE_W;
-            const u8 * src = digit + r * 2 * TILE + y * TILE_W;
-            if (us) {
-                memcpy(dst + 1, src + 1, TILE_W - 1);
-                memcpy(dst + TILE, src + TILE, TILE_W);
-            } else {
-                memcpy(dst, src, TILE_W);
-                memcpy(dst + TILE, src + TILE, TILE_W - 1);
-            }
-        }
-    }
-
-    bk->label_desc = *p1;
-    bk->label_desc.image_ptr = bk->label;
-    DCFlushRange(bk->label, LABEL_SIZE);
-}
-
 // Points a label joint's texture at ours; the vanilla's anim puts P1 back
 // whenever it re-requests the frame.
 static void set_label(PortBlock * bk, HSD_JObj * joint) {
-    label_tobj(joint)->imagedesc = &bk->label_desc;
+    label_tobj(joint)->imagedesc = (HSD_ImageDesc *)&labels[bk->port - 4];
 }
 
 // Requests the frame on the child and re-animates that subtree only, so
@@ -336,9 +301,6 @@ static void create_port(int port) {
     const CSSAnim * puck_anim = &css_anim_table[ANIM_PUCK];
     HSD_JObj * puck_jobj = HSD_JObjLoadJoint(puck_anim->desc[0]);
     setup_model(puck, puck_jobj, puck_anim, 2);
-    // The hand and puck share one set of label textures, P1-P4 and CP; the
-    // puck's label (joint 4) shows P1 at frame 0.
-    make_label(bk, label_tobj(css_child(puck_jobj, 4))->imagedesc);
     GObj_AddProc(puck, puck_think, 2);
     GObj_AddUserData(puck, 4, noop, &bk->puck);
 
