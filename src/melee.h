@@ -398,6 +398,21 @@ typedef struct PauseData {
 } PauseData;
 ASSERT_OFFSET(PauseData, slot, 0x14);
 
+// One player's standing on the results screen.
+typedef struct ResultsPlayer {
+    u8 player_type; // 1 is a CPU, 3 is empty.
+    u8 char_external_id;
+    u8 char_internal_id;
+    u8 costume_id; // Shares the byte with the rumble and stamina flags.
+    u8 nametag; // 0x78 for none.
+    u8 placement; // 0 is 1st.
+    u8 sub_placement;
+    u8 team;
+    u8 pad0[0xA0];
+} ResultsPlayer;
+ASSERT_SIZE(ResultsPlayer, 0xA8);
+ASSERT_OFFSET(ResultsPlayer, team, 7);
+
 void * memset(void * dst, int value, size_t size);
 void * memcpy(void * dst, const void * src, size_t size);
 
@@ -506,6 +521,7 @@ extern u8 * ft_blastzone_colors;
 extern u8 menu_cur_menu;
 extern TextCanvas * text_canvases;
 extern PauseData pause_data;
+extern ResultsPlayer results_players[GM_MAX_PLAYERS];
 extern const u16 mn_rumble_test_effect[2]; // The Options menu's one-shot buzz.
 
 #endif

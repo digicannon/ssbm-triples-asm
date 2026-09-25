@@ -103,3 +103,4 @@ controller_map = 0x80479C30;
 text_canvases = 0x804D797C; /* HSD_SisLib_804D797C */
 
 pause_data = 0x80479B10; /* lbl_80479B10 */
+results_players = 0x80479DFC;

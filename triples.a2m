@@ -368,7 +368,7 @@
 @file 030E44 asm/disable_screen_shake.asm
 
 # On-exit (quit out or Game!) results screen patch.
-@file 16EBA8 asm/fix_results_screen.asm
+@c src/fix_results_screen.c
 @file 177B48 asm/results_56_continue.asm
 @file 17858C asm/results_56_exit.asm
 
