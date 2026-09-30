@@ -4,6 +4,7 @@
 
 #include "css.h"
 #include "css_56_card.h"
+#include "mex.h"
 #include "triples.h"
 
 extern const u8 css_label_5[];
@@ -201,12 +202,17 @@ static void card_think(HSD_GObj * gobj) {
     PortBlock * bk = gobj->user_data;
     // The scene proc also counts down the icon flash timers and resets the
     // icon on the tree it was given; leave that to the real scene proc.
-    u8 timers[ICON_COUNT];
-    for (int i = 0; i < ICON_COUNT; ++i) timers[i] = css_icons[i].anim_timer;
+    CSSIcon * icons = css_icon_table();
+    int count = css_icon_count();
+    if (count > ICON_MAX) {
+        count = ICON_MAX;
+    }
+    u8 timers[ICON_MAX];
+    for (int i = 0; i < count; ++i) timers[i] = icons[i].anim_timer;
     swap_in(bk);
     css_scene_think(&bk->stub);
     swap_out(bk);
-    for (int i = 0; i < ICON_COUNT; ++i) css_icons[i].anim_timer = timers[i];
+    for (int i = 0; i < count; ++i) icons[i].anim_timer = timers[i];
     if (!css_is_teams && bk->doors[0].p_kind == PKIND_HUMAN) css_56_card_set_color(bk->root, port_color(bk));
 }
 
@@ -247,7 +253,7 @@ static void create_port(int port) {
     for (int i = 0; i < 4; ++i) {
         CSSDoor * door = &bk->doors[i];
         door->p_kind = door->p_kind_prev = PKIND_CLOSED;
-        door->sel_icon = door->sel_icon_prev = ICON_NONE;
+        door->sel_icon = door->sel_icon_prev = css_icon_count();
         door->dooranim_timer = door->slideranim_timer = 0;
         // No button can be hit: their pieces are the real doors'.
         door->bounds[0] = door->bounds[2] = FLT_MAX;
@@ -265,11 +271,12 @@ static void create_port(int port) {
     // for its four slots.
     if (player->cpu_level == 0) player->cpu_level = 1;
 
-    for (int i = 0; i < ICON_COUNT; ++i) {
-        if (css_icons[i].char_kind != player->ckind) continue;
+    const CSSIcon * icons = css_icon_table();
+    for (int i = 0; i < css_icon_count(); ++i) {
+        if (icons[i].char_kind != player->ckind) continue;
         bk->doors[0].sel_icon = bk->doors[0].sel_icon_prev = i;
-        bk->puck.x = bk->puck.x10 = css_icons[i].bound_l + 3.4f;
-        bk->puck.y = bk->puck.x14 = css_icons[i].bound_u - 3.0f;
+        bk->puck.x = bk->puck.x10 = icons[i].bound_l + 3.4f;
+        bk->puck.y = bk->puck.x14 = icons[i].bound_u - 3.0f;
         break;
     }
 

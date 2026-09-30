@@ -2,6 +2,7 @@
 
 #include "css.h"
 #include "css_door_text.h"
+#include "mex.h"
 
 #define PLATE_JOINT 0x3D // Door 0's name plate: skinned, six joints.
 #define PLATE_JOINTS 6
@@ -122,6 +123,7 @@ HSD_JObj * css_56_card_create(int port, CSSTagData * tag) {
     HSD_JObjResolveRefsAll(card, joint_tree);
     bind_plate(css_scene_root, PLATE_JOINT);
     HSD_JObjAddAnimAll(card, anim_tree, matanim_tree, NULL);
+    mex_add_door_anims(css_child(card, CARD_COSTUME), css_child(card, CARD_EMBLEM));
     HSD_JObjReqAnimAll(card, 0.0f);
     HSD_JObjAnimAll(card);
     HSD_ForeachAnim(card, HSD_TYPE_JOBJ, ALL_TYPE_MASK, HSD_AObjStopAnim, HSD_TYPE_JOBJ, 0, 0);

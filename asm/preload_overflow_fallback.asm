@@ -14,7 +14,8 @@
 .set lbDvd_DropEntry, 0x800174E8
 .set lbDvd_CacheNext, 0x80017CC4
 .set lbHeap_Alloc, 0x80015BD0
-.set heap_array, 0x80431FA0 + 0x10
+.set lbHeap_data, 0x80431FA0
+.set heap_array, 0x10
 .set heap_size, 0x1C
 .set epilogue, 0x80017CB0
 .set slack, 0x100 # HSD_Archive plus alignment.
@@ -25,12 +26,16 @@
     cmpwi r29, 4
     blt alloc
     mulli r0, r29, heap_size
-    load r5, heap_array
+    test_mex r5
+    load r5, lbHeap_data
+    beq heaps
+    loadwz r5, mex_heap_data
+heaps:
     add r5, r5, r0
-    lwz r0, 0x10(r5)
+    lwz r0, heap_array + 0x10(r5)
     cmpwi r0, 0
     beq alloc # HSD heap, no handle to query.
-    lwz r3, 4(r5)
+    lwz r3, heap_array + 4(r5)
     branchl r12, lbMemory_FreeBytes
     addi r0, r30, slack
     cmplw r3, r0

@@ -1,6 +1,8 @@
 @title Triples Dat
 
 @symbols src/melee.ld
+@symbols src/mex.ld
+@c src/mex.c
 @symbols src/triples.ld
 @c src/triples.c
 
@@ -68,7 +70,10 @@
 @file 1AF6F4 asm/skip_memcard_prompt.asm
 
 # Prevent data re-initialization on reset.
-@set 1A4234 60000000
+@file 15FBA4 asm/reboot_skip_data_init.asm
+
+# Boot to CSS.  m-ex compatible.
+@asm 1BFA20 li r3, 2
 
 # Widescreen support.
 # These are the C2 codes that Nintendont can't write on its own.
@@ -138,45 +143,10 @@
 
 @file 2608B0 asm/css_hand_right_limit.asm
 
-# "RANDOM" is Default Highlighted on Stage Select Screen (1.02) [Jorgasms]
-@set 25AA10 38E0001D
-
 # Hold L+R+A+Start During Stage Load to Return to the CSS (1.02) [Jorgasms]
 @set 25B8BC 38600002
 
-# Stage striking [Sham Rock, Dan Salvato]
-@branch  259C40
-39600000 3D408045
-614AC388 38600000
-3C80803F 608406D0
-28000013 4082000C
-39600001 48000010
-28000000 408200C0
-48000034 2C03001D
-408000B4 2C0B0002
-4182004C 1CA3001C
-7CA52214 88C5000A
-80AA0000 7CA53430
-54A507FF 40820088
-4800002C 806DB600
-5460056B 4082001C
-546006F7 40820008
-48000074 39600002
-38600000 4BFFFFB0
-886DB60E 2C03001D
-4080005C 1CA3001C
-7CA52214 38C00000
-2C0B0002 40820008
-38C00002 98C50008
-80A50000 2C030016
-41800008 80A50010
-3CC04400 2C0B0002
-40820008 38C00000
-90C50038 38C0001E
-98CDB60E 2C0B0000
-4182000C 38630001
-4BFFFF4C 800DB604
-28000000
+@file 259C40 asm/stage_striking.asm
 
 # Unrestricted pause camera [Dan Salvato]
 @set 02CF64 60000000
@@ -308,6 +278,8 @@
 # ==========
 # Stage select / match load.
 # ==========
+
+@file 25AA10 asm/sss_random_highlight.asm
 
 @file 259F00 asm/stage_select_color.asm
 

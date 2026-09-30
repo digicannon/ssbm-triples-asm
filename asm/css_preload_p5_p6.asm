@@ -15,11 +15,15 @@
     addi r5, r3, 0x30
     load r6, players + (player_size * 4)
     li r7, 2
+    test_mex r8
+    li r8, CHKIND_NONE
+    beq loop
+    loadwz r8, mex_ext_count
 loop:
     # slot_type: 0=HMN, 1=CPU, 3=NONE.
     lbz r4, 1(r6)
     cmplwi r4, 1
-    li r3, CHKIND_NONE
+    mr r3, r8
     bgt store
     lbz r3, 0(r6)
     extsb r3, r3

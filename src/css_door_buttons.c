@@ -1,5 +1,6 @@
 #include "css.h"
 #include "css_56_cursor.h"
+#include "mex.h"
 
 #define TOGGLE_TOP 0.2f
 #define TOGGLE_BOTTOM -4.6f
@@ -46,7 +47,7 @@ static void cycle_kind(int port, int door_idx) {
         players[door_idx].nametag = NAMETAG_NONE;
         css_port_tag(door_idx)->use_tag = 0;
         // Melee only checks the flag; a door that lost its pick would stay empty.
-        bool unpicked = !door->selected_since_load || door->sel_icon >= ICON_NONE;
+        bool unpicked = !door->selected_since_load || door->sel_icon >= css_icon_count();
         if (unpicked && port != door_idx) {
             pick_rand_char = true;
         }

@@ -9,11 +9,15 @@
 .include "common.s"
 
 .set sorted_banks, 0x80433B44
-.set bank_sizes, 0x803BC4E4 # u32[56][2], size at [i][0].
 .set lbAudioAx_SortBanks, 0x80023254
 
+    test_mex r4
     load r4, sorted_banks
-    load r5, bank_sizes
+    beq sizes
+    loadwz r4, mex_audio
+    lwz r4, 0x14(r4) # m-ex's sorted list.
+sizes:
+    addi r5, r31, 0x11E4 # u32[][2] bank sizes; m-ex rebases r31 onto its own.
     lwz r8, -0x525C(r13) # lbl_804D6444, character bank total.
     lwz r0, 0x10(r4)
     slwi r0, r0, 3

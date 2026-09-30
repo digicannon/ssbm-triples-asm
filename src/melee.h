@@ -90,6 +90,13 @@ typedef struct HSD_DObj {
     HSD_PObj * pobj;
 } HSD_DObj;
 
+typedef struct HSD_MatAnimJoint {
+    struct HSD_MatAnimJoint * child;
+    struct HSD_MatAnimJoint * next;
+    void * matanim;
+} HSD_MatAnimJoint;
+ASSERT_SIZE(HSD_MatAnimJoint, 0xC);
+
 typedef struct HSD_JObj {
     u8 pad0[0xC];
     struct HSD_JObj * parent;
@@ -426,6 +433,12 @@ void GObj_SetupGXLink(HSD_GObj * gobj, void (*callback)(HSD_GObj *, int), int li
 void HSD_GObj_JObjCallback(HSD_GObj * gobj, int pass);
 HSD_JObj * HSD_JObjLoadJoint(HSD_JObjDesc * desc);
 void HSD_JObjAddAnimAll(HSD_JObj * jobj, void * anim, void * matanim, void * shapeanim);
+void HSD_DObjAddAnimAll(HSD_DObj * dobj, void * matanim, void * shapeanim);
+void * HSD_ArchiveGetPublicAddress(void * archive, const char * symbol);
+// lbDvd_8001819C.  A preloaded file's archive by its name without extension.
+void * lbDvd_GetArchiveByName(const char * name);
+// The game mode table; m-ex swaps in its own, with a longer entry.
+void * gm_GetAllGameModes();
 void HSD_JObjReqAnim(HSD_JObj * jobj, f32 frame);
 void HSD_JObjReqAnimAll(HSD_JObj * jobj, f32 frame);
 void HSD_JObjAnimAll(HSD_JObj * jobj);

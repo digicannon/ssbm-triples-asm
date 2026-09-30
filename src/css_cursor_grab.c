@@ -1,5 +1,6 @@
 #include "css.h"
 #include "css_56_cursor.h"
+#include "mex.h"
 
 #define HELD_BASE 12 // Then kind * PORT_COUNT + door.
 #define HOLD_PUCK 0
@@ -50,8 +51,9 @@ static bool over_random_button(const CSSCharModel * puck) {
 }
 
 static bool all_icons_shown() {
-    for (int i = 0; i < ICON_COUNT; ++i) {
-        if (css_icons[i].state < 2) return false;
+    const CSSIcon * icons = css_icon_table();
+    for (int i = 0; i < css_icon_count(); ++i) {
+        if (icons[i].state < 2) return false;
     }
     return true;
 }
@@ -151,22 +153,23 @@ static void slide(int port, int door, int kind) {
 }
 
 static int icon_under(const CSSCharModel * puck) {
-    for (int i = 0; i < ICON_COUNT; ++i) {
-        if (over_icon(puck, &css_icons[i])) return i;
+    const CSSIcon * icons = css_icon_table();
+    for (int i = 0; i < css_icon_count(); ++i) {
+        if (over_icon(puck, &icons[i])) return i;
     }
     return -1;
 }
 
 static void pick(int slot, int icon) {
-    players[slot].ckind = css_icons[icon].char_kind;
-    HSD_ForeachAnim(css_child(css_scene_root, css_icons[icon].joint_id_vs), HSD_TYPE_JOBJ, TOBJ_MASK,
-                    HSD_AObjReqAnim, AOBJ_ARG_AF, 10.0);
-    css_icons[icon].anim_timer = 0xC;
+    CSSIcon * icons = css_icon_table();
+    players[slot].ckind = icons[icon].char_kind;
+    HSD_ForeachAnim(css_icon_joint(icon), HSD_TYPE_JOBJ, TOBJ_MASK, HSD_AObjReqAnim, AOBJ_ARG_AF, 10.0);
+    icons[icon].anim_timer = 0xC;
     css_pucks[slot]->x5 = 0;
     GObj_GXLinkLike(css_pucks[slot]->gobj, css_hands[3]->gobj);
     css_doors[slot].selected_since_load = 1;
-    sfx_play_id(css_icons[icon].sfx, 0x7F, 0x40, icon + ANNOUNCE_ID);
-    announce_character(css_icons[icon].char_kind);
+    sfx_play_id(icons[icon].sfx, 0x7F, 0x40, icon + ANNOUNCE_ID);
+    announce_character(icons[icon].char_kind);
 }
 
 static void pick_random(int slot) {
@@ -190,7 +193,7 @@ static void hold_puck(int port, int door) {
     } else {
         css_door_portrait(slot, 0, true);
         if (!css_tags[slot].data->use_tag) css_tags[slot].data->text->hidden = 1;
-        d->sel_icon_prev = ICON_NONE;
+        d->sel_icon_prev = css_icon_count();
     }
 
     bool picked = false;
@@ -200,11 +203,11 @@ static void hold_puck(int port, int door) {
         if (hand->y < ROW_BOTTOM) sfx_play(SFX_DROP, 0x7F, 0x40);
     } else if (!(trigger & PAD_BUTTON_A)) {
         css_costume_change(slot, trigger);
-    } else if (over_random_button(puck) && all_icons_shown()) {
-        pick_random(slot);
-        picked = true;
     } else if (icon >= 0) {
         pick(slot, icon);
+        picked = true;
+    } else if (css_miss_picks_random() || (over_random_button(puck) && all_icons_shown())) {
+        pick_random(slot);
         picked = true;
     } else {
         menu_sfx(SFX_DENY);
@@ -231,7 +234,7 @@ static void grab_think(int port) {
         if (css_port_sees(port, door)) continue;
         const CSSDoor * d = css_port_door(door);
         const CSSCharModel * puck = css_port_puck(door);
-        if (d->p_kind != PKIND_CPU || d->sel_icon >= ICON_NONE || puck->x5 != 0) continue;
+        if (d->p_kind != PKIND_CPU || d->sel_icon >= css_icon_count() || puck->x5 != 0) continue;
         // Melee's reach test, offset to the puck's grip.
         f32 dx = 3.8f + (hand->x - puck->x);
         f32 dy = -2.6f + (hand->y - puck->y);

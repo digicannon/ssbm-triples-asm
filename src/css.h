@@ -29,6 +29,8 @@ extern const NodeKind css_node_kinds[3];
 #define CHILD(node, kind) (*(void **)((u8 *)(node) + css_node_kinds[kind].child))
 #define NEXT(node, kind) (*(void **)((u8 *)(node) + css_node_kinds[kind].next))
 
+#define ICON_MAX 0x80 // More than any icon count, m-ex's included.
+
 void css_hand_warp_to_spawn(CSSCursorData * cursor, int port);
 
 HSD_JObj * css_child(HSD_JObj * root, int index);

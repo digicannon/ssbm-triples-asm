@@ -35,6 +35,15 @@ ori \reg, \reg, \address @l
 lbz \reg, 0(\reg)
 .endm
 
+# Sets cr0 ne under m-ex (github.com/akaneia/m-ex), which hooks the CSS's
+# archive load, lwz r3, -0x49D0(r13).  Keep in step with mex_is_loaded() in
+# src/mex.h.
+.macro test_mex reg
+loadwz \reg, 0x80266984
+xoris \reg, \reg, 0x806D
+cmplwi \reg, 0xB630
+.endm
+
 # This is where the free space in our stack frame starts
 .set BKP_FREE_SPACE_OFFSET, 8
 

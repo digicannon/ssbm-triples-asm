@@ -1,11 +1,13 @@
+#include "css.h"
 #include "css_56_cursor.h"
+#include "mex.h"
 
 #define MAX_UNIQUE_COSTUMES 6
 
 void css_costume_suggest(int slot) {
     CSSDoor * door = &css_doors[slot];
 
-    if (css_door_count != 4 || door->sel_icon >= ICON_NONE) {
+    if (css_door_count != 4 || door->sel_icon >= css_icon_count()) {
         return;
     }
 
@@ -25,7 +27,7 @@ void css_costume_suggest(int slot) {
         }
     }
 
-    int count = costume_count(css_icons[door->sel_icon].char_kind);
+    int count = costume_count(css_icon_table()[door->sel_icon].char_kind);
     door->costume = 0;
     for (int i = 1; i < count; ++i) {
         if (taken[i] < taken[door->costume]) {
