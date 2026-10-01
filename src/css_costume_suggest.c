@@ -27,7 +27,7 @@ void css_costume_suggest(int slot) {
         }
     }
 
-    int count = costume_count(css_icon_table()[door->sel_icon].char_kind);
+    int count = gm_GetNumCostumesForCKind(css_icon_table()[door->sel_icon].char_kind);
     door->costume = 0;
     for (int i = 1; i < count; ++i) {
         if (taken[i] < taken[door->costume]) {

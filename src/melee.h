@@ -483,7 +483,7 @@ int css_return_puck(int slot);
 void css_door_portrait(int slot, int frame, bool hidden);
 void css_costume_change(int slot, u32 input);
 bool css_duplicate_costume(int slot);
-int costume_count(u32 char_kind);
+int gm_GetNumCostumesForCKind(u32 char_kind);
 void announce_character(u32 char_kind);
 void menu_sfx(int sound);
 int sfx_play(int sfx, int volume, int pan);
@@ -502,7 +502,7 @@ int HSD_Randi(int max);
 #define ALL_TYPE_MASK 0xFFFF
 #define HSD_TYPE_JOBJ 6
 
-extern CSSAnim * css_anim_table;
+extern CSSAnim * css_models;
 extern HSD_JObj * css_scene_root;
 extern CSSCursorData * css_hands[4];
 extern CSSCharModel * css_pucks[4];

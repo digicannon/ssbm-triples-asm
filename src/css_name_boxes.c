@@ -10,9 +10,9 @@
 
 void css_name_boxes() {
     int index = BOX_JOINT;
-    HSD_JObjDesc * box_desc = css_find_node(css_anim_table[ANIM_SCENE].desc[KIND_JOINT], KIND_JOINT, &index);
+    HSD_JObjDesc * box_desc = css_find_node(css_models[ANIM_SCENE].desc[KIND_JOINT], KIND_JOINT, &index);
     index = BOX_JOINT;
-    void * box_matanim = css_find_node(css_anim_table[ANIM_SCENE].desc[KIND_MATANIM], KIND_MATANIM, &index);
+    void * box_matanim = css_find_node(css_models[ANIM_SCENE].desc[KIND_MATANIM], KIND_MATANIM, &index);
 
     const HSD_JObj * bg0 = css_child(css_scene_root, BG_JOINT);
     f32 squeeze = bg0->scale[0];
@@ -22,7 +22,7 @@ void css_name_boxes() {
         int door = i < 4 ? i : 0;
         // Stock x of the door whose box this is.
         index = BG_JOINT + door;
-        const HSD_JObjDesc * bg = css_find_node(css_anim_table[ANIM_SCENE].desc[KIND_JOINT], KIND_JOINT, &index);
+        const HSD_JObjDesc * bg = css_find_node(css_models[ANIM_SCENE].desc[KIND_JOINT], KIND_JOINT, &index);
         HSD_JObj * box = HSD_JObjLoadJoint(box_desc);
         HSD_JObjAddAnimAll(box, NULL, box_matanim, NULL);
         HSD_JObjReqAnimAll(box, 0.0f);

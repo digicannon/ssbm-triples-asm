@@ -297,7 +297,7 @@ static void create_port(int port) {
 
     HSD_GObj * hand = GObj_Create(4, 5, 0x80);
     bk->cursor.gobj = hand;
-    const CSSAnim * hand_anim = &css_anim_table[ANIM_HAND];
+    const CSSAnim * hand_anim = &css_models[ANIM_HAND];
     HSD_JObj * hand_jobj = HSD_JObjLoadJoint(hand_anim->desc[0]);
     setup_model(hand, hand_jobj, hand_anim, 3);
     GObj_AddProc(hand, hand_think, 1);
@@ -305,7 +305,7 @@ static void create_port(int port) {
 
     HSD_GObj * puck = GObj_Create(4, 5, 0x80);
     bk->puck.gobj = puck;
-    const CSSAnim * puck_anim = &css_anim_table[ANIM_PUCK];
+    const CSSAnim * puck_anim = &css_models[ANIM_PUCK];
     HSD_JObj * puck_jobj = HSD_JObjLoadJoint(puck_anim->desc[0]);
     setup_model(puck, puck_jobj, puck_anim, 2);
     GObj_AddProc(puck, puck_think, 2);

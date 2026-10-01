@@ -80,7 +80,7 @@ static void free_tree(void * node, int kind) {
 // A copy of the scene's root of that kind whose only children are door 0's
 // pieces, in door_pieces order.  Only needed while loading; free_tree after.
 static void * build_tree(int kind) {
-    void * scene = css_anim_table[ANIM_SCENE].desc[kind];
+    void * scene = css_models[ANIM_SCENE].desc[kind];
     void * root = copy_node(scene, kind, false);
     void * prev = NULL;
     for (unsigned i = 0; i < sizeof(door_pieces) / sizeof(door_pieces[0]); ++i) {
@@ -105,7 +105,7 @@ static void * build_tree(int kind) {
 static void bind_plate(HSD_JObj * tree, int plate) {
     for (int i = 0; i < PLATE_JOINTS; ++i) {
         int index = PLATE_JOINT + i;
-        void * desc = css_find_node(css_anim_table[ANIM_SCENE].desc[KIND_JOINT], KIND_JOINT, &index);
+        void * desc = css_find_node(css_models[ANIM_SCENE].desc[KIND_JOINT], KIND_JOINT, &index);
         HSD_IDInsertToTable(NULL, desc, css_child(tree, plate + i));
     }
 }

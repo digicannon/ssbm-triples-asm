@@ -18,8 +18,8 @@
 
     # Only do anything for human player kind.
     mulli r3, r4, match_player_size
-    addis r3, r3, match_players @h
-    addi r3, r3, match_players @l
+    addis r3, r3, player_slots @h
+    addi r3, r3, player_slots @l
     lwz r3, match_player_ofst_kind(r3)
     cmpwi r3, PKIND_HUMAN
     bne return
